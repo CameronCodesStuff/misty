@@ -6,6 +6,16 @@
 <title>Misty — Your identity. Your space.</title>
 <meta name="description" content="Create a digital identity that feels completely yours.">
 <meta name="theme-color" content="#07070f">
+<script>
+  // Restores the real URL (e.g. /misty/@cameron) after the 404.html
+  // redirect trick encodes it as a query string. Must run before app.js.
+  (function(l){
+    if(l.search[1]==='/'){
+      var decoded = l.search.slice(1).split('&').map(function(s){return s.replace(/~and~/g,'&')}).join('?');
+      window.history.replaceState(null,null, l.pathname.slice(0,-1)+decoded+l.hash);
+    }
+  })(window.location);
+</script>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="logo.png">
 <meta property="og:title" content="Misty — Your identity. Your space.">

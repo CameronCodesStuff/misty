@@ -85,16 +85,22 @@ function initMist(){
     c:i%3===0?'167,139,250':i%3===1?'103,232,249':'244,114,182', a:.05+Math.random()*.05
   }));
 }
+let mistT = 0;
 function drawMist(){
+  mistT += 0.006;
   mctx.clearRect(0,0,mistCanvas.width,mistCanvas.height);
+  mctx.globalCompositeOperation = 'lighter';
   for(const b of blobs){
     b.x+=b.dx; b.y+=b.dy;
     if(b.x<-b.r) b.x=innerWidth+b.r; if(b.x>innerWidth+b.r) b.x=-b.r;
     if(b.y<-b.r) b.y=innerHeight+b.r; if(b.y>innerHeight+b.r) b.y=-b.r;
-    const g=mctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
-    g.addColorStop(0,`rgba(${b.c},${b.a})`); g.addColorStop(1,'rgba(0,0,0,0)');
-    mctx.fillStyle=g; mctx.beginPath(); mctx.arc(b.x,b.y,b.r,0,7); mctx.fill();
+    const pulse = 1 + Math.sin(mistT + b.x*0.002)*.08;
+    const r = b.r*pulse;
+    const g=mctx.createRadialGradient(b.x,b.y,0,b.x,b.y,r);
+    g.addColorStop(0,`rgba(${b.c},${b.a})`); g.addColorStop(.6,`rgba(${b.c},${b.a*.4})`); g.addColorStop(1,'rgba(0,0,0,0)');
+    mctx.fillStyle=g; mctx.beginPath(); mctx.arc(b.x,b.y,r,0,7); mctx.fill();
   }
+  mctx.globalCompositeOperation = 'source-over';
   requestAnimationFrame(drawMist);
 }
 initMist(); drawMist();
@@ -158,13 +164,46 @@ async function claimUsername(user, wanted){
   throw new Error('Could not claim a username');
 }
 
-function route(){ const h=location.hash.replace(/^#\/?/,''); return h||''; }
-addEventListener('hashchange', router);
+// --- Clean-path routing (no #) ---------------------------------------
+// BASE_PATH is the site's root folder (e.g. "/misty/"), figured out once
+// from whatever URL the page happened to load with. Everything after it
+// (e.g. "@cameron", "dashboard", "") is the route.
+const ROUTE_KEYWORDS = ['auth', 'dashboard', 'discover', 'admin'];
+function splitBaseAndRoute(pathname){
+  const parts = pathname.split('/');
+  const last = parts[parts.length - 1];
+  if(last === '') return { base: pathname, route: '' };
+  if(last.startsWith('@') || ROUTE_KEYWORDS.includes(last)){
+    parts.pop();
+    return { base: parts.join('/') + '/', route: last };
+  }
+  return { base: pathname.replace(/[^/]*$/, ''), route: last };
+}
+const BASE_PATH = splitBaseAndRoute(location.pathname).base;
+function route(){
+  let p = location.pathname;
+  if(p.startsWith(BASE_PATH)) p = p.slice(BASE_PATH.length);
+  return p.replace(/^\/+/, '').replace(/\/+$/, '');
+}
+function go(path){
+  path = String(path || '').replace(/^\/+/, '');
+  const url = BASE_PATH + path;
+  if(location.pathname + location.search !== url) history.pushState(null, '', url);
+  router();
+}
+window.go = go;
+addEventListener('popstate', router);
+
+addEventListener('scroll', ()=>{
+  const n = document.querySelector('nav');
+  if(n) n.classList.toggle('scrolled', scrollY>10);
+}, {passive:true});
 
 function router(){
   cursorFxOn = false;
   document.body.classList.remove('previewing');
   document.querySelectorAll('.public-page,.fab').forEach(e=>e.remove());
+  app.classList.remove('page-in'); void app.offsetWidth; app.classList.add('page-in');
   const r = route();
   if(r.startsWith('@')) return renderPublic(normUser(r.slice(1)));
   if(r==='auth') return renderAuth();
@@ -177,15 +216,15 @@ function router(){
 function navHTML(active){
   const user = ME && MYDOC;
   return `<nav><div class="wrap">
-    <div class="logo" onclick="location.hash=''"><img src="logo.png" alt="">MISTY</div>
+    <div class="logo" onclick="go('')"><img src="logo.png" alt="">MISTY</div>
     <div class="navlinks">
-      <button class="nl hidem ${active==='discover'?'on':''}" onclick="location.hash='#/discover'">Discover</button>
-      ${user? `<button class="nl ${active==='dash'?'on':''}" onclick="location.hash='#/dashboard'">Dashboard</button>
-        ${MYDOC?.role==='admin'? `<button class="nl ${active==='admin'?'on':''}" onclick="location.hash='#/admin'">Admin</button>`:''}
-        <button class="nl hidem" onclick="location.hash='#/@${MYDOC.username}'">My page</button>
-        <img class="avatar-mini" src="${esc(MYDOC.avatar||avatarFor(MYDOC.username))}" onclick="location.hash='#/dashboard'">`
-      : `<button class="nl" onclick="location.hash='#/auth'">Log in</button>
-        <button class="btn primary sm" onclick="location.hash='#/auth'">Create Your Misty</button>`}
+      <button class="nl hidem ${active==='discover'?'on':''}" onclick="go('discover')">Discover</button>
+      ${user? `<button class="nl ${active==='dash'?'on':''}" onclick="go('dashboard')">Dashboard</button>
+        ${MYDOC?.role==='admin'? `<button class="nl ${active==='admin'?'on':''}" onclick="go('admin')">Admin</button>`:''}
+        <button class="nl hidem" onclick="go('@${MYDOC.username}')">My page</button>
+        <img class="avatar-mini" src="${esc(MYDOC.avatar||avatarFor(MYDOC.username))}" onclick="go('dashboard')">`
+      : `<button class="nl" onclick="go('auth')">Log in</button>
+        <button class="btn primary sm" onclick="go('auth')">Create Your Misty</button>`}
     </div>
   </div></nav>`;
 }
@@ -210,8 +249,8 @@ function renderLanding(){
       <h1>Your identity.<br>Your space.<br><span class="gr">Your Misty.</span></h1>
       <p>Create a digital identity that feels completely yours. Animated backgrounds, living links, widgets, themes — one page that is unmistakably you.</p>
       <div class="cta">
-        <button class="btn primary" onclick="location.hash='#/auth'">Create Your Misty</button>
-        <button class="btn" onclick="location.hash='#/discover'">Explore Profiles</button>
+        <button class="btn primary" onclick="go('auth')">Create Your Misty</button>
+        <button class="btn" onclick="go('discover')">Explore Profiles</button>
       </div>
       <div class="claim glass">
         <span>misty.gg/</span>
@@ -223,18 +262,18 @@ function renderLanding(){
   <section class="land"><div class="wrap">
     <div class="sechead"><div class="eyebrow">// what you get</div><h2>Everything a link page wishes it was</h2></div>
     <div class="grid3">
-      <div class="feat glass"><span class="ic">🌫️</span><h3>Living backgrounds</h3><p>Drifting mist, animated auroras, nebulas, gradients, particles and full video backgrounds — your page breathes.</p></div>
-      <div class="feat glass"><span class="ic">🔗</span><h3>Links with presence</h3><p>Real brand icons, glass, outline or solid styles with glow, hover motion and per-link click tracking.</p></div>
-      <div class="feat glass"><span class="ic">🧩</span><h3>Widgets</h3><p>Drop in Spotify players, YouTube videos, Discord invites, images and text blocks.</p></div>
-      <div class="feat glass"><span class="ic">🎨</span><h3>Theme gallery</h3><p>Twelve full presets — six free, six animated Pro exclusives — then tune every color, font and effect.</p></div>
-      <div class="feat glass"><span class="ic">📊</span><h3>Real analytics</h3><p>Profile views, likes and click counts for every single link, updated live from Firestore.</p></div>
-      <div class="feat glass"><span class="ic">⚡</span><h3>Live editor</h3><p>Edit on the left, watch your actual page update instantly on the right. Autosaved as you type.</p></div>
+      <div class="feat glass reveal" style="transition-delay:.02s"><span class="ic">🌫️</span><h3>Living backgrounds</h3><p>Drifting mist, animated auroras, nebulas, gradients, particles and full video backgrounds — your page breathes.</p></div>
+      <div class="feat glass reveal" style="transition-delay:.08s"><span class="ic">🔗</span><h3>Links with presence</h3><p>Real brand icons, glass, outline or solid styles with glow, hover motion and per-link click tracking.</p></div>
+      <div class="feat glass reveal" style="transition-delay:.14s"><span class="ic">🧩</span><h3>Widgets</h3><p>Drop in Spotify players, YouTube videos, Discord invites, images and text blocks.</p></div>
+      <div class="feat glass reveal" style="transition-delay:.02s"><span class="ic">🎨</span><h3>Theme gallery</h3><p>Twelve full presets — six free, six animated Pro exclusives — then tune every color, font and effect.</p></div>
+      <div class="feat glass reveal" style="transition-delay:.08s"><span class="ic">📊</span><h3>Real analytics</h3><p>Profile views, likes and click counts for every single link, updated live from Firestore.</p></div>
+      <div class="feat glass reveal" style="transition-delay:.14s"><span class="ic">⚡</span><h3>Live editor</h3><p>Edit on the left, watch your actual page update instantly on the right. Autosaved as you type.</p></div>
     </div>
   </div></section>
   <section class="land"><div class="wrap">
     <div class="sechead"><div class="eyebrow">// theme showcase</div><h2>Start from a mood</h2><p>The ✦ themes are animated Pro exclusives.</p></div>
-    <div class="showcase">${PRESETS.map(p=>`
-      <div class="theme-mini" onclick="location.hash='#/auth'">
+    <div class="showcase">${PRESETS.map((p,i)=>`
+      <div class="theme-mini reveal" style="transition-delay:${(i%3)*.06}s" onclick="go('auth')">
         <div style="position:absolute;inset:0;${p.t.bgType==='anim'?'':p.t.bgType==='solid'?`background:${p.t.bgA}`:`background:linear-gradient(140deg,${p.t.bgA},${p.t.bgB})`}">
           ${p.t.bgType==='anim'?`<div class="pp-anim anim-${p.t.anim}" style="inset:0"></div>`:''}
         </div>
@@ -249,12 +288,12 @@ function renderLanding(){
   <section class="land"><div class="wrap">
     <div class="sechead"><div class="eyebrow">// pricing</div><h2>Free forever. Pro when you want more.</h2></div>
     <div class="pricing">
-      <div class="plan glass"><h3>Free</h3><div class="price">$0<small>/forever</small></div>
+      <div class="plan glass reveal"><h3>Free</h3><div class="price">$0<small>/forever</small></div>
         <ul><li>Your misty.gg page</li><li>Unlimited links</li><li>Six theme presets</li><li>Core effects & fonts</li><li>Views & click analytics</li></ul>
-        <button class="btn" style="width:100%" onclick="location.hash='#/auth'">Start free</button></div>
-      <div class="plan glass pro"><div class="tag">MISTY PRO</div><h3>Pro</h3><div class="price">$4<small>/month</small></div>
+        <button class="btn" style="width:100%" onclick="go('auth')">Start free</button></div>
+      <div class="plan glass pro reveal" style="transition-delay:.08s"><div class="tag">MISTY PRO</div><h3>Pro</h3><div class="price">$4<small>/month</small></div>
         <ul><li>Everything in Free</li><li>Six animated Pro themes</li><li>Video backgrounds</li><li>PRO badge on your page</li><li>Priority on Discover</li><li>Everything we ship next</li></ul>
-        <button class="btn primary" style="width:100%" onclick="location.hash='#/auth'">Go Pro</button></div>
+        <button class="btn primary" style="width:100%" onclick="go('auth')">Go Pro</button></div>
     </div>
   </div></section>
   <section class="land"><div class="wrap">
@@ -267,12 +306,13 @@ function renderLanding(){
     </div>
   </div></section>
   <footer><div class="wrap"><div class="logo"><img src="logo.png" alt="">MISTY</div>Made in the mist · © ${new Date().getFullYear()}</div></footer>`;
-  $('#claimBtn').onclick = ()=>{ const v=normUser($('#claimIn').value); if(v) sessionStorage.setItem('misty_uname', v); location.hash='#/auth'; };
+  $('#claimBtn').onclick = ()=>{ const v=normUser($('#claimIn').value); if(v) sessionStorage.setItem('misty_uname', v); go('auth'); };
   $('#claimIn').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#claimBtn').click(); });
+  observeReveals();
 }
 
 function renderAuth(mode='signup'){
-  if(ME && MYDOC){ location.hash='#/dashboard'; return; }
+  if(ME && MYDOC){ go('dashboard'); return; }
   const pending = sessionStorage.getItem('misty_uname')||'';
   app.innerHTML = navHTML('') + `<div class="wrap">
     <div class="authbox glass">
@@ -312,11 +352,11 @@ function renderAuth(mode='signup'){
         await signInWithEmailAndPassword(auth, em, pw);
         toast('Logged in','✨');
       }
-      location.hash='#/dashboard';
+      go('dashboard');
     }catch(e){ toast(cleanErr(e),'⚠️'); $('#aGo').disabled=false; }
   };
   $('#aGoogle').onclick = async ()=>{
-    try{ await signInWithPopup(auth, new GoogleAuthProvider()); location.hash='#/dashboard'; }
+    try{ await signInWithPopup(auth, new GoogleAuthProvider()); go('dashboard'); }
     catch(e){ if(!String(e.code).includes('popup-closed')) toast(cleanErr(e),'⚠️'); }
   };
 }
@@ -336,7 +376,7 @@ async function renderDashboard(){
         <span class="mono">misty.gg/${esc(MYDOC.username)}</span>
         <div style="display:flex;gap:14px;align-items:center">
           <span class="savestate"><span class="dot" id="saveDot"></span><span id="saveTxt">Saved</span></span>
-          <a href="#/@${esc(MYDOC.username)}" style="font-size:12px">Open ↗</a>
+          <a href="${BASE_PATH}@${esc(MYDOC.username)}" onclick="event.preventDefault();go('@${esc(MYDOC.username)}')" style="font-size:12px">Open ↗</a>
         </div>
       </div>
       <div class="preview-frame" id="previewFrame"></div>
@@ -366,6 +406,15 @@ function renderPreview(){
 }
 
 function field(lbl, html){ return `<label>${lbl}</label>${html}`; }
+
+function observeReveals(){
+  const els = document.querySelectorAll('.reveal:not(.in-view)');
+  if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in-view')); return; }
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in-view'); io.unobserve(en.target); } });
+  }, {threshold:.15, rootMargin:'0px 0px -40px 0px'});
+  els.forEach(e=>io.observe(e));
+}
 
 function renderEditorTab(){
   const body = $('#dBody'); const p = MYPROFILE; const t = p.theme;
@@ -496,14 +545,14 @@ function renderEditorTab(){
         <div class="stat glass"><div class="n mono" style="font-size:15px;padding-top:8px">@${esc(MYDOC.username)}</div><div class="l">Username</div></div>
       </div>
       ${!MYDOC.pro? `<button class="btn primary" id="goPro" style="width:100%">✦ Upgrade to Misty Pro</button>`:`<div class="empty" style="padding:16px">✦ You're a Pro. Thanks for supporting the mist.</div>`}
-      ${field('Share your page', `<div style="display:flex;gap:8px"><input readonly value="${location.origin+location.pathname}#/@${esc(MYDOC.username)}"><button class="btn sm" id="copyUrl">Copy</button></div>`)}
+      ${field('Share your page', `<div style="display:flex;gap:8px"><input readonly value="${location.origin+BASE_PATH}@${esc(MYDOC.username)}"><button class="btn sm" id="copyUrl">Copy</button></div>`)}
       <div style="display:flex;gap:10px;margin-top:26px">
         <button class="btn" id="logout" style="flex:1">Log out</button>
         <button class="btn danger" id="wipe" style="flex:1">Reset page</button>
       </div>`;
     const gp=$('#goPro'); if(gp) gp.onclick=()=>openProModal();
     $('#copyUrl').onclick = e=>{ navigator.clipboard.writeText(e.target.previousElementSibling.value); toast('Link copied','📋'); };
-    $('#logout').onclick = async ()=>{ await signOut(auth); location.hash=''; };
+    $('#logout').onclick = async ()=>{ await signOut(auth); go(''); };
     $('#wipe').onclick = ()=>{
       openModal(`<h3>Reset your page?</h3><div class="sub">This clears your links, widgets and theme. Your username stays yours.</div>
         <div style="display:flex;gap:10px;margin-top:20px"><button class="btn" id="mCancel" style="flex:1">Cancel</button><button class="btn danger" id="mYes" style="flex:1">Reset</button></div>`);
@@ -688,13 +737,21 @@ function wireProfileFx(root, p, opts={}){
   if(pc){
     const ctx = pc.getContext('2d');
     pc.width = pc.offsetWidth; pc.height = pc.offsetHeight;
-    const dots = Array.from({length:46},()=>({x:Math.random()*pc.width,y:Math.random()*pc.height,r:.6+Math.random()*1.8,s:.15+Math.random()*.45}));
+    const dots = Array.from({length:46},()=>({x:Math.random()*pc.width,y:Math.random()*pc.height,r:.6+Math.random()*1.8,s:.15+Math.random()*.45,tw:Math.random()*Math.PI*2}));
+    ctx.shadowColor = t.accent;
     (function loop(){
       if(!pc.isConnected) return;
       ctx.clearRect(0,0,pc.width,pc.height);
       ctx.fillStyle = t.accent;
-      for(const d of dots){ d.y -= d.s; if(d.y<-4){ d.y=pc.height+4; d.x=Math.random()*pc.width; } ctx.globalAlpha=.35; ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,7); ctx.fill(); }
-      ctx.globalAlpha=1;
+      for(const d of dots){
+        d.y -= d.s; d.tw += .03;
+        if(d.y<-4){ d.y=pc.height+4; d.x=Math.random()*pc.width; }
+        const twinkle = .5 + Math.sin(d.tw)*.35;
+        ctx.shadowBlur = d.r*4;
+        ctx.globalAlpha = .35 + twinkle*.3;
+        ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,7); ctx.fill();
+      }
+      ctx.globalAlpha=1; ctx.shadowBlur=0;
       requestAnimationFrame(loop);
     })();
   }
@@ -716,9 +773,9 @@ async function renderPublic(uname){
   document.body.appendChild(page);
   const snap = await getDoc(doc(db,'profiles',uname));
   if(!snap.exists()){
-    page.innerHTML = `<button class="pp-back" onclick="history.length>1?history.back():location.hash=''">← Back</button>
+    page.innerHTML = `<button class="pp-back" onclick="history.length>1?history.back():go('')">← Back</button>
       <div class="empty" style="padding-top:30vh"><span class="big">🌫️</span>This corner of the mist is empty.<br><br>
-      <button class="btn primary" onclick="document.querySelector('.public-page').remove();sessionStorage.setItem('misty_uname','${esc(uname)}');location.hash='#/auth'">Claim misty.gg/${esc(uname)}</button></div>`;
+      <button class="btn primary" onclick="document.querySelector('.public-page').remove();sessionStorage.setItem('misty_uname','${esc(uname)}');go('auth')">Claim misty.gg/${esc(uname)}</button></div>`;
     return;
   }
   const p = snap.data();
@@ -733,10 +790,10 @@ async function renderPublic(uname){
       updateDoc(doc(db,'profiles',uname),{views:increment(1)}).catch(()=>{});
     }
   }
-  page.innerHTML = `<button class="pp-back" onclick="history.length>1?history.back():location.hash=''">← misty</button>` + profileHTML(p,{liked});
+  page.innerHTML = `<button class="pp-back" onclick="history.length>1?history.back():go('')">← misty</button>` + profileHTML(p,{liked});
   wireProfileFx(page, p);
   page.querySelector('#ppShare').onclick = ()=>{
-    const url = location.origin+location.pathname+'#/@'+uname;
+    const url = location.origin+BASE_PATH+'@'+uname;
     if(navigator.share) navigator.share({title:`${p.displayName} on Misty`, url}).catch(()=>{});
     else { navigator.clipboard.writeText(url); toast('Link copied','📋'); }
   };
@@ -774,7 +831,7 @@ async function renderDiscover(){
     profs.sort((a,b)=> ( (b.badges?.includes('pro')?1e9:0)+(b.views||0) ) - ( (a.badges?.includes('pro')?1e9:0)+(a.views||0) ));
     $('#dgrid').innerHTML = profs.length? profs.map(p=>{
       const t = {...DEFAULT_THEME,...(p.theme||{})};
-      return `<div class="pcard glass" onclick="location.hash='#/@${esc(p.username)}'">
+      return `<div class="pcard glass" onclick="go('@${esc(p.username)}')">
         <div class="cb" style="${p.banner?`background-image:url('${esc(p.banner)}')`:`background:linear-gradient(120deg,${t.bgA||'#1e1b3a'},${t.bgB||'#0f2a3a'})`}"></div>
         <img class="cav" src="${esc(p.avatar||avatarFor(p.username))}" loading="lazy">
         <div class="cbody">
@@ -807,7 +864,7 @@ async function renderAdmin(){
       <div class="admin-row">
         <img src="${esc(u.avatar||avatarFor(u.username))}">
         <div class="flex1"><b>${esc(u.displayName||u.username)}</b> <span class="mono" style="color:var(--dim);font-size:11px">@${esc(u.username)}</span>${u.pro?' <span class="badge pro">✦</span>':''}${u.role==='admin'?' <span class="badge owner">ADMIN</span>':''}<div class="em">${esc(u.email||'')}</div></div>
-        <button class="btn sm" onclick="location.hash='#/@${esc(u.username)}'">View</button>
+        <button class="btn sm" onclick="go('@${esc(u.username)}')">View</button>
         <button class="btn sm ${u.banned?'':'danger'}" data-ban="${u._id}" data-now="${u.banned?1:0}">${u.banned?'Unban':'Ban'}</button>
       </div>`).join('');
     $('#adUsers').querySelectorAll('[data-ban]').forEach(b=>b.onclick=async ()=>{

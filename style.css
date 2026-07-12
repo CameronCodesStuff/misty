@@ -1153,6 +1153,89 @@ footer .logo{justify-content:center;margin-bottom:12px}
 .pp-stage[data-anim="holo"] .pp-link{background:rgba(10,10,20,.42)}
 .pp-stage[data-anim="holo"] .pp-widget{background:rgba(10,10,20,.42)}
 
+/* ---------- Extra polish: page transitions, shine, glow, atmosphere ---------- */
+
+#app.page-in{animation:pageIn .55s var(--ease)}
+@keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* Subtle rotating vignette + grain for a more cinematic, premium feel */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  opacity:.035;
+  background-image:radial-gradient(rgba(255,255,255,.9) 1px,transparent 1px);
+  background-size:3px 3px;
+  mix-blend-mode:overlay;
+}
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  background:radial-gradient(130% 90% at 50% -10%,transparent 45%,rgba(0,0,0,.4) 100%);
+  mix-blend-mode:multiply;
+}
+
+/* Nav gains presence once you scroll */
+nav{transition:background .35s,box-shadow .35s,border-color .35s}
+nav.scrolled{
+  background:rgba(6,6,13,.86);
+  box-shadow:0 10px 34px rgba(0,0,0,.4);
+  border-bottom-color:rgba(255,255,255,.13);
+}
+
+/* Shine sweep on links, matching the primary button treatment */
+.pp-link::after{
+  content:'';
+  position:absolute;
+  top:0;left:-60%;
+  width:40%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.2),transparent);
+  transform:skewX(-20deg);
+  transition:left .65s var(--ease);
+  pointer-events:none;
+}
+.pp-link:hover::after{left:130%}
+
+/* A soft rotating halo behind the Pro plan card */
+.plan.pro{position:relative}
+.plan.pro::before{
+  content:'';
+  position:absolute;
+  inset:-2px;
+  border-radius:inherit;
+  background:conic-gradient(from 0deg,var(--mist),var(--cyan),var(--rose),var(--mist));
+  opacity:.55;
+  z-index:-1;
+  filter:blur(16px);
+  animation:rotateGlow 7s linear infinite;
+}
+@keyframes rotateGlow{to{transform:rotate(360deg)}}
+
+/* Gentle idle glow pulse on public profile avatars, tuned to the theme accent */
+.pp-av{animation:avPulse 4.5s ease-in-out infinite}
+@keyframes avPulse{
+  0%,100%{box-shadow:0 0 26px rgba(0,0,0,.5)}
+  50%{box-shadow:0 0 40px var(--pa,rgba(167,139,250,.45))}
+}
+
+/* Scroll-reveal utility: elements fade + rise into view as you scroll */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.in-view{opacity:1;transform:translateY(0)}
+
+/* Discover / preset cards get a touch more life on hover */
+.pcard .cav{transition:transform .3s var(--ease)}
+.pcard:hover .cav{transform:scale(1.06)}
+.badge.pro{animation:badgeGlow 3s ease-in-out infinite}
+@keyframes badgeGlow{
+  0%,100%{box-shadow:0 0 12px rgba(167,139,250,.4)}
+  50%{box-shadow:0 0 20px rgba(103,232,249,.55)}
+}
+
 @media(max-width:1100px){
   .wrap{padding:0 18px}
   .dash{grid-template-columns:minmax(340px,420px) 1fr;gap:18px}

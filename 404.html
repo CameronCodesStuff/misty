@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Misty</title>
+<script>
+  // GitHub Pages only serves real files/folders — a clean link like
+  // /misty/@cameron has no matching file, so GH Pages serves this 404
+  // page instead. We encode the path into a query string and redirect
+  // to the real index.html, which decodes it back (see index.html).
+  // This is what makes clean, hash-free URLs possible on GH Pages.
+  //
+  // pathSegmentsToKeep = number of path segments that make up the
+  // site's base folder. For https://cameroncodesstuff.github.io/misty/
+  // that's 1 (the "misty" segment). Change to 0 if this is ever hosted
+  // at the domain root (e.g. a custom domain).
+  var pathSegmentsToKeep = 1;
+  var l = window.location;
+  l.replace(
+    l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+    l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+    l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+    (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+    l.hash
+  );
+</script>
+</head>
+<body></body>
+</html>
