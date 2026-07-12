@@ -1,1233 +1,824 @@
-:root{
-  --ink:#07070f;
-  --ink2:#0c0c18;
-  --ink3:#12121f;
-  --mist:#a78bfa;
-  --cyan:#67e8f9;
-  --rose:#f472b6;
-  --gold:#fbbf24;
-  --mint:#34d399;
-  --txt:#e7e7f2;
-  --dim:#8b8ba3;
-  --dimmer:#5b5b73;
-  --glass:rgba(255,255,255,.045);
-  --glass2:rgba(255,255,255,.07);
-  --line:rgba(255,255,255,.09);
-  --line2:rgba(255,255,255,.16);
-  --r:18px;
-  --r-sm:12px;
-  --r-lg:26px;
-  --shadow-lg:0 30px 80px rgba(0,0,0,.5);
-  --shadow-md:0 12px 40px rgba(0,0,0,.35);
-  --glow-mist:0 0 24px rgba(167,139,250,.35);
-  --glow-cyan:0 0 24px rgba(103,232,249,.35);
-  --ease:cubic-bezier(.22,.9,.3,1);
-  --nav-h:66px;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, getDocs, increment, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAr7vu7WVP2SqoE0za9kbPY7zw2J_gdMgg",
+  authDomain: "misty-14365.firebaseapp.com",
+  projectId: "misty-14365",
+  storageBucket: "misty-14365.firebasestorage.app",
+  messagingSenderId: "56752616090",
+  appId: "1:56752616090:web:65c559d16cb0fe74eb2523",
+  measurementId: "G-6FM7K718R8"
+};
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+const storage = getStorage(fbApp);
+
+const $ = s => document.querySelector(s);
+const app = $('#app');
+let ME = null, MYDOC = null, MYPROFILE = null, liveEditTab = 'profile';
+
+const FONTS = {sora:"'Sora',sans-serif", unbounded:"'Unbounded',sans-serif", orbitron:"'Orbitron',sans-serif", mono:"'JetBrains Mono',monospace", pixel:"'Press Start 2P',monospace", serif:"'Playfair Display',serif", cinzel:"'Cinzel',serif"};
+const FONT_NAMES = {sora:'Sora', unbounded:'Unbounded', orbitron:'Orbitron', mono:'Mono', pixel:'Pixel', serif:'Serif', cinzel:'Cinzel'};
+const ACCENTS = ['#a78bfa','#67e8f9','#f472b6','#34d399','#fbbf24','#fb7185','#60a5fa','#e879f9','#ffffff'];
+const EMOJIS = ['🔗','🌐','💻','🎮','🎵','📺','💬','⭐','🚀','💜','🔥','👾','🎨','📁','☕','💰','📧','🛒'];
+const BRANDS = {
+  github:'GitHub', youtube:'YouTube', twitch:'Twitch', discord:'Discord', x:'X',
+  instagram:'Instagram', tiktok:'TikTok', spotify:'Spotify', soundcloud:'SoundCloud',
+  steam:'Steam', reddit:'Reddit', telegram:'Telegram', whatsapp:'WhatsApp',
+  snapchat:'Snapchat', pinterest:'Pinterest', patreon:'Patreon', kofi:'Ko-fi',
+  paypal:'PayPal', kick:'Kick', roblox:'Roblox'
+};
+const BRAND_MATCH = [
+  ['github.com','github'],['youtu','youtube'],['twitch.tv','twitch'],['discord','discord'],
+  ['twitter.com','x'],['x.com','x'],['instagram.com','instagram'],['tiktok.com','tiktok'],
+  ['spotify.com','spotify'],['soundcloud.com','soundcloud'],['steam','steam'],
+  ['reddit.com','reddit'],['t.me','telegram'],['telegram','telegram'],['wa.me','whatsapp'],
+  ['whatsapp','whatsapp'],['snapchat','snapchat'],['pinterest','pinterest'],
+  ['patreon','patreon'],['ko-fi','kofi'],['paypal','paypal'],['kick.com','kick'],['roblox','roblox']
+];
+
+const PRESETS = [
+  {name:'Violet Mist', pro:false, t:{preset:'Violet Mist',bgType:'mist',bgA:'#a78bfa',bgB:'#67e8f9',accent:'#a78bfa',font:'sora',btnStyle:'glass',glow:true,particles:false,cursorFx:false,textColor:'#e7e7f2',radius:16}},
+  {name:'Cyber Night', pro:false, t:{preset:'Cyber Night',bgType:'gradient',bgA:'#0f0524',bgB:'#003344',accent:'#67e8f9',font:'orbitron',btnStyle:'outline',glow:true,particles:true,cursorFx:false,textColor:'#d6faff',radius:8}},
+  {name:'Rose Static', pro:false, t:{preset:'Rose Static',bgType:'gradient',bgA:'#1a0512',bgB:'#2b0a2e',accent:'#f472b6',font:'unbounded',btnStyle:'glass',glow:true,particles:false,cursorFx:true,textColor:'#ffe4f1',radius:22}},
+  {name:'Terminal', pro:false, t:{preset:'Terminal',bgType:'solid',bgA:'#050805',bgB:'#050805',accent:'#34d399',font:'mono',btnStyle:'outline',glow:true,particles:false,cursorFx:false,textColor:'#c6f6d5',radius:4}},
+  {name:'Arcade', pro:false, t:{preset:'Arcade',bgType:'gradient',bgA:'#12002e',bgB:'#000000',accent:'#fbbf24',font:'pixel',btnStyle:'solid',glow:false,particles:true,cursorFx:false,textColor:'#fff7d6',radius:0}},
+  {name:'Ivory Ghost', pro:false, t:{preset:'Ivory Ghost',bgType:'gradient',bgA:'#101018',bgB:'#1c1c28',accent:'#ffffff',font:'serif',btnStyle:'outline',glow:false,particles:false,cursorFx:false,textColor:'#f5f5fa',radius:14}},
+  {name:'Aurora Veil', pro:true, t:{preset:'Aurora Veil',bgType:'anim',anim:'aurora',bgA:'#04221c',bgB:'#0b1030',accent:'#34d399',font:'sora',btnStyle:'glass',glow:true,particles:false,cursorFx:true,textColor:'#e8fff7',radius:18}},
+  {name:'Nebula Drift', pro:true, t:{preset:'Nebula Drift',bgType:'anim',anim:'nebula',bgA:'#1c0b3a',bgB:'#3a0b2e',accent:'#e879f9',font:'unbounded',btnStyle:'glass',glow:true,particles:false,cursorFx:true,textColor:'#f7e9ff',radius:20}},
+  {name:'Holo Chrome', pro:true, t:{preset:'Holo Chrome',bgType:'anim',anim:'holo',bgA:'#241a3a',bgB:'#0d2a33',accent:'#ffffff',font:'orbitron',btnStyle:'outline',glow:true,particles:false,cursorFx:true,textColor:'#ffffff',radius:14}},
+  {name:'Midnight Gold', pro:true, t:{preset:'Midnight Gold',bgType:'anim',anim:'gold',bgA:'#0c0803',bgB:'#2a1c05',accent:'#fbbf24',font:'cinzel',btnStyle:'outline',glow:true,particles:false,cursorFx:false,textColor:'#fdf3d7',radius:10}},
+  {name:'Ember Rift', pro:true, t:{preset:'Ember Rift',bgType:'anim',anim:'ember',bgA:'#160308',bgB:'#3a0d10',accent:'#fb7185',font:'unbounded',btnStyle:'glass',glow:true,particles:false,cursorFx:true,textColor:'#ffe8e4',radius:16}},
+  {name:'Deep Current', pro:true, t:{preset:'Deep Current',bgType:'anim',anim:'ocean',bgA:'#02131f',bgB:'#0a2a4a',accent:'#38bdf8',font:'sora',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#e2f6ff',radius:18}}
+];
+const DEFAULT_THEME = JSON.parse(JSON.stringify(PRESETS[0].t));
+
+function toast(msg, icon='✨'){ const t=document.createElement('div'); t.className='toast'; t.innerHTML=`<span>${icon}</span><span>${esc(msg)}</span>`; $('#toasts').appendChild(t); setTimeout(()=>{t.style.opacity='0';t.style.transition='.4s';setTimeout(()=>t.remove(),400)},2600); }
+function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function debounce(fn,ms){ let t; return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}; }
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function safeUrl(u){ u=String(u||'').trim(); if(!u) return ''; if(!/^https?:\/\//i.test(u)) u='https://'+u; try{ const p=new URL(u); return (p.protocol==='http:'||p.protocol==='https:')?p.href:''; }catch{ return ''; } }
+function normUser(u){ return String(u||'').toLowerCase().replace(/[^a-z0-9_]/g,'').slice(0,20); }
+function num(n){ n=n||0; return n>999999?(n/1e6).toFixed(1)+'M':n>999?(n/1e3).toFixed(1)+'K':String(n); }
+function detectBrand(url){ try{ const h=new URL(safeUrl(url)).hostname.toLowerCase()+new URL(safeUrl(url)).pathname.toLowerCase(); for(const [k,slug] of BRAND_MATCH) if(h.includes(k)) return slug; }catch{} return ''; }
+function brandImg(slug,color){ return `<img src="https://cdn.simpleicons.org/${slug}/${color.replace('#','')}" alt="${esc(BRANDS[slug]||slug)}" loading="lazy" onerror="this.style.display='none'">`; }
+function iconHTML(icon, t){
+  if(BRANDS[icon]){
+    const c = t.btnStyle==='solid' ? '0a0a14' : (t.accent==='#ffffff' ? 'ffffff' : t.accent.replace('#',''));
+    return brandImg(icon, c);
+  }
+  return esc(icon||'🔗');
 }
 
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{
-  background:var(--ink);
-  color:var(--txt);
-  font-family:'Sora',sans-serif;
-  overflow-x:hidden;
-  min-height:100vh;
-  min-height:100dvh;
-  -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;
+const mistCanvas = $('#mistbg');
+const mctx = mistCanvas.getContext('2d');
+let blobs = [];
+function initMist(){
+  mistCanvas.width = innerWidth; mistCanvas.height = innerHeight;
+  blobs = Array.from({length:6},(_, i)=>({
+    x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+    r:200+Math.random()*260, dx:(Math.random()-.5)*.28, dy:(Math.random()-.5)*.28,
+    c:i%3===0?'167,139,250':i%3===1?'103,232,249':'244,114,182', a:.05+Math.random()*.05
+  }));
 }
-::selection{background:var(--mist);color:var(--ink)}
-::-webkit-scrollbar{width:9px;height:9px}
-::-webkit-scrollbar-track{background:var(--ink)}
-::-webkit-scrollbar-thumb{background:#26263c;border-radius:9px;border:2px solid var(--ink)}
-::-webkit-scrollbar-thumb:hover{background:#34345a}
-
-#mistbg{position:fixed;inset:0;z-index:0;pointer-events:none}
-#app{position:relative;z-index:1;min-height:100vh;min-height:100dvh}
-.wrap{max-width:1140px;margin:0 auto;padding:0 22px}
-
-h1,h2,h3,.display{font-family:'Unbounded',sans-serif}
-.mono{font-family:'JetBrains Mono',monospace}
-a{color:var(--cyan);text-decoration:none;transition:color .2s}
-a:hover{color:#a5f3ff}
-img{max-width:100%}
-button{font-family:inherit;cursor:pointer;color:inherit}
-
-:focus{outline:none}
-:focus-visible{outline:2px solid var(--mist);outline-offset:2px;border-radius:6px}
-
-input,textarea,select{
-  font-family:inherit;
-  width:100%;
-  background:rgba(255,255,255,.05);
-  border:1px solid var(--line);
-  border-radius:var(--r-sm);
-  padding:11px 14px;
-  color:var(--txt);
-  font-size:14px;
-  outline:none;
-  transition:border-color .2s,box-shadow .2s,background .2s;
-  appearance:none;
-  -webkit-appearance:none;
+function drawMist(){
+  mctx.clearRect(0,0,mistCanvas.width,mistCanvas.height);
+  for(const b of blobs){
+    b.x+=b.dx; b.y+=b.dy;
+    if(b.x<-b.r) b.x=innerWidth+b.r; if(b.x>innerWidth+b.r) b.x=-b.r;
+    if(b.y<-b.r) b.y=innerHeight+b.r; if(b.y>innerHeight+b.r) b.y=-b.r;
+    const g=mctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
+    g.addColorStop(0,`rgba(${b.c},${b.a})`); g.addColorStop(1,'rgba(0,0,0,0)');
+    mctx.fillStyle=g; mctx.beginPath(); mctx.arc(b.x,b.y,b.r,0,7); mctx.fill();
+  }
+  requestAnimationFrame(drawMist);
 }
-input:hover,textarea:hover{border-color:var(--line2)}
-input:focus,textarea:focus,select:focus{
-  border-color:var(--mist);
-  box-shadow:0 0 0 3px rgba(167,139,250,.15);
-  background:rgba(255,255,255,.07);
-}
-input::placeholder,textarea::placeholder{color:var(--dimmer)}
-input[type="color"]{padding:4px;height:44px;cursor:pointer}
-input[type="color"]::-webkit-color-swatch-wrapper{padding:2px}
-input[type="color"]::-webkit-color-swatch{border:none;border-radius:8px}
-input[type="range"]{padding:0;height:32px;background:none;border:none;box-shadow:none;accent-color:var(--mist);cursor:grab}
-input[type="range"]:active{cursor:grabbing}
-textarea{resize:vertical;min-height:70px;line-height:1.6}
-select option{background:var(--ink2);color:var(--txt)}
+initMist(); drawMist();
+addEventListener('resize', initMist);
 
-label{
-  display:block;
-  font-size:11.5px;
-  color:var(--dim);
-  margin:16px 0 7px;
-  letter-spacing:.6px;
-  text-transform:uppercase;
-  font-weight:600;
-}
+let cursorFxOn = false;
+addEventListener('mousemove', e=>{
+  if(!cursorFxOn || Math.random()>.35) return;
+  const d=document.createElement('div'); d.className='cursor-dot';
+  d.style.left=(e.clientX-4)+'px'; d.style.top=(e.clientY-4)+'px';
+  d.style.background = window.__curAccent || '#a78bfa';
+  d.style.boxShadow = `0 0 10px ${window.__curAccent||'#a78bfa'}`;
+  document.body.appendChild(d);
+  setTimeout(()=>{d.style.opacity='0'},50); setTimeout(()=>d.remove(),700);
+});
 
-.btn{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  justify-content:center;
-  border-radius:14px;
-  padding:13px 24px;
-  font-size:14px;
-  font-weight:600;
-  transition:transform .25s var(--ease),background .25s,box-shadow .25s,border-color .25s,opacity .25s;
-  background:rgba(255,255,255,.07);
-  color:var(--txt);
-  border:1px solid var(--line);
-  user-select:none;
-  white-space:nowrap;
-}
-.btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.12);border-color:var(--line2)}
-.btn:active{transform:translateY(0) scale(.98)}
-.btn.primary{
-  background:linear-gradient(120deg,var(--mist),var(--cyan));
-  color:#0a0a14;
-  border:none;
-  box-shadow:var(--glow-mist);
-  position:relative;
-  overflow:hidden;
-}
-.btn.primary::after{
-  content:'';
-  position:absolute;
-  top:0;left:-80%;
-  width:60%;height:100%;
-  background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);
-  transform:skewX(-20deg);
-  transition:left .6s var(--ease);
-}
-.btn.primary:hover::after{left:130%}
-.btn.primary:hover{box-shadow:0 0 40px rgba(103,232,249,.5)}
-.btn.danger{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.4);color:#fda4af}
-.btn.danger:hover{background:rgba(244,63,94,.22);box-shadow:0 0 18px rgba(244,63,94,.25)}
-.btn.ghost{background:transparent}
-.btn.sm{padding:8px 14px;font-size:12px;border-radius:10px}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
-.btn:disabled::after{display:none}
+onAuthStateChanged(auth, async user=>{
+  ME = user;
+  if(user){
+    const uref = doc(db,'users',user.uid);
+    let snap = await getDoc(uref);
+    if(!snap.exists()){
+      const pending = sessionStorage.getItem('misty_uname');
+      await claimUsername(user, normUser(pending || (user.email||'user').split('@')[0]));
+      snap = await getDoc(uref);
+    }
+    MYDOC = snap.exists()? snap.data(): null;
+    if(MYDOC?.username){
+      const ps = await getDoc(doc(db,'profiles',MYDOC.username));
+      MYPROFILE = ps.exists()? ps.data(): null;
+    }
+  } else { MYDOC=null; MYPROFILE=null; }
+  router();
+});
 
-.glass{
-  background:var(--glass);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  border:1px solid var(--line);
-  border-radius:var(--r);
+async function claimUsername(user, wanted){
+  let uname = normUser(wanted) || 'user'+uid().slice(0,4);
+  for(let i=0;i<5;i++){
+    const test = i===0? uname : uname+Math.floor(Math.random()*999);
+    try{
+      await runTransaction(db, async tx=>{
+        const unameRef = doc(db,'usernames',test);
+        const ex = await tx.get(unameRef);
+        if(ex.exists()) throw new Error('taken');
+        tx.set(unameRef,{uid:user.uid});
+        tx.set(doc(db,'users',user.uid),{
+          username:test, displayName:user.displayName||test, email:user.email||'',
+          avatar:user.photoURL||'', bio:'', pro:false, role:'user', banned:false, createdAt:serverTimestamp()
+        });
+        tx.set(doc(db,'profiles',test),{
+          owner:user.uid, username:test, displayName:user.displayName||test,
+          avatar:user.photoURL||'', banner:'', bio:'Just arrived in the mist.', status:'',
+          badges:['og'], theme:DEFAULT_THEME, links:[], widgets:[],
+          views:0, likes:0, createdAt:serverTimestamp()
+        });
+      });
+      sessionStorage.removeItem('misty_uname');
+      return test;
+    }catch(e){ if(e.message!=='taken') throw e; }
+  }
+  throw new Error('Could not claim a username');
 }
 
-nav{
-  position:sticky;
-  top:0;
-  z-index:50;
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  background:rgba(7,7,15,.62);
-  border-bottom:1px solid var(--line);
-}
-nav .wrap{display:flex;align-items:center;justify-content:space-between;height:var(--nav-h);gap:12px}
-.logo{
-  font-family:'Unbounded',sans-serif;
-  font-weight:800;
-  font-size:19px;
-  letter-spacing:1.5px;
-  background:linear-gradient(120deg,#8ab8ff,var(--cyan) 50%,var(--mist));
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  user-select:none;
-  flex-shrink:0;
-}
-.logo img{
-  width:36px;height:36px;
-  object-fit:contain;
-  filter:drop-shadow(0 0 10px rgba(103,232,249,.55));
-  animation:logoFloat 5s ease-in-out infinite;
-}
-@keyframes logoFloat{
-  0%,100%{transform:translateY(0) scale(1);filter:drop-shadow(0 0 8px rgba(103,232,249,.45))}
-  50%{transform:translateY(-2px) scale(1.04);filter:drop-shadow(0 0 16px rgba(167,139,250,.7))}
-}
-.navlinks{display:flex;gap:6px;align-items:center;min-width:0}
-.navlinks .nl{
-  padding:9px 15px;
-  border-radius:11px;
-  font-size:13.5px;
-  color:var(--dim);
-  transition:.2s;
-  background:none;
-  border:none;
-  white-space:nowrap;
-}
-.navlinks .nl:hover{color:var(--txt);background:rgba(255,255,255,.06)}
-.navlinks .nl.on{color:var(--txt);background:rgba(167,139,250,.14)}
-.avatar-mini{
-  width:34px;height:34px;
-  border-radius:50%;
-  object-fit:cover;
-  border:2px solid var(--mist);
-  cursor:pointer;
-  transition:.25s;
-  flex-shrink:0;
-}
-.avatar-mini:hover{box-shadow:0 0 14px rgba(167,139,250,.6);transform:scale(1.06)}
+function route(){ const h=location.hash.replace(/^#\/?/,''); return h||''; }
+addEventListener('hashchange', router);
 
-.hero{
-  min-height:calc(100vh - var(--nav-h));
-  min-height:calc(100dvh - var(--nav-h));
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  text-align:center;
-  padding:70px 0;
-  position:relative;
-}
-.hero-logo{
-  width:120px;height:120px;
-  margin:0 auto 8px;
-  object-fit:contain;
-  filter:drop-shadow(0 0 30px rgba(103,232,249,.5));
-  animation:heroLogo 6s ease-in-out infinite;
-}
-@keyframes heroLogo{
-  0%,100%{transform:translateY(0) rotate(-1.5deg);filter:drop-shadow(0 0 24px rgba(103,232,249,.45))}
-  50%{transform:translateY(-10px) rotate(1.5deg);filter:drop-shadow(0 0 44px rgba(167,139,250,.75))}
-}
-.hero h1{
-  font-size:clamp(36px,7vw,82px);
-  font-weight:800;
-  line-height:1.06;
-  letter-spacing:-1px;
-  animation:riseIn .8s var(--ease) both;
-}
-.hero h1 .gr{
-  background:linear-gradient(110deg,var(--mist) 10%,var(--cyan) 55%,var(--rose) 100%);
-  background-size:200% 100%;
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  filter:drop-shadow(0 0 30px rgba(167,139,250,.4));
-  animation:grShift 7s ease-in-out infinite;
-}
-@keyframes grShift{0%,100%{background-position:0% 0}50%{background-position:100% 0}}
-@keyframes riseIn{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
-.hero p{
-  color:var(--dim);
-  font-size:clamp(15px,2vw,19px);
-  margin:24px auto 38px;
-  max-width:560px;
-  line-height:1.7;
-  animation:riseIn .8s .12s var(--ease) both;
-}
-.hero .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:riseIn .8s .22s var(--ease) both}
-.eyebrow{
-  font-family:'JetBrains Mono',monospace;
-  font-size:11px;
-  letter-spacing:3px;
-  color:var(--cyan);
-  text-transform:uppercase;
-  margin-bottom:14px;
-}
-.claim{
-  display:flex;
-  max-width:460px;
-  margin:44px auto 0;
-  background:rgba(255,255,255,.05);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:6px;
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-  animation:riseIn .8s .32s var(--ease) both;
-  transition:border-color .25s,box-shadow .25s;
-}
-.claim:focus-within{border-color:var(--mist);box-shadow:0 0 26px rgba(167,139,250,.2)}
-.claim span{display:flex;align-items:center;padding:0 2px 0 16px;color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:14px}
-.claim input{border:none;background:none;box-shadow:none;padding:12px 4px;min-width:0}
-.claim input:focus{box-shadow:none;background:none}
-.claim .btn{border-radius:11px;flex-shrink:0}
-
-section.land{padding:90px 0;position:relative}
-.sechead{text-align:center;margin-bottom:54px}
-.sechead h2{font-size:clamp(25px,4vw,42px);font-weight:600;letter-spacing:-.5px}
-.sechead p{color:var(--dim);margin-top:12px;font-size:15px}
-
-.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
-.feat{
-  padding:30px;
-  transition:transform .3s var(--ease),border-color .3s,box-shadow .3s;
-  position:relative;
-  overflow:hidden;
-}
-.feat::before{
-  content:'';
-  position:absolute;
-  top:-60px;right:-60px;
-  width:140px;height:140px;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(167,139,250,.14),transparent 70%);
-  opacity:0;
-  transition:opacity .4s;
-}
-.feat:hover{transform:translateY(-5px);border-color:rgba(167,139,250,.4);box-shadow:0 12px 40px rgba(167,139,250,.12)}
-.feat:hover::before{opacity:1}
-.feat .ic{font-size:30px;margin-bottom:16px;display:block;filter:drop-shadow(0 0 12px rgba(103,232,249,.5))}
-.feat h3{font-size:17px;font-weight:600;margin-bottom:10px}
-.feat p{color:var(--dim);font-size:14px;line-height:1.7}
-
-.pricing{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:24px;max-width:780px;margin:0 auto}
-.plan{padding:36px;position:relative;transition:transform .3s var(--ease),box-shadow .3s}
-.plan:hover{transform:translateY(-4px)}
-.plan.pro{border-color:rgba(167,139,250,.5);box-shadow:0 0 60px rgba(167,139,250,.15)}
-.plan.pro:hover{box-shadow:0 0 80px rgba(167,139,250,.25)}
-.plan .tag{
-  position:absolute;
-  top:-13px;left:50%;
-  transform:translateX(-50%);
-  background:linear-gradient(120deg,var(--mist),var(--cyan));
-  color:#0a0a14;
-  font-size:11px;
-  font-weight:700;
-  padding:5px 16px;
-  border-radius:99px;
-  letter-spacing:1px;
-  box-shadow:0 0 18px rgba(167,139,250,.5);
-}
-.plan h3{font-size:22px}
-.plan .price{font-family:'Unbounded',sans-serif;font-size:40px;margin:18px 0 6px}
-.plan .price small{font-size:14px;color:var(--dim);font-family:'Sora',sans-serif}
-.plan ul{list-style:none;margin:24px 0 30px}
-.plan li{
-  padding:9px 0;
-  color:var(--dim);
-  font-size:14px;
-  border-bottom:1px dashed rgba(255,255,255,.06);
-  display:flex;
-  gap:10px;
-  align-items:baseline;
-}
-.plan li::before{content:'✦';color:var(--cyan);font-size:11px}
-
-.faq{max-width:720px;margin:0 auto}
-.faq details{border-bottom:1px solid var(--line);padding:20px 4px;transition:background .2s}
-.faq details:hover{background:rgba(255,255,255,.015)}
-.faq summary{
-  cursor:pointer;
-  font-weight:600;
-  font-size:15.5px;
-  list-style:none;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:14px;
-}
-.faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:'+';font-size:22px;color:var(--mist);transition:transform .25s var(--ease);flex-shrink:0}
-.faq details[open] summary::after{transform:rotate(45deg)}
-.faq details p{color:var(--dim);font-size:14px;line-height:1.75;margin-top:14px;animation:riseIn .3s var(--ease)}
-
-footer{border-top:1px solid var(--line);padding:44px 0;text-align:center;color:var(--dim);font-size:13px}
-footer .logo{justify-content:center;margin-bottom:12px}
-
-.authbox{max-width:420px;margin:7vh auto;padding:40px;animation:riseIn .5s var(--ease)}
-.authbox h2{font-size:24px;margin-bottom:6px}
-.authbox .sub{color:var(--dim);font-size:14px;margin-bottom:22px}
-.authbox .userfield{
-  display:flex;
-  align-items:center;
-  background:rgba(255,255,255,.05);
-  border:1px solid var(--line);
-  border-radius:var(--r-sm);
-  padding:0 0 0 14px;
-  transition:border-color .2s,box-shadow .2s;
-}
-.authbox .userfield:focus-within{border-color:var(--mist);box-shadow:0 0 0 3px rgba(167,139,250,.15)}
-.authbox .userfield span{color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:13px;white-space:nowrap}
-.authbox .userfield input{border:none;background:none;box-shadow:none}
-.divide{display:flex;align-items:center;gap:14px;color:var(--dim);font-size:12px;margin:20px 0}
-.divide::before,.divide::after{content:'';flex:1;height:1px;background:var(--line)}
-.switchmode{text-align:center;margin-top:20px;font-size:13px;color:var(--dim)}
-.switchmode a{cursor:pointer}
-
-.dash{
-  display:grid;
-  grid-template-columns:minmax(360px,480px) 1fr;
-  gap:24px;
-  padding:26px 0 60px;
-  align-items:start;
-}
-.panel{padding:24px}
-.tabs{
-  display:flex;
-  gap:4px;
-  flex-wrap:wrap;
-  margin-bottom:20px;
-  background:rgba(255,255,255,.04);
-  padding:5px;
-  border-radius:14px;
-}
-.tabs button{
-  flex:1;
-  border:none;
-  background:none;
-  color:var(--dim);
-  padding:9px 6px;
-  border-radius:10px;
-  font-size:12.5px;
-  font-weight:600;
-  transition:.2s;
-  min-width:66px;
-}
-.tabs button:hover{color:var(--txt)}
-.tabs button.on{
-  background:rgba(167,139,250,.18);
-  color:var(--txt);
-  box-shadow:0 0 14px rgba(167,139,250,.15);
+function router(){
+  cursorFxOn = false;
+  document.body.classList.remove('previewing');
+  document.querySelectorAll('.public-page,.fab').forEach(e=>e.remove());
+  const r = route();
+  if(r.startsWith('@')) return renderPublic(normUser(r.slice(1)));
+  if(r==='auth') return renderAuth();
+  if(r==='dashboard') return ME? renderDashboard(): renderAuth();
+  if(r==='discover') return renderDiscover();
+  if(r==='admin') return renderAdmin();
+  renderLanding();
 }
 
-.preview-shell{position:sticky;top:calc(var(--nav-h) + 20px)}
-.preview-frame{
-  border-radius:var(--r-lg);
-  overflow:hidden;
-  border:1px solid var(--line);
-  height:calc(100vh - 180px);
-  height:calc(100dvh - 180px);
-  min-height:520px;
-  position:relative;
-  box-shadow:var(--shadow-lg);
+function navHTML(active){
+  const user = ME && MYDOC;
+  return `<nav><div class="wrap">
+    <div class="logo" onclick="location.hash=''"><img src="logo.png" alt="">MISTY</div>
+    <div class="navlinks">
+      <button class="nl hidem ${active==='discover'?'on':''}" onclick="location.hash='#/discover'">Discover</button>
+      ${user? `<button class="nl ${active==='dash'?'on':''}" onclick="location.hash='#/dashboard'">Dashboard</button>
+        ${MYDOC?.role==='admin'? `<button class="nl ${active==='admin'?'on':''}" onclick="location.hash='#/admin'">Admin</button>`:''}
+        <button class="nl hidem" onclick="location.hash='#/@${MYDOC.username}'">My page</button>
+        <img class="avatar-mini" src="${esc(MYDOC.avatar||avatarFor(MYDOC.username))}" onclick="location.hash='#/dashboard'">`
+      : `<button class="nl" onclick="location.hash='#/auth'">Log in</button>
+        <button class="btn primary sm" onclick="location.hash='#/auth'">Create Your Misty</button>`}
+    </div>
+  </div></nav>`;
 }
-.preview-bar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:12px;
-  font-size:12px;
-  color:var(--dim);
-  gap:10px;
-}
-.savestate{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.savestate .dot{width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399;transition:.3s}
-.savestate .dot.saving{background:#fbbf24;box-shadow:0 0 10px #fbbf24;animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+function avatarFor(name){ return `https://api.dicebear.com/9.x/shapes/svg?seed=${encodeURIComponent(name||'misty')}`; }
 
-.swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.sw{
-  width:36px;height:36px;
-  border-radius:11px;
-  cursor:pointer;
-  border:2px solid transparent;
-  transition:transform .2s var(--ease),border-color .2s,box-shadow .2s;
-}
-.sw:hover{transform:scale(1.1)}
-.sw.on{border-color:#fff;transform:scale(1.14);box-shadow:0 0 14px rgba(255,255,255,.3)}
-
-.optrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.opt{
-  padding:9px 15px;
-  border-radius:11px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.04);
-  color:var(--dim);
-  font-size:12.5px;
-  cursor:pointer;
-  transition:.2s;
-  font-weight:600;
-}
-.opt:hover{color:var(--txt);border-color:var(--line2)}
-.opt.on{
-  border-color:var(--mist);
-  color:var(--txt);
-  background:rgba(167,139,250,.15);
-  box-shadow:0 0 12px rgba(167,139,250,.2);
+function miniThemeInner(p){
+  const t = p.t;
+  const bg = t.bgType==='anim'? '' : t.bgType==='solid'? `background:${t.bgA}` : t.bgType==='mist'? `background:radial-gradient(120% 90% at 20% 10%,${t.bgA}33,transparent 60%),radial-gradient(110% 90% at 85% 85%,${t.bgB}2e,transparent 60%),#0a0a14` : `background:linear-gradient(140deg,${t.bgA},${t.bgB})`;
+  const animLayer = t.bgType==='anim'? `<div class="pp-anim anim-${t.anim}" style="inset:0"></div>`:'';
+  const linkStyle = (r)=>`border-radius:${Math.min(t.radius,12)}px;${t.btnStyle==='solid'?`background:${t.accent}`:t.btnStyle==='outline'?`border:1.5px solid ${t.accent}`:`background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15)`};${t.glow?`box-shadow:0 0 10px ${t.accent}55`:''}`;
+  return `<div style="position:absolute;inset:0;${bg}">${animLayer}</div>
+    <div class="pv-user" style="font-family:${FONTS[t.font]};color:${t.textColor}">username</div>
+    <div class="pv-links"><i style="${linkStyle()}"></i><i style="${linkStyle()}"></i><i style="${linkStyle()}"></i></div>`;
 }
 
-.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
-.preset-card{
-  height:118px;
-  border-radius:16px;
-  position:relative;
-  overflow:hidden;
-  cursor:pointer;
-  border:2px solid var(--line);
-  transition:transform .25s var(--ease),border-color .25s,box-shadow .25s;
-  background:#0a0a14;
-}
-.preset-card:hover{transform:translateY(-3px);border-color:var(--line2);box-shadow:var(--shadow-md)}
-.preset-card.on{
-  border-color:var(--cyan);
-  box-shadow:0 0 0 3px rgba(103,232,249,.2),0 0 26px rgba(103,232,249,.3);
-}
-.preset-card.on::after{
-  content:'✓';
-  position:absolute;
-  top:8px;right:8px;
-  width:22px;height:22px;
-  border-radius:50%;
-  background:var(--cyan);
-  color:#0a0a14;
-  font-size:13px;
-  font-weight:800;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 0 12px rgba(103,232,249,.6);
-  z-index:4;
-}
-.preset-card .pv-name{
-  position:absolute;
-  bottom:8px;left:10px;
-  font-size:11px;
-  font-weight:700;
-  background:rgba(0,0,0,.45);
-  backdrop-filter:blur(8px);
-  padding:4px 11px;
-  border-radius:99px;
-  z-index:3;
-  display:flex;
-  gap:6px;
-  align-items:center;
-}
-.preset-card .pv-links{
-  position:absolute;
-  top:38px;left:16px;right:16px;
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  z-index:2;
-}
-.preset-card .pv-links i{display:block;height:16px}
-.preset-card .pv-user{
-  position:absolute;
-  top:12px;left:0;right:0;
-  text-align:center;
-  font-size:11px;
-  z-index:2;
-}
-.preset-card .pv-lock{
-  position:absolute;
-  inset:0;
-  background:rgba(5,5,12,.55);
-  backdrop-filter:blur(2px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:20px;
-  z-index:5;
-  opacity:1;
-  transition:.25s;
-}
-.preset-card:hover .pv-lock{background:rgba(5,5,12,.35)}
-
-.linkitem{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  padding:14px;
-  background:rgba(255,255,255,.04);
-  border:1px solid var(--line);
-  border-radius:14px;
-  margin-bottom:10px;
-  transition:border-color .2s,background .2s;
-}
-.linkitem:hover{border-color:var(--line2);background:rgba(255,255,255,.06)}
-.linkitem .lic{width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
-.linkitem .lic img{width:22px;height:22px;object-fit:contain}
-.linkitem .info{flex:1;min-width:0}
-.linkitem .info b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.linkitem .info span{font-size:11.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.iconbtns{display:flex;gap:5px;flex-shrink:0}
-.iconbtns button{
-  width:32px;height:32px;
-  border-radius:9px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.05);
-  color:var(--dim);
-  font-size:13px;
-  transition:.2s;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.iconbtns button:hover{color:var(--txt);border-color:var(--mist);background:rgba(167,139,250,.12)}
-
-.brandgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px;margin-top:8px}
-.brand{
-  aspect-ratio:1;
-  border-radius:12px;
-  border:1.5px solid var(--line);
-  background:rgba(255,255,255,.04);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  transition:.2s;
-  font-size:19px;
-}
-.brand img{width:22px;height:22px;object-fit:contain;opacity:.85}
-.brand:hover{border-color:var(--line2);transform:translateY(-2px)}
-.brand.on{border-color:var(--cyan);background:rgba(103,232,249,.12);box-shadow:0 0 12px rgba(103,232,249,.25)}
-.brand.on img{opacity:1}
-
-.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-.stat{padding:20px;text-align:center;transition:transform .25s var(--ease)}
-.stat:hover{transform:translateY(-2px)}
-.stat .n{
-  font-family:'Unbounded',sans-serif;
-  font-size:27px;
-  background:linear-gradient(120deg,var(--mist),var(--cyan));
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-}
-.stat .l{font-size:11px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-top:6px}
-.bar{height:8px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:8px}
-.bar i{
-  display:block;
-  height:100%;
-  border-radius:99px;
-  background:linear-gradient(90deg,var(--mist),var(--cyan));
-  box-shadow:0 0 10px rgba(103,232,249,.4);
-  transition:width .8s var(--ease);
+function renderLanding(){
+  app.innerHTML = navHTML('') + `
+  <div class="wrap">
+    <div class="hero">
+      <img class="hero-logo" src="logo.png" alt="Misty">
+      <div class="eyebrow">// digital identity, reimagined</div>
+      <h1>Your identity.<br>Your space.<br><span class="gr">Your Misty.</span></h1>
+      <p>Create a digital identity that feels completely yours. Animated backgrounds, living links, widgets, themes — one page that is unmistakably you.</p>
+      <div class="cta">
+        <button class="btn primary" onclick="location.hash='#/auth'">Create Your Misty</button>
+        <button class="btn" onclick="location.hash='#/discover'">Explore Profiles</button>
+      </div>
+      <div class="claim glass">
+        <span>misty.gg/</span>
+        <input id="claimIn" placeholder="yourname" maxlength="20" spellcheck="false" autocomplete="off">
+        <button class="btn primary sm" id="claimBtn">Claim</button>
+      </div>
+    </div>
+  </div>
+  <section class="land"><div class="wrap">
+    <div class="sechead"><div class="eyebrow">// what you get</div><h2>Everything a link page wishes it was</h2></div>
+    <div class="grid3">
+      <div class="feat glass"><span class="ic">🌫️</span><h3>Living backgrounds</h3><p>Drifting mist, animated auroras, nebulas, gradients, particles and full video backgrounds — your page breathes.</p></div>
+      <div class="feat glass"><span class="ic">🔗</span><h3>Links with presence</h3><p>Real brand icons, glass, outline or solid styles with glow, hover motion and per-link click tracking.</p></div>
+      <div class="feat glass"><span class="ic">🧩</span><h3>Widgets</h3><p>Drop in Spotify players, YouTube videos, Discord invites, images and text blocks.</p></div>
+      <div class="feat glass"><span class="ic">🎨</span><h3>Theme gallery</h3><p>Twelve full presets — six free, six animated Pro exclusives — then tune every color, font and effect.</p></div>
+      <div class="feat glass"><span class="ic">📊</span><h3>Real analytics</h3><p>Profile views, likes and click counts for every single link, updated live from Firestore.</p></div>
+      <div class="feat glass"><span class="ic">⚡</span><h3>Live editor</h3><p>Edit on the left, watch your actual page update instantly on the right. Autosaved as you type.</p></div>
+    </div>
+  </div></section>
+  <section class="land"><div class="wrap">
+    <div class="sechead"><div class="eyebrow">// theme showcase</div><h2>Start from a mood</h2><p>The ✦ themes are animated Pro exclusives.</p></div>
+    <div class="showcase">${PRESETS.map(p=>`
+      <div class="theme-mini" onclick="location.hash='#/auth'">
+        <div style="position:absolute;inset:0;${p.t.bgType==='anim'?'':p.t.bgType==='solid'?`background:${p.t.bgA}`:`background:linear-gradient(140deg,${p.t.bgA},${p.t.bgB})`}">
+          ${p.t.bgType==='anim'?`<div class="pp-anim anim-${p.t.anim}" style="inset:0"></div>`:''}
+        </div>
+        <div class="tuser" style="font-family:${FONTS[p.t.font]};color:${p.t.textColor}">username</div>
+        <div class="tlinks">
+          ${[1,2,3].map(()=>`<i style="border-radius:${Math.min(p.t.radius,13)}px;${p.t.btnStyle==='solid'?`background:${p.t.accent}`:p.t.btnStyle==='outline'?`border:1.5px solid ${p.t.accent}`:`background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15)`};${p.t.glow?`box-shadow:0 0 12px ${p.t.accent}44`:''}"></i>`).join('')}
+        </div>
+        <div class="tlabel">${p.pro?'✦ ':''}${p.name}</div>
+      </div>`).join('')}
+    </div>
+  </div></section>
+  <section class="land"><div class="wrap">
+    <div class="sechead"><div class="eyebrow">// pricing</div><h2>Free forever. Pro when you want more.</h2></div>
+    <div class="pricing">
+      <div class="plan glass"><h3>Free</h3><div class="price">$0<small>/forever</small></div>
+        <ul><li>Your misty.gg page</li><li>Unlimited links</li><li>Six theme presets</li><li>Core effects & fonts</li><li>Views & click analytics</li></ul>
+        <button class="btn" style="width:100%" onclick="location.hash='#/auth'">Start free</button></div>
+      <div class="plan glass pro"><div class="tag">MISTY PRO</div><h3>Pro</h3><div class="price">$4<small>/month</small></div>
+        <ul><li>Everything in Free</li><li>Six animated Pro themes</li><li>Video backgrounds</li><li>PRO badge on your page</li><li>Priority on Discover</li><li>Everything we ship next</li></ul>
+        <button class="btn primary" style="width:100%" onclick="location.hash='#/auth'">Go Pro</button></div>
+    </div>
+  </div></section>
+  <section class="land"><div class="wrap">
+    <div class="sechead"><div class="eyebrow">// faq</div><h2>Questions</h2></div>
+    <div class="faq">
+      <details><summary>What is Misty?</summary><p>Misty is a customizable profile page — one link that holds your socials, projects, music and personality. Think link-in-bio, but alive.</p></details>
+      <details><summary>Is it really free?</summary><p>Yes. Free accounts get a full page with unlimited links, themes and analytics. Pro unlocks the animated themes and video backgrounds.</p></details>
+      <details><summary>Can I change my look later?</summary><p>Any time. The dashboard has a live editor — every change previews instantly and saves automatically.</p></details>
+      <details><summary>Do I own my page?</summary><p>Your username is yours from the moment you claim it. You can edit or wipe your page whenever you like.</p></details>
+    </div>
+  </div></section>
+  <footer><div class="wrap"><div class="logo"><img src="logo.png" alt="">MISTY</div>Made in the mist · © ${new Date().getFullYear()}</div></footer>`;
+  $('#claimBtn').onclick = ()=>{ const v=normUser($('#claimIn').value); if(v) sessionStorage.setItem('misty_uname', v); location.hash='#/auth'; };
+  $('#claimIn').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#claimBtn').click(); });
 }
 
-.toastwrap{
-  position:fixed;
-  bottom:24px;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:200;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  align-items:center;
-  pointer-events:none;
-  width:max-content;
-  max-width:92vw;
+function renderAuth(mode='signup'){
+  if(ME && MYDOC){ location.hash='#/dashboard'; return; }
+  const pending = sessionStorage.getItem('misty_uname')||'';
+  app.innerHTML = navHTML('') + `<div class="wrap">
+    <div class="authbox glass">
+      <h2>${mode==='signup'?'Create your Misty':'Welcome back'}</h2>
+      <div class="sub">${mode==='signup'?'Claim your corner of the mist.':'The mist remembers you.'}</div>
+      ${mode==='signup'?`<label>Username</label>
+      <div class="userfield">
+        <span>misty.gg/</span>
+        <input id="aUser" value="${esc(pending)}" placeholder="yourname" maxlength="20" spellcheck="false" autocomplete="off">
+      </div>`:''}
+      <label>Email</label><input id="aEmail" type="email" placeholder="you@somewhere.com" autocomplete="email">
+      <label>Password</label><input id="aPass" type="password" placeholder="••••••••" autocomplete="${mode==='signup'?'new-password':'current-password'}">
+      <button class="btn primary" id="aGo" style="width:100%;margin-top:22px">${mode==='signup'?'Create account':'Log in'}</button>
+      <div class="divide">or</div>
+      <button class="btn" id="aGoogle" style="width:100%">🔮 Continue with Google</button>
+      <div class="switchmode">${mode==='signup'?`Already have a page? <a id="aSwap">Log in</a>`:`New here? <a id="aSwap">Create your Misty</a> · <a id="aForgot">Forgot password</a>`}</div>
+    </div></div>`;
+  $('#aSwap').onclick = ()=>renderAuth(mode==='signup'?'login':'signup');
+  const forgot = $('#aForgot'); if(forgot) forgot.onclick = async ()=>{
+    const em = $('#aEmail').value.trim(); if(!em) return toast('Enter your email first','📧');
+    try{ await sendPasswordResetEmail(auth, em); toast('Reset email sent','📧'); }catch(e){ toast(cleanErr(e),'⚠️'); }
+  };
+  $('#aGo').onclick = async ()=>{
+    const em=$('#aEmail').value.trim(), pw=$('#aPass').value;
+    if(!em||!pw) return toast('Email and password required','⚠️');
+    $('#aGo').disabled = true;
+    try{
+      if(mode==='signup'){
+        const un = normUser($('#aUser').value);
+        if(!un || un.length<3){ $('#aGo').disabled=false; return toast('Username needs 3+ characters','⚠️'); }
+        const taken = await getDoc(doc(db,'usernames',un));
+        if(taken.exists()){ $('#aGo').disabled=false; return toast('That username is taken','😔'); }
+        sessionStorage.setItem('misty_uname', un);
+        await createUserWithEmailAndPassword(auth, em, pw);
+        toast('Welcome to the mist','🌫️');
+      } else {
+        await signInWithEmailAndPassword(auth, em, pw);
+        toast('Logged in','✨');
+      }
+      location.hash='#/dashboard';
+    }catch(e){ toast(cleanErr(e),'⚠️'); $('#aGo').disabled=false; }
+  };
+  $('#aGoogle').onclick = async ()=>{
+    try{ await signInWithPopup(auth, new GoogleAuthProvider()); location.hash='#/dashboard'; }
+    catch(e){ if(!String(e.code).includes('popup-closed')) toast(cleanErr(e),'⚠️'); }
+  };
 }
-.toast{
-  background:rgba(15,15,28,.92);
-  border:1px solid var(--line);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  padding:13px 22px;
-  border-radius:14px;
-  font-size:13.5px;
-  box-shadow:0 10px 40px rgba(0,0,0,.5);
-  animation:toastIn .3s var(--ease);
-  display:flex;
-  gap:10px;
-  align-items:center;
-  max-width:92vw;
-}
-@keyframes toastIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+function cleanErr(e){ return String(e.code||e.message||e).replace('auth/','').replace(/-/g,' '); }
 
-.modal-veil{
-  position:fixed;
-  inset:0;
-  background:rgba(4,4,10,.72);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-  z-index:120;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  animation:veilIn .25s;
-}
-@keyframes veilIn{from{opacity:0}to{opacity:1}}
-.modal{
-  max-width:460px;
-  width:100%;
-  padding:32px;
-  max-height:88vh;
-  max-height:88dvh;
-  overflow-y:auto;
-  animation:modalIn .3s var(--ease);
-}
-@keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-.modal h3{font-size:19px;margin-bottom:8px}
-.modal .sub{color:var(--dim);font-size:13.5px;margin-bottom:8px;line-height:1.6}
-
-.discover-head{padding:44px 0 30px}
-.discover-head h2{font-size:clamp(24px,4vw,36px)}
-.discover-head p{color:var(--dim);margin-top:10px;font-size:14px}
-.discover-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
-  gap:18px;
-  padding-bottom:70px;
-}
-.pcard{
-  overflow:hidden;
-  cursor:pointer;
-  transition:transform .3s var(--ease),box-shadow .3s,border-color .3s;
-  position:relative;
-}
-.pcard:hover{
-  transform:translateY(-6px);
-  box-shadow:0 18px 50px rgba(167,139,250,.18);
-  border-color:rgba(167,139,250,.45);
-}
-.pcard .cb{height:80px;background:linear-gradient(120deg,#1e1b3a,#0f2a3a);background-size:cover;background-position:center}
-.pcard .cav{
-  width:60px;height:60px;
-  border-radius:50%;
-  object-fit:cover;
-  border:3px solid var(--ink);
-  margin:-32px auto 0;
-  display:block;
-  position:relative;
-  background:#1a1a2e;
-}
-.pcard .cbody{padding:12px 16px 18px;text-align:center}
-.pcard .cbody b{font-size:15px}
-.pcard .cbody .u{color:var(--dim);font-size:12px;font-family:'JetBrains Mono',monospace;margin-top:2px}
-.pcard .cstats{display:flex;justify-content:center;gap:16px;margin-top:10px;font-size:11.5px;color:var(--dim)}
-
-.badge{
-  display:inline-flex;
-  align-items:center;
-  gap:4px;
-  font-size:10px;
-  font-weight:700;
-  padding:3px 9px;
-  border-radius:99px;
-  letter-spacing:.6px;
-  text-transform:uppercase;
-  vertical-align:middle;
-}
-.badge.pro{background:linear-gradient(120deg,var(--mist),var(--cyan));color:#0a0a14;box-shadow:0 0 12px rgba(167,139,250,.4)}
-.badge.owner{background:rgba(244,114,182,.2);color:var(--rose);border:1px solid rgba(244,114,182,.4)}
-.badge.og{background:rgba(103,232,249,.15);color:var(--cyan);border:1px solid rgba(103,232,249,.35)}
-
-.admin-row{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:13px 16px;
-  border-bottom:1px solid rgba(255,255,255,.05);
-  font-size:13.5px;
-  flex-wrap:wrap;
-}
-.admin-row img{width:32px;height:32px;border-radius:50%;object-fit:cover}
-.admin-row .flex1{flex:1;min-width:140px}
-.admin-row .em{color:var(--dim);font-size:11.5px}
-
-.filedrop{
-  border:1.5px dashed var(--line);
-  border-radius:14px;
-  padding:18px;
-  text-align:center;
-  color:var(--dim);
-  font-size:12.5px;
-  cursor:pointer;
-  transition:.2s;
-  margin-top:8px;
-}
-.filedrop:hover{border-color:var(--mist);color:var(--txt);background:rgba(167,139,250,.05)}
-
-.spin{
-  width:38px;height:38px;
-  border:3px solid rgba(255,255,255,.1);
-  border-top-color:var(--mist);
-  border-radius:50%;
-  animation:sp 1s linear infinite;
-  margin:80px auto;
-}
-@keyframes sp{to{transform:rotate(360deg)}}
-
-.empty{text-align:center;color:var(--dim);padding:50px 20px;font-size:14px;line-height:1.8}
-.empty .big{font-size:40px;display:block;margin-bottom:14px;filter:grayscale(.4)}
-
-.chip{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(255,255,255,.06);
-  border:1px solid var(--line);
-  border-radius:12px;
-  width:40px;height:40px;
-  font-size:17px;
-  color:var(--dim);
-  margin:3px 3px 0 0;
-  cursor:pointer;
-  transition:.2s;
-}
-.chip:hover{border-color:var(--line2);transform:translateY(-2px)}
-.chip.on{border-color:var(--cyan);background:rgba(103,232,249,.12);box-shadow:0 0 10px rgba(103,232,249,.25)}
-
-.cursor-dot{
-  position:fixed;
-  width:9px;height:9px;
-  border-radius:50%;
-  pointer-events:none;
-  z-index:300;
-  opacity:.8;
-  transition:opacity .6s;
+async function renderDashboard(){
+  if(!MYDOC || !MYPROFILE){ app.innerHTML = navHTML('dash')+`<div class="spin"></div>`; return; }
+  app.innerHTML = navHTML('dash') + `<div class="wrap"><div class="dash">
+    <div class="panel glass">
+      <div class="tabs" id="dTabs">
+        ${['profile','looks','links','widgets','stats','account'].map(t=>`<button data-t="${t}" class="${liveEditTab===t?'on':''}">${{profile:'Profile',looks:'Looks',links:'Links',widgets:'Widgets',stats:'Stats',account:'Account'}[t]}</button>`).join('')}
+      </div>
+      <div id="dBody"></div>
+    </div>
+    <div class="preview-shell">
+      <div class="preview-bar">
+        <span class="mono">misty.gg/${esc(MYDOC.username)}</span>
+        <div style="display:flex;gap:14px;align-items:center">
+          <span class="savestate"><span class="dot" id="saveDot"></span><span id="saveTxt">Saved</span></span>
+          <a href="#/@${esc(MYDOC.username)}" style="font-size:12px">Open ↗</a>
+        </div>
+      </div>
+      <div class="preview-frame" id="previewFrame"></div>
+    </div>
+  </div></div>`;
+  const fab = document.createElement('button');
+  fab.className='fab'; fab.id='pvFab'; fab.textContent='👁';
+  fab.onclick = ()=>{ const on=document.body.classList.toggle('previewing'); fab.textContent=on?'✎':'👁'; };
+  document.body.appendChild(fab);
+  $('#dTabs').querySelectorAll('button').forEach(b=> b.onclick=()=>{ liveEditTab=b.dataset.t; renderDashboard(); });
+  renderEditorTab();
+  renderPreview();
 }
 
-.showcase{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;max-width:1000px;margin:0 auto}
-.theme-mini{
-  height:190px;
-  border-radius:20px;
-  position:relative;
-  overflow:hidden;
-  cursor:pointer;
-  border:1px solid var(--line);
-  transition:transform .3s var(--ease),box-shadow .3s;
-  background:#0a0a14;
-}
-.theme-mini:hover{transform:translateY(-5px) rotate(-.5deg);box-shadow:0 16px 44px rgba(0,0,0,.4)}
-.theme-mini .tlabel{
-  position:absolute;
-  bottom:12px;left:14px;
-  font-size:12px;
-  font-weight:700;
-  background:rgba(0,0,0,.4);
-  backdrop-filter:blur(8px);
-  padding:5px 13px;
-  border-radius:99px;
-  z-index:3;
-  display:flex;
-  gap:6px;
-  align-items:center;
-}
-.theme-mini .tuser{position:absolute;top:18px;left:0;right:0;text-align:center;font-size:14px;z-index:2}
-.theme-mini .tlinks{position:absolute;top:52px;left:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:2}
-.theme-mini .tlinks i{display:block;height:26px}
+function markSaving(){ $('#saveDot')?.classList.add('saving'); if($('#saveTxt')) $('#saveTxt').textContent='Saving…'; }
+function markSaved(){ $('#saveDot')?.classList.remove('saving'); if($('#saveTxt')) $('#saveTxt').textContent='Saved'; }
+const pushProfile = debounce(async ()=>{
+  try{ await updateDoc(doc(db,'profiles',MYDOC.username), MYPROFILE); markSaved(); }
+  catch(e){ toast('Save failed: '+cleanErr(e),'⚠️'); }
+}, 700);
+function saveProfile(){ markSaving(); renderPreview(); pushProfile(); }
 
-.fab{
-  position:fixed;
-  right:18px;
-  bottom:calc(18px + env(safe-area-inset-bottom,0px));
-  z-index:90;
-  width:56px;height:56px;
-  border-radius:50%;
-  border:none;
-  background:linear-gradient(120deg,var(--mist),var(--cyan));
-  color:#0a0a14;
-  font-size:22px;
-  box-shadow:0 10px 30px rgba(167,139,250,.45);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  transition:transform .25s var(--ease);
-}
-.fab:active{transform:scale(.92)}
-
-.pp-stage{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
-.pp-bg{position:absolute;inset:0;z-index:0;overflow:hidden}
-.pp-bg video,.pp-bg img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-.pp-content{
-  position:relative;
-  z-index:2;
-  max-width:560px;
-  margin:0 auto;
-  padding:0 20px calc(60px + env(safe-area-inset-bottom,0px));
-  min-height:100%;
-}
-.pp-banner{
-  height:150px;
-  border-radius:0 0 24px 24px;
-  background-size:cover;
-  background-position:center;
-  margin:0 -20px;
-}
-.pp-head{text-align:center;margin-top:-46px;animation:riseIn .6s var(--ease) both}
-.pp-av{
-  width:96px;height:96px;
-  border-radius:50%;
-  object-fit:cover;
-  border:4px solid rgba(255,255,255,.15);
-  box-shadow:0 0 30px rgba(0,0,0,.5);
-  background:#141428;
-}
-.pp-name{font-size:24px;font-weight:700;margin-top:12px;display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
-.pp-user{font-size:13px;opacity:.65;font-family:'JetBrains Mono',monospace;margin-top:2px}
-.pp-status{
-  display:inline-block;
-  margin-top:10px;
-  font-size:12.5px;
-  padding:6px 16px;
-  border-radius:99px;
-  background:rgba(255,255,255,.09);
-  backdrop-filter:blur(8px);
-}
-.pp-bio{margin-top:16px;font-size:14px;line-height:1.7;opacity:.85;white-space:pre-wrap}
-.pp-links{margin-top:28px;display:flex;flex-direction:column;gap:12px}
-.pp-link{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  padding:15px 18px;
-  border-radius:var(--pr,16px);
-  background:rgba(255,255,255,.08);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,.12);
-  color:inherit;
-  transition:transform .25s var(--ease),box-shadow .25s,background .25s;
-  position:relative;
-  overflow:hidden;
-  animation:riseIn .5s var(--ease) both;
-}
-.pp-link:nth-child(1){animation-delay:.05s}
-.pp-link:nth-child(2){animation-delay:.1s}
-.pp-link:nth-child(3){animation-delay:.15s}
-.pp-link:nth-child(4){animation-delay:.2s}
-.pp-link:nth-child(5){animation-delay:.25s}
-.pp-link:nth-child(6){animation-delay:.3s}
-.pp-link:nth-child(n+7){animation-delay:.35s}
-.pp-link:hover{transform:translateY(-3px) scale(1.015)}
-.pp-link.glow:hover{box-shadow:0 0 26px var(--pa,#a78bfa)}
-.pp-link.outline{background:transparent;border:1.5px solid var(--pa,#a78bfa)}
-.pp-link.solid{background:var(--pa,#a78bfa);color:#0a0a14;border:none}
-.pp-link .li{font-size:22px;width:32px;text-align:center;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.pp-link .li img{width:24px;height:24px;object-fit:contain}
-.pp-link .lt{flex:1;min-width:0}
-.pp-link .lt b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pp-link .lt span{font-size:11.5px;opacity:.65;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pp-link .arrow{opacity:.5;flex-shrink:0;transition:transform .25s var(--ease)}
-.pp-link:hover .arrow{transform:translate(2px,-2px)}
-.pp-widgets{margin-top:26px;display:flex;flex-direction:column;gap:16px}
-.pp-widget{
-  border-radius:18px;
-  overflow:hidden;
-  background:rgba(255,255,255,.07);
-  backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,.1);
-  animation:riseIn .5s .3s var(--ease) both;
-}
-.pp-widget iframe{display:block;width:100%;border:none}
-.pp-widget .wtext{padding:18px;font-size:14px;line-height:1.7;white-space:pre-wrap}
-.pp-widget img{width:100%;display:block}
-.pp-actions{display:flex;justify-content:center;gap:12px;margin-top:34px}
-.pp-actions button{
-  background:rgba(255,255,255,.09);
-  border:1px solid rgba(255,255,255,.14);
-  color:inherit;
-  padding:10px 20px;
-  border-radius:99px;
-  font-size:13px;
-  backdrop-filter:blur(10px);
-  transition:.2s;
-  display:flex;
-  gap:7px;
-  align-items:center;
-}
-.pp-actions button:hover{transform:scale(1.06)}
-.pp-actions button.liked{background:rgba(244,114,182,.25);border-color:#f472b6}
-.pp-foot{
-  text-align:center;
-  margin-top:40px;
-  font-size:11px;
-  opacity:.45;
-  font-family:'JetBrains Mono',monospace;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-}
-.pp-foot img{width:16px;height:16px;object-fit:contain;opacity:.8}
-.pp-views{
-  position:absolute;
-  top:14px;right:16px;
-  z-index:5;
-  font-size:11px;
-  font-family:'JetBrains Mono',monospace;
-  background:rgba(0,0,0,.35);
-  backdrop-filter:blur(8px);
-  padding:5px 12px;
-  border-radius:99px;
-  opacity:.85;
-}
-.public-page{position:fixed;inset:0;z-index:60;background:var(--ink)}
-.public-page .pp-back{
-  position:absolute;
-  top:calc(14px + env(safe-area-inset-top,0px));
-  left:16px;
-  z-index:5;
-  background:rgba(0,0,0,.35);
-  backdrop-filter:blur(8px);
-  border:none;
-  color:#fff;
-  padding:8px 16px;
-  border-radius:99px;
-  font-size:12px;
-  cursor:pointer;
-  transition:.2s;
-}
-.public-page .pp-back:hover{background:rgba(0,0,0,.55)}
-
-.pp-anim{position:absolute;inset:-20%;z-index:0;pointer-events:none}
-
-.anim-aurora{
-  background:
-    radial-gradient(60% 45% at 18% 18%,rgba(52,211,153,.34),transparent 68%),
-    radial-gradient(55% 50% at 82% 26%,rgba(103,232,249,.3),transparent 66%),
-    radial-gradient(65% 55% at 50% 88%,rgba(167,139,250,.32),transparent 70%),
-    linear-gradient(180deg,#02100e,#040414 60%,#02060f);
-  filter:blur(6px) saturate(1.25);
-  animation:auroraDrift 16s ease-in-out infinite alternate;
-}
-@keyframes auroraDrift{
-  0%{transform:translate(0,0) scale(1) rotate(0deg)}
-  33%{transform:translate(-3%,2%) scale(1.06) rotate(1.2deg)}
-  66%{transform:translate(3%,-2%) scale(1.03) rotate(-1.2deg)}
-  100%{transform:translate(-2%,3%) scale(1.08) rotate(.6deg)}
-}
-.anim-aurora::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  background:radial-gradient(38% 30% at 65% 60%,rgba(52,211,153,.22),transparent 70%);
-  animation:auroraPulse 7s ease-in-out infinite alternate;
-}
-@keyframes auroraPulse{from{opacity:.4;transform:translateY(0)}to{opacity:1;transform:translateY(-4%)}}
-
-.anim-nebula{
-  background:
-    radial-gradient(42% 38% at 28% 30%,rgba(232,121,249,.4),transparent 70%),
-    radial-gradient(48% 44% at 74% 62%,rgba(129,90,246,.42),transparent 70%),
-    radial-gradient(30% 26% at 58% 22%,rgba(244,114,182,.3),transparent 72%),
-    radial-gradient(24% 22% at 40% 76%,rgba(103,232,249,.24),transparent 72%),
-    #050214;
-  filter:blur(10px) saturate(1.35);
-  animation:nebulaSpin 40s linear infinite;
-}
-@keyframes nebulaSpin{from{transform:rotate(0deg) scale(1.18)}to{transform:rotate(360deg) scale(1.18)}}
-.anim-nebula::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  background-image:
-    radial-gradient(1.6px 1.6px at 12% 24%,rgba(255,255,255,.9),transparent 60%),
-    radial-gradient(1.2px 1.2px at 34% 68%,rgba(255,255,255,.7),transparent 60%),
-    radial-gradient(1.8px 1.8px at 58% 14%,rgba(255,255,255,.85),transparent 60%),
-    radial-gradient(1.2px 1.2px at 72% 44%,rgba(255,255,255,.65),transparent 60%),
-    radial-gradient(1.5px 1.5px at 86% 78%,rgba(255,255,255,.8),transparent 60%),
-    radial-gradient(1.1px 1.1px at 22% 88%,rgba(255,255,255,.6),transparent 60%),
-    radial-gradient(1.4px 1.4px at 46% 40%,rgba(255,255,255,.75),transparent 60%),
-    radial-gradient(1.2px 1.2px at 64% 92%,rgba(255,255,255,.6),transparent 60%),
-    radial-gradient(1.7px 1.7px at 92% 18%,rgba(255,255,255,.85),transparent 60%);
-  filter:blur(0);
-  animation:starTwinkle 5s ease-in-out infinite alternate;
-}
-@keyframes starTwinkle{from{opacity:.5}to{opacity:1}}
-
-.anim-holo{
-  background:conic-gradient(from 0deg at 50% 50%,
-    #ff7ad9,#ffd36e,#7affc9,#6ec3ff,#b78bff,#ff7ad9);
-  filter:blur(60px) saturate(1.15) brightness(.62);
-  animation:holoSpin 22s linear infinite;
-}
-@keyframes holoSpin{from{transform:rotate(0deg) scale(1.35)}to{transform:rotate(360deg) scale(1.35)}}
-.anim-holo::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  background:radial-gradient(circle at 50% 50%,transparent 30%,rgba(2,2,10,.72) 78%);
+function renderPreview(){
+  const f = $('#previewFrame'); if(!f) return;
+  f.innerHTML = profileHTML(MYPROFILE, {preview:true});
+  wireProfileFx(f, MYPROFILE, {preview:true});
 }
 
-.anim-gold{
-  background:
-    linear-gradient(115deg,transparent 25%,rgba(251,191,36,.16) 42%,rgba(255,236,170,.3) 50%,rgba(251,191,36,.16) 58%,transparent 75%),
-    radial-gradient(80% 60% at 50% 110%,rgba(120,72,10,.5),transparent 70%),
-    linear-gradient(180deg,#0c0803,#050302);
-  background-size:300% 100%,100% 100%,100% 100%;
-  animation:goldShimmer 8s ease-in-out infinite;
-}
-@keyframes goldShimmer{
-  0%{background-position:120% 0,0 0,0 0}
-  55%{background-position:-60% 0,0 0,0 0}
-  100%{background-position:-120% 0,0 0,0 0}
-}
-.anim-gold::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  background-image:
-    radial-gradient(1.4px 1.4px at 20% 30%,rgba(255,224,138,.9),transparent 60%),
-    radial-gradient(1.1px 1.1px at 66% 20%,rgba(255,224,138,.7),transparent 60%),
-    radial-gradient(1.6px 1.6px at 82% 66%,rgba(255,224,138,.85),transparent 60%),
-    radial-gradient(1.2px 1.2px at 38% 78%,rgba(255,224,138,.6),transparent 60%);
-  animation:starTwinkle 4s ease-in-out infinite alternate;
-}
+function field(lbl, html){ return `<label>${lbl}</label>${html}`; }
 
-.anim-ember{
-  background:
-    radial-gradient(70% 55% at 50% 115%,rgba(249,115,22,.55),rgba(190,18,60,.32) 55%,transparent 78%),
-    radial-gradient(40% 30% at 26% 96%,rgba(251,146,60,.32),transparent 70%),
-    radial-gradient(40% 30% at 76% 100%,rgba(225,29,72,.3),transparent 70%),
-    linear-gradient(180deg,#0b0306,#160308);
-  animation:emberBreath 5.5s ease-in-out infinite alternate;
-}
-@keyframes emberBreath{
-  from{filter:brightness(.85) saturate(1.1)}
-  to{filter:brightness(1.2) saturate(1.35)}
-}
-.anim-ember::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  background-image:
-    radial-gradient(2px 2px at 30% 84%,rgba(255,160,90,.9),transparent 60%),
-    radial-gradient(1.5px 1.5px at 54% 72%,rgba(255,120,70,.8),transparent 60%),
-    radial-gradient(1.8px 1.8px at 72% 88%,rgba(255,180,110,.85),transparent 60%),
-    radial-gradient(1.3px 1.3px at 42% 60%,rgba(255,140,80,.7),transparent 60%);
-  animation:emberRise 6s linear infinite;
-}
-@keyframes emberRise{
-  from{transform:translateY(6%);opacity:.9}
-  to{transform:translateY(-14%);opacity:0}
-}
-
-.anim-ocean{
-  background:
-    radial-gradient(90% 55% at 50% -18%,rgba(56,189,248,.28),transparent 70%),
-    radial-gradient(75% 55% at 20% 105%,rgba(14,116,144,.42),transparent 72%),
-    radial-gradient(75% 55% at 84% 108%,rgba(30,64,175,.4),transparent 72%),
-    linear-gradient(180deg,#020918,#02131f 60%,#010a14);
-  animation:oceanSway 12s ease-in-out infinite alternate;
-}
-@keyframes oceanSway{
-  from{transform:translateX(-2%) scale(1.05)}
-  to{transform:translateX(2%) scale(1.1)}
-}
-.anim-ocean::after{
-  content:'';
-  position:absolute;
-  left:-10%;right:-10%;
-  top:18%;
-  height:34%;
-  background:
-    radial-gradient(50% 100% at 30% 50%,rgba(103,232,249,.14),transparent 70%),
-    radial-gradient(50% 100% at 70% 50%,rgba(56,189,248,.12),transparent 70%);
-  filter:blur(14px);
-  animation:causticDrift 9s ease-in-out infinite alternate;
-}
-@keyframes causticDrift{
-  from{transform:translateX(-4%) skewX(-4deg)}
-  to{transform:translateX(4%) skewX(4deg)}
-}
-
-.pp-stage[data-anim] .pp-link{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-.pp-stage[data-anim="gold"]{--pa:#fbbf24}
-.pp-stage[data-anim="gold"] .pp-av{border-color:rgba(251,191,36,.4)}
-.pp-stage[data-anim="holo"] .pp-link{background:rgba(10,10,20,.42)}
-.pp-stage[data-anim="holo"] .pp-widget{background:rgba(10,10,20,.42)}
-
-@media(max-width:1100px){
-  .wrap{padding:0 18px}
-  .dash{grid-template-columns:minmax(340px,420px) 1fr;gap:18px}
-}
-
-@media(max-width:920px){
-  .dash{grid-template-columns:1fr;padding-top:18px}
-  .preview-shell{position:static;display:none}
-  body.previewing .preview-shell{display:block}
-  body.previewing .dash > .panel{display:none}
-  .preview-frame{height:calc(100dvh - 200px);min-height:440px}
-  .fab{display:flex}
-  .navlinks .nl.hidem{display:none}
-  .hero{min-height:calc(100svh - var(--nav-h));padding:50px 0}
-  section.land{padding:64px 0}
-  .preset-grid{grid-template-columns:1fr 1fr}
-}
-
-@media(max-width:720px){
-  .authbox{margin:4vh auto;padding:30px 24px}
-  .panel{padding:18px}
-  .modal{padding:26px 20px}
-  .statgrid{grid-template-columns:1fr 1fr}
-  .discover-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
-  .pcard .cb{height:64px}
-  .pcard .cav{width:52px;height:52px;margin-top:-28px}
-  .admin-row .btn{padding:7px 12px;font-size:11px}
-  .hero-logo{width:92px;height:92px}
-}
-
-@media(max-width:560px){
-  :root{--nav-h:58px}
-  .logo{font-size:16px}
-  .logo img{width:30px;height:30px}
-  .navlinks .btn{padding:9px 14px;font-size:12px}
-  .hero .cta .btn{width:100%;max-width:320px}
-  .claim{flex-wrap:nowrap}
-  .claim span{padding-left:12px;font-size:12.5px}
-  .grid3{grid-template-columns:1fr}
-  .tabs button{min-width:0;font-size:11.5px;padding:9px 4px}
-  .pp-content{padding-left:16px;padding-right:16px}
-  .pp-banner{margin:0 -16px;height:120px}
-  .pp-name{font-size:21px}
-  .pp-av{width:86px;height:86px}
-  .pp-link{padding:13px 15px;gap:11px}
-  .pp-link .li{width:28px;font-size:19px}
-  .pp-link .li img{width:21px;height:21px}
-  .preset-grid{grid-template-columns:1fr 1fr;gap:9px}
-  .preset-card{height:104px}
-  .brandgrid{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
-  .toastwrap{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
-  .theme-mini{height:170px}
-  footer{padding:34px 0}
-}
-
-@media(max-width:400px){
-  .hero h1{font-size:33px}
-  .statgrid{gap:9px}
-  .stat{padding:15px 10px}
-  .stat .n{font-size:21px}
-  .iconbtns button{width:29px;height:29px}
-  .preset-card .pv-name{font-size:10px;padding:3px 9px}
-}
-
-@media(hover:none){
-  .btn:hover,.opt:hover,.sw:hover,.pcard:hover,.feat:hover,.preset-card:hover,.pp-link:hover{transform:none}
-  .btn:active{transform:scale(.97)}
-  .pp-link:active{transform:scale(.985)}
-  input,textarea,select{font-size:16px}
-}
-
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{
-    animation-duration:.001s!important;
-    animation-iteration-count:1!important;
-    transition-duration:.001s!important;
+function renderEditorTab(){
+  const body = $('#dBody'); const p = MYPROFILE; const t = p.theme;
+  if(liveEditTab==='profile'){
+    body.innerHTML = `
+      ${field('Display name', `<input id="eName" value="${esc(p.displayName)}" maxlength="32">`)}
+      ${field('Status', `<input id="eStatus" value="${esc(p.status||'')}" maxlength="60" placeholder="🌫️ vibing in the mist">`)}
+      ${field('Bio', `<textarea id="eBio" rows="4" maxlength="400">${esc(p.bio||'')}</textarea>`)}
+      ${field('Avatar', `<div class="filedrop" id="upAv">${p.avatar?'Change avatar':'Upload avatar'} · or paste a URL below</div><input id="eAv" value="${esc(p.avatar||'')}" placeholder="https://..." style="margin-top:8px">`)}
+      ${field('Banner', `<div class="filedrop" id="upBan">${p.banner?'Change banner':'Upload banner'} · or paste a URL below</div><input id="eBan" value="${esc(p.banner||'')}" placeholder="https://..." style="margin-top:8px">`)}`;
+    $('#eName').oninput = e=>{ p.displayName=e.target.value; saveProfile(); };
+    $('#eStatus').oninput = e=>{ p.status=e.target.value; saveProfile(); };
+    $('#eBio').oninput = e=>{ p.bio=e.target.value; saveProfile(); };
+    $('#eAv').onchange = e=>{ p.avatar=safeUrl(e.target.value); saveProfile(); };
+    $('#eBan').onchange = e=>{ p.banner=safeUrl(e.target.value); saveProfile(); };
+    $('#upAv').onclick = ()=>pickUpload('avatar', url=>{ p.avatar=url; $('#eAv').value=url; saveProfile(); });
+    $('#upBan').onclick = ()=>pickUpload('banner', url=>{ p.banner=url; $('#eBan').value=url; saveProfile(); });
+  }
+  if(liveEditTab==='looks'){
+    body.innerHTML = `
+      ${field('Theme presets', `<div class="preset-grid">${PRESETS.map((pr,i)=>`
+        <div class="preset-card ${t.preset===pr.name?'on':''}" data-preset="${i}">
+          ${miniThemeInner(pr)}
+          <div class="pv-name">${pr.pro?'✦':''} ${pr.name}</div>
+          ${pr.pro && !MYDOC.pro? `<div class="pv-lock">🔒</div>`:''}
+        </div>`).join('')}</div>`)}
+      ${field('Background', `<div class="optrow" id="bgRow">${['mist','gradient','solid','image','video'].map(b=>`<button class="opt ${t.bgType===b?'on':''}" data-bg="${b}">${b[0].toUpperCase()+b.slice(1)}${b==='video'?' ✦':''}</button>`).join('')}${t.bgType==='anim'?`<button class="opt on">Animated ✦</button>`:''}</div>`)}
+      <div id="bgExtra"></div>
+      ${field('Accent color', `<div class="swatches">${ACCENTS.map(c=>`<div class="sw ${t.accent===c?'on':''}" data-ac="${c}" style="background:${c};box-shadow:0 0 10px ${c}55"></div>`).join('')}</div>`)}
+      ${field('Font', `<div class="optrow">${Object.keys(FONTS).map(f=>`<button class="opt ${t.font===f?'on':''}" data-font="${f}" style="font-family:${FONTS[f]}">${FONT_NAMES[f]}</button>`).join('')}</div>`)}
+      ${field('Button style', `<div class="optrow">${['glass','outline','solid'].map(s=>`<button class="opt ${t.btnStyle===s?'on':''}" data-bs="${s}">${s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</div>`)}
+      ${field('Corner radius', `<input id="eRad" type="range" min="0" max="28" value="${t.radius??16}">`)}
+      ${field('Effects', `<div class="optrow">
+        <button class="opt ${t.glow?'on':''}" id="fxGlow">✨ Glow</button>
+        <button class="opt ${t.particles?'on':''}" id="fxPart">❄ Particles</button>
+        <button class="opt ${t.cursorFx?'on':''}" id="fxCur">🖱 Cursor trail</button>
+      </div>`)}
+      ${field('Text color', `<div class="swatches">${['#e7e7f2','#ffffff','#d6faff','#ffe4f1','#c6f6d5','#fff7d6','#f7e9ff','#e2f6ff'].map(c=>`<div class="sw ${t.textColor===c?'on':''}" data-tc="${c}" style="background:${c}"></div>`).join('')}</div>`)}`;
+    body.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{
+      const pr = PRESETS[+b.dataset.preset];
+      if(pr.pro && !MYDOC.pro) return openProModal(pr.name);
+      p.theme = JSON.parse(JSON.stringify(pr.t));
+      toast(`Applied ${pr.name}`, pr.pro?'✦':'🎨');
+      saveProfile(); renderEditorTab();
+    });
+    body.querySelectorAll('[data-bg]').forEach(b=>b.onclick=()=>{
+      if(b.dataset.bg==='video' && !MYDOC.pro) return openProModal();
+      t.bgType=b.dataset.bg; t.preset=''; saveProfile(); renderEditorTab();
+    });
+    body.querySelectorAll('[data-ac]').forEach(b=>b.onclick=()=>{ t.accent=b.dataset.ac; saveProfile(); renderEditorTab(); });
+    body.querySelectorAll('[data-tc]').forEach(b=>b.onclick=()=>{ t.textColor=b.dataset.tc; saveProfile(); renderEditorTab(); });
+    body.querySelectorAll('[data-font]').forEach(b=>b.onclick=()=>{ t.font=b.dataset.font; saveProfile(); renderEditorTab(); });
+    body.querySelectorAll('[data-bs]').forEach(b=>b.onclick=()=>{ t.btnStyle=b.dataset.bs; saveProfile(); renderEditorTab(); });
+    $('#eRad').oninput = e=>{ t.radius=+e.target.value; saveProfile(); };
+    $('#fxGlow').onclick = ()=>{ t.glow=!t.glow; saveProfile(); renderEditorTab(); };
+    $('#fxPart').onclick = ()=>{ t.particles=!t.particles; saveProfile(); renderEditorTab(); };
+    $('#fxCur').onclick = ()=>{ t.cursorFx=!t.cursorFx; saveProfile(); renderEditorTab(); };
+    const extra = $('#bgExtra');
+    if(t.bgType==='gradient'||t.bgType==='solid'){
+      extra.innerHTML = field(t.bgType==='solid'?'Color':'Gradient colors', `<div style="display:flex;gap:10px">
+        <input id="bgA" type="color" value="${t.bgA||'#0f0524'}">
+        ${t.bgType==='gradient'?`<input id="bgB" type="color" value="${t.bgB||'#003344'}">`:''}
+      </div>`);
+      $('#bgA').oninput = e=>{ t.bgA=e.target.value; t.preset=''; saveProfile(); };
+      const bb=$('#bgB'); if(bb) bb.oninput = e=>{ t.bgB=e.target.value; t.preset=''; saveProfile(); };
+    }
+    if(t.bgType==='image'){
+      extra.innerHTML = field('Background image', `<div class="filedrop" id="upBg">Upload image</div><input id="bgImg" value="${esc(t.bgImage||'')}" placeholder="https://..." style="margin-top:8px">`);
+      $('#bgImg').onchange = e=>{ t.bgImage=safeUrl(e.target.value); saveProfile(); };
+      $('#upBg').onclick = ()=>pickUpload('background', url=>{ t.bgImage=url; saveProfile(); renderEditorTab(); });
+    }
+    if(t.bgType==='video'){
+      extra.innerHTML = field('Background video (mp4/webm)', `<div class="filedrop" id="upVid">Upload video</div><input id="bgVid" value="${esc(t.bgVideo||'')}" placeholder="https://....mp4" style="margin-top:8px">`);
+      $('#bgVid').onchange = e=>{ t.bgVideo=safeUrl(e.target.value); saveProfile(); };
+      $('#upVid').onclick = ()=>pickUpload('bgvideo', url=>{ t.bgVideo=url; saveProfile(); renderEditorTab(); }, 'video/*', 50);
+    }
+  }
+  if(liveEditTab==='links'){
+    body.innerHTML = `
+      <button class="btn primary" id="addLink" style="width:100%">+ Add link</button>
+      <div style="margin-top:18px" id="linkList">
+        ${p.links.length? p.links.map((l,i)=>`
+          <div class="linkitem">
+            <div class="lic">${BRANDS[l.icon]? brandImg(l.icon,'8b8ba3') : esc(l.icon||'🔗')}</div>
+            <div class="info"><b>${esc(l.title)}</b><span>${esc(l.url)}</span></div>
+            <div class="iconbtns">
+              <button data-up="${i}" title="Move up">↑</button>
+              <button data-dn="${i}" title="Move down">↓</button>
+              <button data-ed="${i}" title="Edit">✎</button>
+              <button data-rm="${i}" title="Delete">✕</button>
+            </div>
+          </div>`).join('') : `<div class="empty"><span class="big">🔗</span>No links yet. Add your first one.</div>`}
+      </div>`;
+    $('#addLink').onclick = ()=>linkModal();
+    body.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>linkModal(+b.dataset.ed));
+    body.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{ p.links.splice(+b.dataset.rm,1); saveProfile(); renderEditorTab(); });
+    body.querySelectorAll('[data-up]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.up; if(i>0){ [p.links[i-1],p.links[i]]=[p.links[i],p.links[i-1]]; saveProfile(); renderEditorTab(); }});
+    body.querySelectorAll('[data-dn]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.dn; if(i<p.links.length-1){ [p.links[i+1],p.links[i]]=[p.links[i],p.links[i+1]]; saveProfile(); renderEditorTab(); }});
+  }
+  if(liveEditTab==='widgets'){
+    body.innerHTML = `
+      ${field('Add a widget', `<div class="optrow">
+        ${[['youtube','▶ YouTube'],['spotify','🎵 Spotify'],['discord','💬 Discord'],['image','🖼 Image'],['text','✍ Text']].map(([k,n])=>`<button class="opt" data-w="${k}">${n}</button>`).join('')}
+      </div>`)}
+      <div style="margin-top:18px">
+        ${p.widgets.length? p.widgets.map((w,i)=>`
+          <div class="linkitem">
+            <div class="lic">${{youtube:'▶',spotify:'🎵',discord:'💬',image:'🖼',text:'✍'}[w.type]||'🧩'}</div>
+            <div class="info"><b>${esc(w.title||w.type)}</b><span>${esc((w.value||'').slice(0,60))}</span></div>
+            <div class="iconbtns">
+              <button data-wup="${i}">↑</button><button data-wdn="${i}">↓</button><button data-wrm="${i}">✕</button>
+            </div>
+          </div>`).join(''): `<div class="empty"><span class="big">🧩</span>No widgets yet.</div>`}
+      </div>`;
+    body.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>widgetModal(b.dataset.w));
+    body.querySelectorAll('[data-wrm]').forEach(b=>b.onclick=()=>{ p.widgets.splice(+b.dataset.wrm,1); saveProfile(); renderEditorTab(); });
+    body.querySelectorAll('[data-wup]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.wup; if(i>0){ [p.widgets[i-1],p.widgets[i]]=[p.widgets[i],p.widgets[i-1]]; saveProfile(); renderEditorTab(); }});
+    body.querySelectorAll('[data-wdn]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.wdn; if(i<p.widgets.length-1){ [p.widgets[i+1],p.widgets[i]]=[p.widgets[i],p.widgets[i+1]]; saveProfile(); renderEditorTab(); }});
+  }
+  if(liveEditTab==='stats'){
+    body.innerHTML = `<div class="spin"></div>`;
+    loadStats(body);
+  }
+  if(liveEditTab==='account'){
+    body.innerHTML = `
+      <div class="statgrid">
+        <div class="stat glass"><div class="n">${MYDOC.pro?'PRO':'FREE'}</div><div class="l">Plan</div></div>
+        <div class="stat glass"><div class="n mono" style="font-size:15px;padding-top:8px">@${esc(MYDOC.username)}</div><div class="l">Username</div></div>
+      </div>
+      ${!MYDOC.pro? `<button class="btn primary" id="goPro" style="width:100%">✦ Upgrade to Misty Pro</button>`:`<div class="empty" style="padding:16px">✦ You're a Pro. Thanks for supporting the mist.</div>`}
+      ${field('Share your page', `<div style="display:flex;gap:8px"><input readonly value="${location.origin+location.pathname}#/@${esc(MYDOC.username)}"><button class="btn sm" id="copyUrl">Copy</button></div>`)}
+      <div style="display:flex;gap:10px;margin-top:26px">
+        <button class="btn" id="logout" style="flex:1">Log out</button>
+        <button class="btn danger" id="wipe" style="flex:1">Reset page</button>
+      </div>`;
+    const gp=$('#goPro'); if(gp) gp.onclick=()=>openProModal();
+    $('#copyUrl').onclick = e=>{ navigator.clipboard.writeText(e.target.previousElementSibling.value); toast('Link copied','📋'); };
+    $('#logout').onclick = async ()=>{ await signOut(auth); location.hash=''; };
+    $('#wipe').onclick = ()=>{
+      openModal(`<h3>Reset your page?</h3><div class="sub">This clears your links, widgets and theme. Your username stays yours.</div>
+        <div style="display:flex;gap:10px;margin-top:20px"><button class="btn" id="mCancel" style="flex:1">Cancel</button><button class="btn danger" id="mYes" style="flex:1">Reset</button></div>`);
+      $('#mYes').onclick = ()=>{ MYPROFILE.links=[]; MYPROFILE.widgets=[]; MYPROFILE.theme=JSON.parse(JSON.stringify(DEFAULT_THEME)); MYPROFILE.bio=''; MYPROFILE.status=''; saveProfile(); closeModal(); renderEditorTab(); toast('Page reset','🧹'); };
+    };
   }
 }
+
+async function loadStats(body){
+  let clicks = {};
+  try{ const cs = await getDoc(doc(db,'clicks',MYDOC.username)); if(cs.exists()) clicks = cs.data(); }catch{}
+  const totalClicks = Object.values(clicks).reduce((a,b)=>a+(+b||0),0);
+  const max = Math.max(1,...Object.values(clicks).map(v=>+v||0));
+  body.innerHTML = `
+    <div class="statgrid">
+      <div class="stat glass"><div class="n">${num(MYPROFILE.views)}</div><div class="l">Profile views</div></div>
+      <div class="stat glass"><div class="n">${num(MYPROFILE.likes)}</div><div class="l">Likes</div></div>
+      <div class="stat glass"><div class="n">${num(totalClicks)}</div><div class="l">Link clicks</div></div>
+      <div class="stat glass"><div class="n">${MYPROFILE.links.length}</div><div class="l">Links</div></div>
+    </div>
+    <label>Clicks per link</label>
+    ${MYPROFILE.links.length? MYPROFILE.links.map(l=>{
+      const c = +clicks[l.id]||0;
+      return `<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:13px;gap:10px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${BRANDS[l.icon]?'':esc(l.icon||'🔗')+' '}${esc(l.title)}</span><span class="mono" style="color:var(--dim)">${num(c)}</span></div><div class="bar"><i style="width:${Math.round(c/max*100)}%"></i></div></div>`;
+    }).join(''): `<div class="empty">Add links to start tracking clicks.</div>`}`;
+}
+
+function linkModal(idx){
+  const l = idx!=null? {...MYPROFILE.links[idx]} : {id:uid(), title:'', url:'', icon:'', desc:''};
+  openModal(`<h3>${idx!=null?'Edit link':'New link'}</h3>
+    ${field('Title',`<input id="mTitle" value="${esc(l.title)}" maxlength="40" placeholder="My YouTube">`)}
+    ${field('URL',`<input id="mUrl" value="${esc(l.url)}" placeholder="youtube.com/@you">`)}
+    ${field('Description',`<input id="mDesc" value="${esc(l.desc||'')}" maxlength="60" placeholder="optional">`)}
+    ${field('Icon — auto-detected from URL, or pick one',`
+      <div class="brandgrid" id="mBrands">${Object.keys(BRANDS).map(b=>`<div class="brand ${l.icon===b?'on':''}" data-bic="${b}" title="${BRANDS[b]}">${brandImg(b,'e7e7f2')}</div>`).join('')}</div>
+      <div style="margin-top:8px">${EMOJIS.map(ic=>`<span class="chip ${l.icon===ic?'on':''}" data-ic="${ic}">${ic}</span>`).join('')}</div>`)}
+    <div style="display:flex;gap:10px;margin-top:24px"><button class="btn" id="mCancel" style="flex:1">Cancel</button><button class="btn primary" id="mSave" style="flex:1">Save</button></div>`);
+  const selectIcon = (val)=>{
+    l.icon = val;
+    document.querySelectorAll('[data-bic],[data-ic]').forEach(x=>x.classList.toggle('on', x.dataset.bic===val || x.dataset.ic===val));
+  };
+  document.querySelectorAll('[data-bic]').forEach(c=>c.onclick=()=>selectIcon(c.dataset.bic));
+  document.querySelectorAll('[data-ic]').forEach(c=>c.onclick=()=>selectIcon(c.dataset.ic));
+  $('#mUrl').addEventListener('change', e=>{
+    if(!l.icon || BRANDS[l.icon]){
+      const d = detectBrand(e.target.value);
+      if(d) selectIcon(d);
+    }
+  });
+  $('#mSave').onclick = ()=>{
+    l.title = $('#mTitle').value.trim(); l.url = safeUrl($('#mUrl').value); l.desc = $('#mDesc').value.trim();
+    if(!l.title || !l.url) return toast('Title and a valid URL required','⚠️');
+    if(!l.icon) l.icon = detectBrand(l.url) || '🔗';
+    if(idx!=null) MYPROFILE.links[idx]=l; else MYPROFILE.links.push(l);
+    saveProfile(); closeModal(); renderEditorTab();
+  };
+}
+
+function widgetModal(type){
+  const hints = {youtube:'YouTube video URL', spotify:'Spotify track/playlist/album URL', discord:'Discord invite URL', image:'Image URL', text:'Your text'};
+  openModal(`<h3>Add ${type} widget</h3>
+    ${field('Title (optional)',`<input id="wTitle" maxlength="40">`)}
+    ${field(hints[type], type==='text'? `<textarea id="wVal" rows="4" maxlength="600"></textarea>`:`<input id="wVal" placeholder="https://...">`)}
+    ${type==='image'?`<div class="filedrop" id="wUp" style="margin-top:10px">Or upload an image</div>`:''}
+    <div style="display:flex;gap:10px;margin-top:24px"><button class="btn" id="mCancel" style="flex:1">Cancel</button><button class="btn primary" id="mSave" style="flex:1">Add</button></div>`);
+  const wu=$('#wUp'); if(wu) wu.onclick=()=>pickUpload('widget', url=>{ $('#wVal').value=url; });
+  $('#mSave').onclick = ()=>{
+    let v = $('#wVal').value.trim();
+    if(type!=='text') v = safeUrl(v);
+    if(!v) return toast('Value required','⚠️');
+    MYPROFILE.widgets.push({id:uid(), type, title:$('#wTitle').value.trim(), value:v});
+    saveProfile(); closeModal(); renderEditorTab();
+  };
+}
+
+function openModal(inner){
+  closeModal();
+  const v = document.createElement('div'); v.className='modal-veil'; v.id='veil';
+  v.innerHTML = `<div class="modal glass">${inner}</div>`;
+  v.onclick = e=>{ if(e.target===v) closeModal(); };
+  document.body.appendChild(v);
+  const c = $('#mCancel'); if(c) c.onclick = closeModal;
+}
+function closeModal(){ $('#veil')?.remove(); }
+
+function openProModal(themeName){
+  openModal(`<h3>✦ Misty Pro</h3>
+    <div class="sub">${themeName? `<b>${esc(themeName)}</b> is a Pro theme. `:''}Unlock all six animated themes, video backgrounds, the PRO badge, priority on Discover, and everything we ship next.</div>
+    <div class="stat glass" style="margin:18px 0"><div class="n">$4<small style="font-size:13px;color:var(--dim)">/mo</small></div><div class="l">Cancel anytime</div></div>
+    <button class="btn primary" id="mPro" style="width:100%">Activate Pro</button>
+    <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--dim)">Payment processing coming soon — activating instantly for now.</div>`);
+  $('#mPro').onclick = async ()=>{
+    try{
+      await updateDoc(doc(db,'users',ME.uid),{pro:true});
+      MYDOC.pro = true;
+      if(!MYPROFILE.badges.includes('pro')) MYPROFILE.badges.push('pro');
+      saveProfile(); closeModal(); toast('Welcome to Pro','✦'); renderDashboard();
+    }catch(e){ toast(cleanErr(e),'⚠️'); }
+  };
+}
+
+function pickUpload(kind, done, accept='image/*', maxMB=8){
+  const inp = document.createElement('input'); inp.type='file'; inp.accept=accept;
+  inp.onchange = async ()=>{
+    const f = inp.files[0]; if(!f) return;
+    if(f.size > maxMB*1024*1024) return toast(`Max ${maxMB}MB`,'⚠️');
+    toast('Uploading…','☁️');
+    try{
+      const r = ref(storage, `users/${ME.uid}/${kind}_${Date.now()}_${f.name.replace(/[^\w.]/g,'')}`);
+      await uploadBytes(r, f);
+      done(await getDownloadURL(r));
+      toast('Uploaded','✅');
+    }catch(e){ toast('Upload failed: '+cleanErr(e),'⚠️'); }
+  };
+  inp.click();
+}
+
+function bgStyle(t){
+  if(t.bgType==='solid') return `background:${t.bgA||'#07070f'}`;
+  if(t.bgType==='gradient') return `background:linear-gradient(150deg,${t.bgA||'#0f0524'},${t.bgB||'#003344'})`;
+  if(t.bgType==='image') return `background:#07070f`;
+  if(t.bgType==='video') return `background:#000`;
+  if(t.bgType==='anim') return `background:#04040c`;
+  return `background:radial-gradient(1200px 700px at 20% 10%,${(t.bgA||'#a78bfa')}26,transparent 60%),radial-gradient(1000px 700px at 85% 85%,${(t.bgB||'#67e8f9')}22,transparent 60%),#0a0a14`;
+}
+function ytEmbed(u){ try{ const url=new URL(u); let id=''; if(url.hostname.includes('youtu.be')) id=url.pathname.slice(1); else id=url.searchParams.get('v')||url.pathname.split('/').pop(); return id? `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}`:''; }catch{ return ''; } }
+function spEmbed(u){ try{ const url=new URL(u); if(!url.hostname.includes('spotify.com')) return ''; return `https://open.spotify.com/embed${url.pathname}`; }catch{ return ''; } }
+
+function profileHTML(p, opts={}){
+  const t = {...DEFAULT_THEME, ...(p.theme||{})};
+  const font = FONTS[t.font]||FONTS.sora;
+  const badges = (p.badges||[]).map(b=>({og:`<span class="badge og">OG</span>`,pro:`<span class="badge pro">✦ PRO</span>`,owner:`<span class="badge owner">OWNER</span>`}[b]||'')).join('');
+  const animLayer = t.bgType==='anim'? `<div class="pp-anim anim-${esc(t.anim||'aurora')}"></div>`:'';
+  const bgLayer = t.bgType==='image' && t.bgImage? `<img src="${esc(t.bgImage)}" alt="">`
+    : t.bgType==='video' && t.bgVideo? `<video src="${esc(t.bgVideo)}" autoplay muted loop playsinline></video>` : '';
+  const overlay = (t.bgType==='image'||t.bgType==='video')? `<div style="position:absolute;inset:0;background:rgba(4,4,10,.45)"></div>`:'';
+  const partCanvas = t.particles? `<canvas class="pp-particles" style="position:absolute;inset:0;width:100%;height:100%;z-index:1"></canvas>`:'';
+  return `<div class="pp-stage" ${t.bgType==='anim'?`data-anim="${esc(t.anim||'aurora')}"`:''} style="${bgStyle(t)};color:${t.textColor||'#e7e7f2'};font-family:${font};--pa:${t.accent};--pr:${t.radius??16}px">
+    <div class="pp-bg">${animLayer}${bgLayer}${overlay}${partCanvas}</div>
+    ${opts.preview?'':`<div class="pp-views mono">👁 ${num(p.views)}</div>`}
+    <div class="pp-content">
+      ${p.banner? `<div class="pp-banner" style="background-image:url('${esc(p.banner)}')"></div>`:`<div style="height:60px"></div>`}
+      <div class="pp-head" style="${p.banner?'':'margin-top:0'}">
+        <img class="pp-av" src="${esc(p.avatar||avatarFor(p.username))}" alt="" style="${t.glow?`box-shadow:0 0 34px ${t.accent}66`:''}">
+        <div class="pp-name">${esc(p.displayName||p.username)} ${badges}</div>
+        <div class="pp-user">misty.gg/${esc(p.username)}</div>
+        ${p.status? `<div class="pp-status">${esc(p.status)}</div>`:''}
+        ${p.bio? `<div class="pp-bio">${esc(p.bio)}</div>`:''}
+      </div>
+      <div class="pp-links">
+        ${(p.links||[]).map(l=>`
+          <a class="pp-link ${t.btnStyle} ${t.glow?'glow':''}" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener" data-lid="${esc(l.id)}">
+            <span class="li">${iconHTML(l.icon, t)}</span>
+            <span class="lt"><b>${esc(l.title)}</b>${l.desc?`<span>${esc(l.desc)}</span>`:''}</span>
+            <span class="arrow">↗</span>
+          </a>`).join('')}
+      </div>
+      <div class="pp-widgets">
+        ${(p.widgets||[]).map(w=>{
+          if(w.type==='youtube'){ const e=ytEmbed(w.value); return e?`<div class="pp-widget"><iframe src="${esc(e)}" height="230" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe></div>`:''; }
+          if(w.type==='spotify'){ const e=spEmbed(w.value); return e?`<div class="pp-widget"><iframe src="${esc(e)}" height="152" allow="encrypted-media" loading="lazy" style="border-radius:18px"></iframe></div>`:''; }
+          if(w.type==='discord'){ return `<a class="pp-link ${t.btnStyle} ${t.glow?'glow':''}" href="${esc(safeUrl(w.value))}" target="_blank" rel="noopener"><span class="li">${iconHTML('discord',t)}</span><span class="lt"><b>${esc(w.title||'Join my Discord')}</b><span>discord invite</span></span><span class="arrow">↗</span></a>`; }
+          if(w.type==='image'){ return `<div class="pp-widget"><img src="${esc(safeUrl(w.value))}" alt="" loading="lazy"></div>`; }
+          if(w.type==='text'){ return `<div class="pp-widget"><div class="wtext">${w.title?`<b style="display:block;margin-bottom:8px">${esc(w.title)}</b>`:''}${esc(w.value)}</div></div>`; }
+          return '';
+        }).join('')}
+      </div>
+      ${opts.preview? '' : `<div class="pp-actions">
+        <button id="ppLike" class="${opts.liked?'liked':''}">❤ <span id="ppLikeN">${num(p.likes)}</span></button>
+        <button id="ppShare">↗ Share</button>
+      </div>`}
+      <div class="pp-foot"><img src="logo.png" alt="">made with MISTY</div>
+    </div>
+  </div>`;
+}
+
+function wireProfileFx(root, p, opts={}){
+  const t = {...DEFAULT_THEME, ...(p.theme||{})};
+  window.__curAccent = t.accent;
+  if(!opts.preview) cursorFxOn = !!t.cursorFx;
+  const pc = root.querySelector('.pp-particles');
+  if(pc){
+    const ctx = pc.getContext('2d');
+    pc.width = pc.offsetWidth; pc.height = pc.offsetHeight;
+    const dots = Array.from({length:46},()=>({x:Math.random()*pc.width,y:Math.random()*pc.height,r:.6+Math.random()*1.8,s:.15+Math.random()*.45}));
+    (function loop(){
+      if(!pc.isConnected) return;
+      ctx.clearRect(0,0,pc.width,pc.height);
+      ctx.fillStyle = t.accent;
+      for(const d of dots){ d.y -= d.s; if(d.y<-4){ d.y=pc.height+4; d.x=Math.random()*pc.width; } ctx.globalAlpha=.35; ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,7); ctx.fill(); }
+      ctx.globalAlpha=1;
+      requestAnimationFrame(loop);
+    })();
+  }
+  if(!opts.preview){
+    root.querySelectorAll('[data-lid]').forEach(a=>{
+      a.addEventListener('click', ()=>{ recordClick(p.username, a.dataset.lid); });
+    });
+  }
+}
+
+async function recordClick(uname, lid){
+  try{ await setDoc(doc(db,'clicks',uname), {[lid]: increment(1)}, {merge:true}); }catch{}
+}
+
+async function renderPublic(uname){
+  if(!uname) return renderLanding();
+  app.innerHTML = navHTML('');
+  const page = document.createElement('div'); page.className='public-page'; page.innerHTML=`<div class="spin"></div>`;
+  document.body.appendChild(page);
+  const snap = await getDoc(doc(db,'profiles',uname));
+  if(!snap.exists()){
+    page.innerHTML = `<button class="pp-back" onclick="history.length>1?history.back():location.hash=''">← Back</button>
+      <div class="empty" style="padding-top:30vh"><span class="big">🌫️</span>This corner of the mist is empty.<br><br>
+      <button class="btn primary" onclick="document.querySelector('.public-page').remove();sessionStorage.setItem('misty_uname','${esc(uname)}');location.hash='#/auth'">Claim misty.gg/${esc(uname)}</button></div>`;
+    return;
+  }
+  const p = snap.data();
+  let liked = false;
+  if(ME){ const ls = await getDoc(doc(db,'likes',`${uname}_${ME.uid}`)); liked = ls.exists(); }
+  const isOwner = ME && p.owner===ME.uid;
+  if(!isOwner){
+    const key = 'mv_'+uname;
+    if(!sessionStorage.getItem(key)){
+      sessionStorage.setItem(key,'1');
+      p.views = (p.views||0)+1;
+      updateDoc(doc(db,'profiles',uname),{views:increment(1)}).catch(()=>{});
+    }
+  }
+  page.innerHTML = `<button class="pp-back" onclick="history.length>1?history.back():location.hash=''">← misty</button>` + profileHTML(p,{liked});
+  wireProfileFx(page, p);
+  page.querySelector('#ppShare').onclick = ()=>{
+    const url = location.origin+location.pathname+'#/@'+uname;
+    if(navigator.share) navigator.share({title:`${p.displayName} on Misty`, url}).catch(()=>{});
+    else { navigator.clipboard.writeText(url); toast('Link copied','📋'); }
+  };
+  page.querySelector('#ppLike').onclick = async ()=>{
+    if(!ME){ toast('Log in to like profiles','🔒'); return; }
+    const btn = page.querySelector('#ppLike'), n = page.querySelector('#ppLikeN');
+    try{
+      const lref = doc(db,'likes',`${uname}_${ME.uid}`);
+      if(btn.classList.contains('liked')){
+        await deleteDoc(lref);
+        await updateDoc(doc(db,'profiles',uname),{likes:increment(-1)});
+        p.likes--; btn.classList.remove('liked');
+      } else {
+        await setDoc(lref,{user:ME.uid, profile:uname, at:serverTimestamp()});
+        await updateDoc(doc(db,'profiles',uname),{likes:increment(1)});
+        p.likes=(p.likes||0)+1; btn.classList.add('liked');
+      }
+      n.textContent = num(p.likes);
+    }catch(err){ toast(cleanErr(err),'⚠️'); }
+  };
+}
+
+async function renderDiscover(){
+  app.innerHTML = navHTML('discover') + `<div class="wrap">
+    <div class="discover-head">
+      <div class="eyebrow">// discover</div>
+      <h2>Wandering the mist</h2>
+      <p>Trending profiles from across Misty.</p>
+    </div>
+    <div class="discover-grid" id="dgrid"><div class="spin" style="grid-column:1/-1"></div></div>
+  </div>`;
+  try{
+    const qs = await getDocs(query(collection(db,'profiles'), orderBy('views','desc'), limit(30)));
+    const profs = []; qs.forEach(d=>profs.push(d.data()));
+    profs.sort((a,b)=> ( (b.badges?.includes('pro')?1e9:0)+(b.views||0) ) - ( (a.badges?.includes('pro')?1e9:0)+(a.views||0) ));
+    $('#dgrid').innerHTML = profs.length? profs.map(p=>{
+      const t = {...DEFAULT_THEME,...(p.theme||{})};
+      return `<div class="pcard glass" onclick="location.hash='#/@${esc(p.username)}'">
+        <div class="cb" style="${p.banner?`background-image:url('${esc(p.banner)}')`:`background:linear-gradient(120deg,${t.bgA||'#1e1b3a'},${t.bgB||'#0f2a3a'})`}"></div>
+        <img class="cav" src="${esc(p.avatar||avatarFor(p.username))}" loading="lazy">
+        <div class="cbody">
+          <b>${esc(p.displayName||p.username)}</b> ${(p.badges||[]).includes('pro')?'<span class="badge pro">✦</span>':''}
+          <div class="u">@${esc(p.username)}</div>
+          <div class="cstats"><span>👁 ${num(p.views)}</span><span>❤ ${num(p.likes)}</span><span>🔗 ${(p.links||[]).length}</span></div>
+        </div>
+      </div>`;
+    }).join('') : `<div class="empty" style="grid-column:1/-1"><span class="big">🌫️</span>The mist is quiet. Be the first.</div>`;
+  }catch(e){ $('#dgrid').innerHTML = `<div class="empty" style="grid-column:1/-1">Could not load profiles: ${esc(cleanErr(e))}</div>`; }
+}
+
+async function renderAdmin(){
+  if(!MYDOC || MYDOC.role!=='admin'){ app.innerHTML = navHTML('admin')+`<div class="empty" style="padding-top:22vh"><span class="big">🔒</span>Admin access only.</div>`; return; }
+  app.innerHTML = navHTML('admin') + `<div class="wrap">
+    <div class="discover-head"><div class="eyebrow">// admin</div><h2>Control room</h2></div>
+    <div class="statgrid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))" id="adStats"><div class="spin" style="grid-column:1/-1"></div></div>
+    <div class="panel glass" style="margin:10px 0 60px"><h3 style="margin-bottom:14px;font-size:16px">Users</h3><div id="adUsers"><div class="spin"></div></div></div>
+  </div>`;
+  try{
+    const us = await getDocs(query(collection(db,'users'), limit(200)));
+    const ps = await getDocs(query(collection(db,'profiles'), limit(200)));
+    let totalViews=0, totalLikes=0, pros=0;
+    ps.forEach(d=>{ const p=d.data(); totalViews+=p.views||0; totalLikes+=p.likes||0; });
+    const users=[]; us.forEach(d=>{ const u=d.data(); u._id=d.id; users.push(u); if(u.pro) pros++; });
+    $('#adStats').innerHTML = [
+      ['Users', users.length],['Profiles', ps.size],['Total views', num(totalViews)],['Total likes', num(totalLikes)],['Pro members', pros]
+    ].map(([l,n])=>`<div class="stat glass"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+    $('#adUsers').innerHTML = users.map(u=>`
+      <div class="admin-row">
+        <img src="${esc(u.avatar||avatarFor(u.username))}">
+        <div class="flex1"><b>${esc(u.displayName||u.username)}</b> <span class="mono" style="color:var(--dim);font-size:11px">@${esc(u.username)}</span>${u.pro?' <span class="badge pro">✦</span>':''}${u.role==='admin'?' <span class="badge owner">ADMIN</span>':''}<div class="em">${esc(u.email||'')}</div></div>
+        <button class="btn sm" onclick="location.hash='#/@${esc(u.username)}'">View</button>
+        <button class="btn sm ${u.banned?'':'danger'}" data-ban="${u._id}" data-now="${u.banned?1:0}">${u.banned?'Unban':'Ban'}</button>
+      </div>`).join('');
+    $('#adUsers').querySelectorAll('[data-ban]').forEach(b=>b.onclick=async ()=>{
+      const banned = b.dataset.now!=='1';
+      try{
+        await updateDoc(doc(db,'users',b.dataset.ban),{banned});
+        toast(banned?'User banned':'User unbanned', banned?'🔨':'🕊️');
+        renderAdmin();
+      }catch(e){ toast(cleanErr(e),'⚠️'); }
+    });
+  }catch(e){ $('#adUsers').innerHTML = `<div class="empty">${esc(cleanErr(e))}</div>`; }
+}
+
+router();
