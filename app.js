@@ -63,7 +63,11 @@ const PRESETS = [
   {name:'Rainy Pines', pro:true, t:{preset:'Rainy Pines',bgType:'video',bgVideo:'assets/backgrounds/rainy-pine-forest.mp4',bgA:'#0a1410',bgB:'#12201a',accent:'#7dd3a8',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
   {name:'Sakura Bloom', pro:true, t:{preset:'Sakura Bloom',bgType:'video',bgVideo:'assets/backgrounds/large-sakura-tree.mp4',bgA:'#1a0a12',bgB:'#2a1020',accent:'#f9a8d4',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
   {name:'Celestial Veil', pro:true, t:{preset:'Celestial Veil',bgType:'video',bgVideo:'assets/backgrounds/celestial-veil.mp4',bgA:'#080614',bgB:'#140f2a',accent:'#a78bfa',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
-  {name:'Shadow Monarch', pro:true, t:{preset:'Shadow Monarch',bgType:'video',bgVideo:'assets/backgrounds/shadow-king.mp4',bgA:'#0a0616',bgB:'#160b2e',accent:'#8b5cf6',font:'chillax',btnStyle:'bia',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}}
+  {name:'Shadow Monarch', pro:true, t:{preset:'Shadow Monarch',bgType:'video',bgVideo:'assets/backgrounds/shadow-king.mp4',bgA:'#0a0616',bgB:'#160b2e',accent:'#8b5cf6',font:'chillax',btnStyle:'bia',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Ultra Ego', pro:true, t:{preset:'Ultra Ego',bgType:'video',bgVideo:'assets/backgrounds/vegeta-ultra-ego.mp4',bgA:'#160516',bgB:'#2e0b2a',accent:'#d946ef',font:'chillax',btnStyle:'bia',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Poppy Field', pro:true, t:{preset:'Poppy Field',bgType:'video',bgVideo:'assets/backgrounds/poppy-field.mp4',bgA:'#160a0a',bgB:'#2e1410',accent:'#fb7185',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Yellow Sundress', pro:true, t:{preset:'Yellow Sundress',bgType:'video',bgVideo:'assets/backgrounds/yellow-sundress.mp4',bgA:'#161206',bgB:'#2e260b',accent:'#fde047',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Golden Sky', pro:true, t:{preset:'Golden Sky',bgType:'video',bgVideo:'assets/backgrounds/golden-sky.mp4',bgA:'#161006',bgB:'#2e220b',accent:'#fbbf24',font:'chillax',btnStyle:'bia',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}}
 ];
 
 // Reskin every preset/template with the exact bia-bio look: frosted
@@ -83,7 +87,11 @@ const BG_VIDEOS = [
   {name:'Rainy Pine Forest', res:'1080p', src:'assets/backgrounds/rainy-pine-forest.mp4'},
   {name:'Large Sakura Tree', res:'4K', src:'assets/backgrounds/large-sakura-tree.mp4'},
   {name:'Celestial Veil', res:'4K', src:'assets/backgrounds/celestial-veil.mp4'},
-  {name:'Shadow King', res:'4K', src:'assets/backgrounds/shadow-king.mp4'}
+  {name:'Shadow King', res:'4K', src:'assets/backgrounds/shadow-king.mp4'},
+  {name:'Vegeta Ultra Ego', res:'4K', src:'assets/backgrounds/vegeta-ultra-ego.mp4'},
+  {name:'Poppy Field', res:'4K', src:'assets/backgrounds/poppy-field.mp4'},
+  {name:'Yellow Sundress', res:'4K', src:'assets/backgrounds/yellow-sundress.mp4'},
+  {name:'Golden Sky', res:'4K', src:'assets/backgrounds/golden-sky.mp4'}
 ];
 
 function toast(msg, icon='✨'){ const t=document.createElement('div'); t.className='toast'; t.innerHTML=`<span>${icon}</span><span>${esc(msg)}</span>`; $('#toasts').appendChild(t); setTimeout(()=>{t.style.opacity='0';t.style.transition='.4s';setTimeout(()=>t.remove(),400)},2600); }
