@@ -21,8 +21,8 @@ const $ = s => document.querySelector(s);
 const app = $('#app');
 let ME = null, MYDOC = null, MYPROFILE = null, liveEditTab = 'profile';
 
-const FONTS = {sora:"'Sora',sans-serif", unbounded:"'Unbounded',sans-serif", orbitron:"'Orbitron',sans-serif", mono:"'JetBrains Mono',monospace", pixel:"'Press Start 2P',monospace", serif:"'Playfair Display',serif", cinzel:"'Cinzel',serif"};
-const FONT_NAMES = {sora:'Sora', unbounded:'Unbounded', orbitron:'Orbitron', mono:'Mono', pixel:'Pixel', serif:'Serif', cinzel:'Cinzel'};
+const FONTS = {sora:"'Sora',sans-serif", unbounded:"'Unbounded',sans-serif", orbitron:"'Orbitron',sans-serif", mono:"'JetBrains Mono',monospace", pixel:"'Press Start 2P',monospace", serif:"'Playfair Display',serif", cinzel:"'Cinzel',serif", spacemono:"'Space Mono',monospace", chillax:"'Chillax',sans-serif"};
+const FONT_NAMES = {sora:'Sora', unbounded:'Unbounded', orbitron:'Orbitron', mono:'Mono', pixel:'Pixel', serif:'Serif', cinzel:'Cinzel', spacemono:'Space Mono', chillax:'Chillax'};
 const ACCENTS = ['#a78bfa','#67e8f9','#f472b6','#34d399','#fbbf24','#fb7185','#60a5fa','#e879f9','#ffffff'];
 const EMOJIS = ['🔗','🌐','💻','🎮','🎵','📺','💬','⭐','🚀','💜','🔥','👾','🎨','📁','☕','💰','📧','🛒'];
 const BRANDS = {
@@ -54,12 +54,12 @@ const PRESETS = [
   {name:'Midnight Gold', pro:true, t:{preset:'Midnight Gold',bgType:'anim',anim:'gold',bgA:'#0c0803',bgB:'#2a1c05',accent:'#fbbf24',font:'cinzel',btnStyle:'outline',glow:true,particles:false,cursorFx:false,textColor:'#fdf3d7',radius:10}},
   {name:'Ember Rift', pro:true, t:{preset:'Ember Rift',bgType:'anim',anim:'ember',bgA:'#160308',bgB:'#3a0d10',accent:'#fb7185',font:'unbounded',btnStyle:'glass',glow:true,particles:false,cursorFx:true,textColor:'#ffe8e4',radius:16}},
   {name:'Deep Current', pro:true, t:{preset:'Deep Current',bgType:'anim',anim:'ocean',bgA:'#02131f',bgB:'#0a2a4a',accent:'#38bdf8',font:'sora',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#e2f6ff',radius:18}},
-  {name:'Neon Static', pro:false, t:{preset:'Neon Static',bgType:'gradient',bgA:'#0a0a1a',bgB:'#3a1030',accent:'#00ced1',font:'mono',btnStyle:'outline',glow:true,particles:true,cursorFx:true,textColor:'#e0e0ff',radius:20,cursorStyle:'dot'}},
-  {name:'Terminal Root', pro:false, t:{preset:'Terminal Root',bgType:'solid',bgA:'#04120a',bgB:'#04120a',accent:'#22c55e',font:'mono',btnStyle:'outline',glow:true,particles:false,cursorFx:false,textColor:'#c6f6d5',radius:4,cursorStyle:'cross'}},
-  {name:'Downpour', pro:false, t:{preset:'Downpour',bgType:'gradient',bgA:'#0a1230',bgB:'#1e3a8a',accent:'#2563eb',font:'mono',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#dbeafe',radius:16}},
-  {name:'Crimson OP', pro:false, t:{preset:'Crimson OP',bgType:'gradient',bgA:'#1a0505',bgB:'#dc2626',accent:'#f87171',font:'unbounded',btnStyle:'icons',glow:true,particles:true,cursorFx:false,textColor:'#fee2e2',radius:18,nameFx:'glow'}},
-  {name:'Redline', pro:false, t:{preset:'Redline',bgType:'gradient',bgA:'#1a1400',bgB:'#eab308',accent:'#facc15',font:'orbitron',btnStyle:'solid',glow:true,particles:false,cursorFx:false,textColor:'#fffbea',radius:6}},
-  {name:'Static Frost', pro:false, t:{preset:'Static Frost',bgType:'gradient',bgA:'#0a0a0a',bgB:'#101820',accent:'#67cae2',font:'sora',btnStyle:'glass',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:17,cardOpacity:70}}
+  {name:'Neon Static', pro:false, t:{preset:'Neon Static',bgType:'gradient',bgA:'#0a0a1a',bgB:'#3a1030',accent:'#00ced1',font:'spacemono',btnStyle:'outline',glow:true,particles:true,cursorFx:true,textColor:'#e0e0ff',radius:20,cursorStyle:'dot',orbitRing:true}},
+  {name:'Terminal Root', pro:false, t:{preset:'Terminal Root',bgType:'solid',bgA:'#04120a',bgB:'#04120a',accent:'#22c55e',font:'spacemono',btnStyle:'outline',glow:true,particles:false,cursorFx:false,textColor:'#c6f6d5',radius:4,cursorStyle:'cross',orbitRing:true}},
+  {name:'Downpour', pro:false, t:{preset:'Downpour',bgType:'gradient',bgA:'#0a1230',bgB:'#1e3a8a',accent:'#2563eb',font:'spacemono',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#dbeafe',radius:16,orbitRing:true}},
+  {name:'Crimson OP', pro:false, t:{preset:'Crimson OP',bgType:'gradient',bgA:'#1a0505',bgB:'#dc2626',accent:'#f87171',font:'spacemono',btnStyle:'icons',glow:true,particles:true,cursorFx:false,textColor:'#fee2e2',radius:18,nameFx:'glow',orbitRing:true}},
+  {name:'Redline', pro:false, t:{preset:'Redline',bgType:'gradient',bgA:'#1a1400',bgB:'#eab308',accent:'#facc15',font:'spacemono',btnStyle:'solid',glow:true,particles:false,cursorFx:false,textColor:'#fffbea',radius:6,orbitRing:true}},
+  {name:'Static Frost', pro:false, t:{preset:'Static Frost',bgType:'image',bgImage:'assets/theme-import/static-frost-bg.jpg',bgA:'#0a0a0a',bgB:'#101820',accent:'#67cae2',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,cursorStyle:'bia',textColor:'#ffffff',radius:17,cardOpacity:70}}
 ];
 const DEFAULT_THEME = JSON.parse(JSON.stringify(PRESETS[0].t));
 
@@ -242,6 +242,7 @@ function miniLinkStyle(t, small){
   const r = t.btnStyle==='icons'? '50%' : Math.min(t.radius, small?12:13)+'px';
   const fill = t.btnStyle==='solid'? `background:${t.accent}`
     : t.btnStyle==='outline'? `border:1.5px solid ${t.accent}`
+    : t.btnStyle==='bia'? `background:linear-gradient(90deg,#3399c06b,#3365c04a);border:1px solid #2d5db18f`
     : `background:linear-gradient(165deg,rgba(255,255,255,.16),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)`;
   const glow = t.glow? `${t.btnStyle==='glass'||t.btnStyle==='icons'?';':''}box-shadow:0 0 10px ${t.accent}55` : '';
   const size = t.btnStyle==='icons'? (small? 'width:16px;height:16px;flex:none' : 'width:24px;height:24px;flex:none') : '';
@@ -278,18 +279,18 @@ const BUILTIN_TEMPLATES = [
    theme:{bgType:'anim',anim:'ocean',bgA:'#02131f',bgB:'#0a2a4a',accent:'#38bdf8',font:'sora',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#e0f2fe',radius:18}},
   {id:'b10', name:'Neon Circuit', desc:'Full-spectrum holo chrome.', author:'misty', builtin:true, pro:true,
    theme:{bgType:'anim',anim:'holo',bgA:'#241a3a',bgB:'#0d2a33',accent:'#ffffff',font:'orbitron',btnStyle:'outline',glow:true,particles:false,cursorFx:true,textColor:'#ffffff',radius:10}},
-  {id:'b11', name:'Neon Static', desc:'Cyan-on-pink mono terminal, dot cursor.', author:'misty', builtin:true, pro:false,
-   theme:{bgType:'gradient',bgA:'#0a0a1a',bgB:'#3a1030',accent:'#00ced1',font:'mono',btnStyle:'outline',glow:true,particles:true,cursorFx:true,textColor:'#e0e0ff',radius:20,cursorStyle:'dot'}},
-  {id:'b12', name:'Terminal Root', desc:'Black-on-green hacker console.', author:'misty', builtin:true, pro:false,
-   theme:{bgType:'solid',bgA:'#04120a',bgB:'#04120a',accent:'#22c55e',font:'mono',btnStyle:'outline',glow:true,particles:false,cursorFx:false,textColor:'#c6f6d5',radius:4,cursorStyle:'cross'}},
+  {id:'b11', name:'Neon Static', desc:'Cyan-on-pink Space Mono, orbiting dot ring.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'gradient',bgA:'#0a0a1a',bgB:'#3a1030',accent:'#00ced1',font:'spacemono',btnStyle:'outline',glow:true,particles:true,cursorFx:true,textColor:'#e0e0ff',radius:20,cursorStyle:'dot',orbitRing:true}},
+  {id:'b12', name:'Terminal Root', desc:'Black-on-green hacker console, Space Mono.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'solid',bgA:'#04120a',bgB:'#04120a',accent:'#22c55e',font:'spacemono',btnStyle:'outline',glow:true,particles:false,cursorFx:false,textColor:'#c6f6d5',radius:4,cursorStyle:'cross',orbitRing:true}},
   {id:'b13', name:'Downpour', desc:'Stormy blues with drifting particles.', author:'misty', builtin:true, pro:false,
-   theme:{bgType:'gradient',bgA:'#0a1230',bgB:'#1e3a8a',accent:'#2563eb',font:'mono',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#dbeafe',radius:16}},
+   theme:{bgType:'gradient',bgA:'#0a1230',bgB:'#1e3a8a',accent:'#2563eb',font:'spacemono',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#dbeafe',radius:16,orbitRing:true}},
   {id:'b14', name:'Crimson OP', desc:'Anime-red glow with icon links.', author:'misty', builtin:true, pro:false,
-   theme:{bgType:'gradient',bgA:'#1a0505',bgB:'#dc2626',accent:'#f87171',font:'unbounded',btnStyle:'icons',glow:true,particles:true,cursorFx:false,textColor:'#fee2e2',radius:18,nameFx:'glow'}},
+   theme:{bgType:'gradient',bgA:'#1a0505',bgB:'#dc2626',accent:'#f87171',font:'spacemono',btnStyle:'icons',glow:true,particles:true,cursorFx:false,textColor:'#fee2e2',radius:18,nameFx:'glow',orbitRing:true}},
   {id:'b15', name:'Redline', desc:'Racing yellow on black, solid blocks.', author:'misty', builtin:true, pro:false,
-   theme:{bgType:'gradient',bgA:'#1a1400',bgB:'#eab308',accent:'#facc15',font:'orbitron',btnStyle:'solid',glow:true,particles:false,cursorFx:false,textColor:'#fffbea',radius:6}},
-  {id:'b16', name:'Static Frost', desc:'Black glass with icy cyan-blue buttons.', author:'misty', builtin:true, pro:false,
-   theme:{bgType:'gradient',bgA:'#0a0a0a',bgB:'#101820',accent:'#67cae2',font:'sora',btnStyle:'glass',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:17,cardOpacity:70}}
+   theme:{bgType:'gradient',bgA:'#1a1400',bgB:'#eab308',accent:'#facc15',font:'spacemono',btnStyle:'solid',glow:true,particles:false,cursorFx:false,textColor:'#fffbea',radius:6,orbitRing:true}},
+  {id:'b16', name:'Static Frost', desc:'The real forest photo, Chillax font, exact frost buttons & cursor.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'image',bgImage:'assets/theme-import/static-frost-bg.jpg',bgA:'#0a0a0a',bgB:'#101820',accent:'#67cae2',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,cursorStyle:'bia',textColor:'#ffffff',radius:17,cardOpacity:70}}
 ];
 
 let TPL_CACHE = [];
@@ -642,12 +643,12 @@ function renderEditorTab(){
       <div id="bgExtra"></div>
       ${field('Accent color', `<div class="swatches">${ACCENTS.map(c=>`<div class="sw ${t.accent===c?'on':''}" data-ac="${c}" style="background:${c};box-shadow:0 0 10px ${c}55"></div>`).join('')}</div>`)}
       ${field('Font', `<div class="optrow">${Object.keys(FONTS).map(f=>`<button class="opt ${t.font===f?'on':''}" data-font="${f}" style="font-family:${FONTS[f]}">${FONT_NAMES[f]}</button>`).join('')}</div>`)}
-      ${field('Button style', `<div class="optrow">${['glass','outline','solid','icons'].map(s=>`<button class="opt ${t.btnStyle===s?'on':''}" data-bs="${s}">${s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</div>`)}
+      ${field('Button style', `<div class="optrow">${['glass','outline','solid','icons','bia'].map(s=>`<button class="opt ${t.btnStyle===s?'on':''}" data-bs="${s}">${s==='bia'?'Frost':s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</div>`)}
       ${field('Corner radius', `<input id="eRad" type="range" min="0" max="28" value="${t.radius??16}">`)}
       ${field('Card opacity', `<input id="eCo" type="range" min="0" max="100" value="${t.cardOpacity??100}"><div class="hint">Slide to 0 for a fully transparent card — your content floats on the background.</div>`)}
       ${field('Card blur', `<input id="eCb" type="range" min="0" max="40" value="${t.cardBlur??28}">`)}
       ${field('Name effect', `<div class="optrow">${[['none','None'],['glow','✨ Glow'],['neon','💡 Neon pulse'],['rainbow','🌈 Rainbow']].map(([k,l])=>`<button class="opt ${(t.nameFx||'none')===k?'on':''}" data-nf="${k}">${l}</button>`).join('')}</div>`)}
-      ${field('Cursor', `<div class="optrow">${[['default','Default'],['dot','◉ Dot'],['cross','＋ Crosshair']].map(([k,l])=>`<button class="opt ${(t.cursorStyle||'default')===k?'on':''}" data-cs="${k}">${l}</button>`).join('')}</div>`)}
+      ${field('Cursor', `<div class="optrow">${[['default','Default'],['dot','◉ Dot'],['cross','＋ Crosshair'],['bia','🖼 Frost']].map(([k,l])=>`<button class="opt ${(t.cursorStyle||'default')===k?'on':''}" data-cs="${k}">${l}</button>`).join('')}</div>`)}
       ${field('Effects', `<div class="optrow">
         <button class="opt ${t.glow?'on':''}" id="fxGlow">✨ Glow</button>
         <button class="opt ${t.particles?'on':''}" id="fxPart">❄ Particles</button>
@@ -888,6 +889,9 @@ function pickUpload(kind, done, accept='image/*', maxMB=8){
 function cursorCSS(t){
   const c = t.accent||'#a78bfa';
   let svg = '', hx = 11, hy = 11, fb = 'auto';
+  if(t.cursorStyle==='bia'){
+    return `cursor:url('assets/theme-import/static-frost-cursor.png') 2 2,auto;`;
+  }
   if(t.cursorStyle==='dot'){
     svg = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><circle cx="11" cy="11" r="5" fill="${c}" fill-opacity="0.9"/><circle cx="11" cy="11" r="9" fill="none" stroke="${c}" stroke-opacity="0.5" stroke-width="1.5"/></svg>`;
   }else if(t.cursorStyle==='cross'){
@@ -950,7 +954,8 @@ function profileHTML(p, opts={}){
         ${t.tilt?`<div class="pp-glare"></div>`:''}
         ${p.banner? `<div class="pp-banner" style="background-image:url('${esc(p.banner)}')"></div>`:`<div class="pp-nobanner"></div>`}
         <div class="pp-head ${p.banner?'':'flat'}">
-          <img class="pp-av" src="${esc(p.avatar||avatarFor(p.username))}" alt="" style="${t.glow?`box-shadow:0 0 34px ${t.accent}66`:''}">
+          ${t.orbitRing?`<div class="pp-orbit-wrap" style="--pa:${t.accent}"><img class="pp-av" src="${esc(p.avatar||avatarFor(p.username))}" alt="" style="${t.glow?`box-shadow:0 0 34px ${t.accent}66`:''}"></div>`
+            :`<img class="pp-av" src="${esc(p.avatar||avatarFor(p.username))}" alt="" style="${t.glow?`box-shadow:0 0 34px ${t.accent}66`:''}">`}
           <div class="pp-name${t.nameFx&&t.nameFx!=='none'?' fx-'+esc(t.nameFx):''}">${esc(p.displayName||p.username)}</div>
           ${badgeChips(p.badges)}
           <div class="pp-user">misty.gg/${esc(p.username)}</div>

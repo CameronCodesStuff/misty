@@ -1224,6 +1224,33 @@ footer .logo{justify-content:center;margin-bottom:12px}
   border:1px solid rgba(255,255,255,.4);
   box-shadow:0 10px 28px color-mix(in srgb,var(--pa,#a78bfa) 30%,transparent),inset 0 1px 0 rgba(255,255,255,.55);
 }
+/* Exact button treatment ported from bia-bio's .btn class */
+.pp-link.bia{
+  color:#67cae2;
+  background:linear-gradient(90deg,#3399c06b,#3365c04a);
+  border:1px solid #2d5db18f;
+}
+.pp-link.bia:hover{
+  background:linear-gradient(90deg,#3399c0a0,#3365c080);
+  border-color:#67cae2;
+}
+/* Exact orbiting-dot decoration ported from gunslol's .profile-container::after */
+.pp-orbit-wrap{position:relative;display:inline-block;border-radius:50%}
+.pp-orbit-wrap::after{
+  content:'';
+  position:absolute;
+  top:-5px;left:-5px;right:-5px;bottom:-5px;
+  border-radius:50%;
+  background:radial-gradient(circle at 10px 10px,var(--pa,#00ced1) 15%,transparent 25%);
+  animation:ppOrbit 3s linear infinite;
+  z-index:-1;
+  filter:blur(2px);
+  box-shadow:0 0 10px var(--pa,#00ced1);
+}
+@keyframes ppOrbit{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
 .pp-link .li{font-size:22px;width:32px;text-align:center;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .pp-link .li img{width:24px;height:24px;object-fit:contain}
 .pp-link .lt{flex:1;min-width:0;text-align:left}
