@@ -47,7 +47,7 @@ const PRESETS = [
   {name:'Rose Static', pro:false, t:{preset:'Rose Static',bgType:'gradient',bgA:'#1a0512',bgB:'#2b0a2e',accent:'#f472b6',font:'unbounded',btnStyle:'glass',glow:true,particles:false,cursorFx:true,textColor:'#ffe4f1',radius:22}},
   {name:'Terminal', pro:false, t:{preset:'Terminal',bgType:'solid',bgA:'#050805',bgB:'#050805',accent:'#34d399',font:'mono',btnStyle:'outline',glow:true,particles:false,cursorFx:false,textColor:'#c6f6d5',radius:4}},
   {name:'Arcade', pro:false, t:{preset:'Arcade',bgType:'gradient',bgA:'#12002e',bgB:'#000000',accent:'#fbbf24',font:'pixel',btnStyle:'solid',glow:false,particles:true,cursorFx:false,textColor:'#fff7d6',radius:0}},
-  {name:'Ivory Ghost', pro:false, t:{preset:'Ivory Ghost',bgType:'gradient',bgA:'#101018',bgB:'#1c1c28',accent:'#ffffff',font:'serif',btnStyle:'outline',glow:false,particles:false,cursorFx:false,textColor:'#f5f5fa',radius:14}},
+  {name:'Ivory Ghost', pro:false, t:{preset:'Ivory Ghost',bgType:'gradient',bgA:'#101018',bgB:'#1c1c28',accent:'#ffffff',font:'serif',btnStyle:'icons',glow:true,particles:false,cursorFx:false,textColor:'#f5f5fa',radius:14}},
   {name:'Aurora Veil', pro:true, t:{preset:'Aurora Veil',bgType:'anim',anim:'aurora',bgA:'#04221c',bgB:'#0b1030',accent:'#34d399',font:'sora',btnStyle:'glass',glow:true,particles:false,cursorFx:true,textColor:'#e8fff7',radius:18}},
   {name:'Nebula Drift', pro:true, t:{preset:'Nebula Drift',bgType:'anim',anim:'nebula',bgA:'#1c0b3a',bgB:'#3a0b2e',accent:'#e879f9',font:'unbounded',btnStyle:'glass',glow:true,particles:false,cursorFx:true,textColor:'#f7e9ff',radius:20}},
   {name:'Holo Chrome', pro:true, t:{preset:'Holo Chrome',bgType:'anim',anim:'holo',bgA:'#241a3a',bgB:'#0d2a33',accent:'#ffffff',font:'orbitron',btnStyle:'outline',glow:true,particles:false,cursorFx:true,textColor:'#ffffff',radius:14}},
@@ -68,7 +68,7 @@ function detectBrand(url){ try{ const h=new URL(safeUrl(url)).hostname.toLowerCa
 function brandImg(slug,color){ return `<img src="https://cdn.simpleicons.org/${slug}/${color.replace('#','')}" alt="${esc(BRANDS[slug]||slug)}" loading="lazy" onerror="this.style.display='none'">`; }
 function iconHTML(icon, t){
   if(BRANDS[icon]){
-    const c = t.btnStyle==='solid' ? '0a0a14' : (t.accent==='#ffffff' ? 'ffffff' : t.accent.replace('#',''));
+    const c = t.btnStyle==='solid' ? '0a0a14' : t.btnStyle==='icons' ? 'ffffff' : (t.accent==='#ffffff' ? 'ffffff' : t.accent.replace('#',''));
     return brandImg(icon, c);
   }
   return esc(icon||'🔗');
@@ -230,32 +230,76 @@ function navHTML(active){
 }
 function avatarFor(name){ return `https://api.dicebear.com/9.x/shapes/svg?seed=${encodeURIComponent(name||'misty')}`; }
 
+function miniLinkStyle(t, small){
+  const r = t.btnStyle==='icons'? '50%' : Math.min(t.radius, small?12:13)+'px';
+  const fill = t.btnStyle==='solid'? `background:${t.accent}`
+    : t.btnStyle==='outline'? `border:1.5px solid ${t.accent}`
+    : `background:linear-gradient(165deg,rgba(255,255,255,.16),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)`;
+  const glow = t.glow? `${t.btnStyle==='glass'||t.btnStyle==='icons'?';':''}box-shadow:0 0 10px ${t.accent}55` : '';
+  const size = t.btnStyle==='icons'? (small? 'width:16px;height:16px;flex:none' : 'width:24px;height:24px;flex:none') : '';
+  return `border-radius:${r};${fill};${glow};${size}`;
+}
 function miniThemeInner(p){
   const t = p.t;
   const bg = t.bgType==='anim'? '' : t.bgType==='solid'? `background:${t.bgA}` : t.bgType==='mist'? `background:radial-gradient(120% 90% at 20% 10%,${t.bgA}33,transparent 60%),radial-gradient(110% 90% at 85% 85%,${t.bgB}2e,transparent 60%),#0a0a14` : `background:linear-gradient(140deg,${t.bgA},${t.bgB})`;
   const animLayer = t.bgType==='anim'? `<div class="pp-anim anim-${t.anim}" style="inset:0"></div>`:'';
-  const linkStyle = (r)=>`border-radius:${Math.min(t.radius,12)}px;${t.btnStyle==='solid'?`background:${t.accent}`:t.btnStyle==='outline'?`border:1.5px solid ${t.accent}`:`background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15)`};${t.glow?`box-shadow:0 0 10px ${t.accent}55`:''}`;
+  const row = t.btnStyle==='icons'? 'flex-direction:row;justify-content:center' : '';
   return `<div style="position:absolute;inset:0;${bg}">${animLayer}</div>
     <div class="pv-user" style="font-family:${FONTS[t.font]};color:${t.textColor}">username</div>
-    <div class="pv-links"><i style="${linkStyle()}"></i><i style="${linkStyle()}"></i><i style="${linkStyle()}"></i></div>`;
+    <div class="pv-links" style="${row}"><i style="${miniLinkStyle(t,true)}"></i><i style="${miniLinkStyle(t,true)}"></i><i style="${miniLinkStyle(t,true)}"></i></div>`;
 }
 
 function renderLanding(){
+  const wIcon = s => `<img src="https://cdn.simpleicons.org/${s}/ffffff" alt="" loading="lazy">`;
   app.innerHTML = navHTML('') + `
   <div class="wrap">
     <div class="hero">
-      <img class="hero-logo" src="logo.png" alt="Misty">
-      <div class="eyebrow">// digital identity, reimagined</div>
-      <h1>Your identity.<br>Your space.<br><span class="gr">Your Misty.</span></h1>
-      <p>Create a digital identity that feels completely yours. Animated backgrounds, living links, widgets, themes — one page that is unmistakably you.</p>
-      <div class="cta">
-        <button class="btn primary" onclick="go('auth')">Create Your Misty</button>
-        <button class="btn" onclick="go('discover')">Explore Profiles</button>
+      <div class="hero-copy">
+        <img class="hero-logo" src="logo.png" alt="Misty">
+        <div class="eyebrow">// digital identity, reimagined</div>
+        <h1>Your identity.<br>Your space.<br><span class="gr">Your Misty.</span></h1>
+        <p>Create a digital identity that feels completely yours. Animated backgrounds, living links, widgets, themes — one page that is unmistakably you.</p>
+        <div class="cta">
+          <button class="btn primary" onclick="go('auth')">Create Your Misty</button>
+          <button class="btn" onclick="go('discover')">Explore Profiles</button>
+        </div>
+        <div class="claim glass">
+          <span>misty.gg/</span>
+          <input id="claimIn" placeholder="yourname" maxlength="20" spellcheck="false" autocomplete="off">
+          <button class="btn primary sm" id="claimBtn">Claim</button>
+        </div>
       </div>
-      <div class="claim glass">
-        <span>misty.gg/</span>
-        <input id="claimIn" placeholder="yourname" maxlength="20" spellcheck="false" autocomplete="off">
-        <button class="btn primary sm" id="claimBtn">Claim</button>
+      <div class="mockdeck" aria-hidden="true">
+        <div class="mockcard c1" style="--mc-bg:radial-gradient(120% 90% at 30% 0%,rgba(148,148,168,.18),transparent 60%)">
+          <img class="mav" src="${avatarFor('azrea')}" alt="">
+          <div class="mname">azrea</div>
+          <div class="mbadges"><i>✦</i><i>♛</i><i>✧</i></div>
+          <div class="mstatus">GFX Artist | Owner</div>
+          <div class="mlink">My Portfolio</div>
+          <div class="mlink">My Store</div>
+          <div class="mlink">My Discord Server</div>
+          <div class="mviews">👁 2,317</div>
+        </div>
+        <div class="mockcard c2" style="--mc-bg:radial-gradient(120% 90% at 70% 0%,rgba(103,232,249,.16),transparent 60%)">
+          <img class="mav" src="${avatarFor('vue')}" alt="">
+          <div class="mname">vue</div>
+          <div class="mbadges"><i>✧</i><i>✦</i></div>
+          <div class="mstatus">welcome to my page!</div>
+          <div class="micons"><i>${wIcon('github')}</i><i>${wIcon('spotify')}</i><i>${wIcon('discord')}</i><i>${wIcon('steam')}</i></div>
+          <div class="mviews">👁 3,194</div>
+        </div>
+        <div class="mockcard c3" style="--mc-bg:radial-gradient(130% 90% at 50% 0%,rgba(167,139,250,.24),transparent 62%)">
+          <img class="mav" src="${avatarFor('hris')}" alt="">
+          <div class="mname">hris</div>
+          <div class="mbadges"><i>✦</i><i>✧</i><i>♛</i><i>✦</i></div>
+          <div class="mstatus">guns.lol on top!</div>
+          <div class="mpresence">
+            <div class="pi">${wIcon('discord')}</div>
+            <div><b>popaperc</b><span>Playing Visual Studio Code<br>editing globals.css</span></div>
+          </div>
+          <div class="micons"><i>${wIcon('github')}</i><i>${wIcon('discord')}</i><i>${wIcon('x')}</i></div>
+          <div class="mviews">👁 4,814</div>
+        </div>
       </div>
     </div>
   </div>
@@ -278,8 +322,8 @@ function renderLanding(){
           ${p.t.bgType==='anim'?`<div class="pp-anim anim-${p.t.anim}" style="inset:0"></div>`:''}
         </div>
         <div class="tuser" style="font-family:${FONTS[p.t.font]};color:${p.t.textColor}">username</div>
-        <div class="tlinks">
-          ${[1,2,3].map(()=>`<i style="border-radius:${Math.min(p.t.radius,13)}px;${p.t.btnStyle==='solid'?`background:${p.t.accent}`:p.t.btnStyle==='outline'?`border:1.5px solid ${p.t.accent}`:`background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15)`};${p.t.glow?`box-shadow:0 0 12px ${p.t.accent}44`:''}"></i>`).join('')}
+        <div class="tlinks" style="${p.t.btnStyle==='icons'?'flex-direction:row;justify-content:center':''}">
+          ${[1,2,3].map(()=>`<i style="${miniLinkStyle(p.t,false)}"></i>`).join('')}
         </div>
         <div class="tlabel">${p.pro?'✦ ':''}${p.name}</div>
       </div>`).join('')}
@@ -445,7 +489,7 @@ function renderEditorTab(){
       <div id="bgExtra"></div>
       ${field('Accent color', `<div class="swatches">${ACCENTS.map(c=>`<div class="sw ${t.accent===c?'on':''}" data-ac="${c}" style="background:${c};box-shadow:0 0 10px ${c}55"></div>`).join('')}</div>`)}
       ${field('Font', `<div class="optrow">${Object.keys(FONTS).map(f=>`<button class="opt ${t.font===f?'on':''}" data-font="${f}" style="font-family:${FONTS[f]}">${FONT_NAMES[f]}</button>`).join('')}</div>`)}
-      ${field('Button style', `<div class="optrow">${['glass','outline','solid'].map(s=>`<button class="opt ${t.btnStyle===s?'on':''}" data-bs="${s}">${s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</div>`)}
+      ${field('Button style', `<div class="optrow">${['glass','outline','solid','icons'].map(s=>`<button class="opt ${t.btnStyle===s?'on':''}" data-bs="${s}">${s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</div>`)}
       ${field('Corner radius', `<input id="eRad" type="range" min="0" max="28" value="${t.radius??16}">`)}
       ${field('Effects', `<div class="optrow">
         <button class="opt ${t.glow?'on':''}" id="fxGlow">✨ Glow</button>
@@ -681,49 +725,68 @@ function bgStyle(t){
 function ytEmbed(u){ try{ const url=new URL(u); let id=''; if(url.hostname.includes('youtu.be')) id=url.pathname.slice(1); else id=url.searchParams.get('v')||url.pathname.split('/').pop(); return id? `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}`:''; }catch{ return ''; } }
 function spEmbed(u){ try{ const url=new URL(u); if(!url.hostname.includes('spotify.com')) return ''; return `https://open.spotify.com/embed${url.pathname}`; }catch{ return ''; } }
 
+function badgeChips(list){
+  const map = {
+    og:`<span class="pp-badge" title="OG — early member">✧</span>`,
+    pro:`<span class="pp-badge pro" title="Misty Pro">✦</span>`,
+    owner:`<span class="pp-badge owner" title="Owner">♛</span>`
+  };
+  const out = (list||[]).map(b=>map[b]||'').join('');
+  return out? `<div class="pp-badges">${out}</div>`:'';
+}
+
 function profileHTML(p, opts={}){
   const t = {...DEFAULT_THEME, ...(p.theme||{})};
   const font = FONTS[t.font]||FONTS.sora;
-  const badges = (p.badges||[]).map(b=>({og:`<span class="badge og">OG</span>`,pro:`<span class="badge pro">✦ PRO</span>`,owner:`<span class="badge owner">OWNER</span>`}[b]||'')).join('');
   const animLayer = t.bgType==='anim'? `<div class="pp-anim anim-${esc(t.anim||'aurora')}"></div>`:'';
   const bgLayer = t.bgType==='image' && t.bgImage? `<img src="${esc(t.bgImage)}" alt="">`
     : t.bgType==='video' && t.bgVideo? `<video src="${esc(t.bgVideo)}" autoplay muted loop playsinline></video>` : '';
-  const overlay = (t.bgType==='image'||t.bgType==='video')? `<div style="position:absolute;inset:0;background:rgba(4,4,10,.45)"></div>`:'';
+  const overlay = (t.bgType==='image'||t.bgType==='video')? `<div style="position:absolute;inset:0;background:rgba(4,4,10,.4)"></div>`:'';
   const partCanvas = t.particles? `<canvas class="pp-particles" style="position:absolute;inset:0;width:100%;height:100%;z-index:1"></canvas>`:'';
+  const links = p.links||[];
+  const iconRow = t.btnStyle==='icons';
+  const linksHTML = iconRow
+    ? `<div class="pp-iconrow">${links.map(l=>`
+        <a class="pp-icon ${t.glow?'glow':''}" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener" data-lid="${esc(l.id)}" title="${esc(l.title)}" aria-label="${esc(l.title)}">${iconHTML(l.icon, t)}</a>`).join('')}</div>`
+    : `<div class="pp-links">${links.map(l=>`
+        <a class="pp-link ${t.btnStyle} ${t.glow?'glow':''}" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener" data-lid="${esc(l.id)}">
+          <span class="li">${iconHTML(l.icon, t)}</span>
+          <span class="lt"><b>${esc(l.title)}</b>${l.desc?`<span>${esc(l.desc)}</span>`:''}</span>
+          <span class="arrow">↗</span>
+        </a>`).join('')}</div>`;
+  const widgetLinkStyle = iconRow? 'glass' : t.btnStyle;
   return `<div class="pp-stage" ${t.bgType==='anim'?`data-anim="${esc(t.anim||'aurora')}"`:''} style="${bgStyle(t)};color:${t.textColor||'#e7e7f2'};font-family:${font};--pa:${t.accent};--pr:${t.radius??16}px">
     <div class="pp-bg">${animLayer}${bgLayer}${overlay}${partCanvas}</div>
-    ${opts.preview?'':`<div class="pp-views mono">👁 ${num(p.views)}</div>`}
     <div class="pp-content">
-      ${p.banner? `<div class="pp-banner" style="background-image:url('${esc(p.banner)}')"></div>`:`<div style="height:60px"></div>`}
-      <div class="pp-head" style="${p.banner?'':'margin-top:0'}">
-        <img class="pp-av" src="${esc(p.avatar||avatarFor(p.username))}" alt="" style="${t.glow?`box-shadow:0 0 34px ${t.accent}66`:''}">
-        <div class="pp-name">${esc(p.displayName||p.username)} ${badges}</div>
-        <div class="pp-user">misty.gg/${esc(p.username)}</div>
-        ${p.status? `<div class="pp-status">${esc(p.status)}</div>`:''}
-        ${p.bio? `<div class="pp-bio">${esc(p.bio)}</div>`:''}
+      <div class="pp-card">
+        ${p.banner? `<div class="pp-banner" style="background-image:url('${esc(p.banner)}')"></div>`:`<div class="pp-nobanner"></div>`}
+        <div class="pp-head ${p.banner?'':'flat'}">
+          <img class="pp-av" src="${esc(p.avatar||avatarFor(p.username))}" alt="" style="${t.glow?`box-shadow:0 0 34px ${t.accent}66`:''}">
+          <div class="pp-name">${esc(p.displayName||p.username)}</div>
+          ${badgeChips(p.badges)}
+          <div class="pp-user">misty.gg/${esc(p.username)}</div>
+          ${p.status? `<div class="pp-status">${esc(p.status)}</div>`:''}
+          ${p.bio? `<div class="pp-bio">${esc(p.bio)}</div>`:''}
+        </div>
+        ${linksHTML}
+        <div class="pp-widgets">
+          ${(p.widgets||[]).map(w=>{
+            if(w.type==='youtube'){ const e=ytEmbed(w.value); return e?`<div class="pp-widget"><iframe src="${esc(e)}" height="230" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe></div>`:''; }
+            if(w.type==='spotify'){ const e=spEmbed(w.value); return e?`<div class="pp-widget"><iframe src="${esc(e)}" height="152" allow="encrypted-media" loading="lazy" style="border-radius:18px"></iframe></div>`:''; }
+            if(w.type==='discord'){ return `<a class="pp-link ${widgetLinkStyle} ${t.glow?'glow':''}" href="${esc(safeUrl(w.value))}" target="_blank" rel="noopener"><span class="li">${iconHTML('discord',t)}</span><span class="lt"><b>${esc(w.title||'Join my Discord')}</b><span>discord invite</span></span><span class="arrow">↗</span></a>`; }
+            if(w.type==='image'){ return `<div class="pp-widget"><img src="${esc(safeUrl(w.value))}" alt="" loading="lazy"></div>`; }
+            if(w.type==='text'){ return `<div class="pp-widget"><div class="wtext">${w.title?`<b style="display:block;margin-bottom:8px">${esc(w.title)}</b>`:''}${esc(w.value)}</div></div>`; }
+            return '';
+          }).join('')}
+        </div>
+        <div class="pp-meta">
+          <span class="pp-views">👁 ${num(p.views)}</span>
+          ${opts.preview? '' : `<div class="pp-actions">
+            <button id="ppLike" class="${opts.liked?'liked':''}">❤ <span id="ppLikeN">${num(p.likes)}</span></button>
+            <button id="ppShare">↗ Share</button>
+          </div>`}
+        </div>
       </div>
-      <div class="pp-links">
-        ${(p.links||[]).map(l=>`
-          <a class="pp-link ${t.btnStyle} ${t.glow?'glow':''}" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener" data-lid="${esc(l.id)}">
-            <span class="li">${iconHTML(l.icon, t)}</span>
-            <span class="lt"><b>${esc(l.title)}</b>${l.desc?`<span>${esc(l.desc)}</span>`:''}</span>
-            <span class="arrow">↗</span>
-          </a>`).join('')}
-      </div>
-      <div class="pp-widgets">
-        ${(p.widgets||[]).map(w=>{
-          if(w.type==='youtube'){ const e=ytEmbed(w.value); return e?`<div class="pp-widget"><iframe src="${esc(e)}" height="230" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe></div>`:''; }
-          if(w.type==='spotify'){ const e=spEmbed(w.value); return e?`<div class="pp-widget"><iframe src="${esc(e)}" height="152" allow="encrypted-media" loading="lazy" style="border-radius:18px"></iframe></div>`:''; }
-          if(w.type==='discord'){ return `<a class="pp-link ${t.btnStyle} ${t.glow?'glow':''}" href="${esc(safeUrl(w.value))}" target="_blank" rel="noopener"><span class="li">${iconHTML('discord',t)}</span><span class="lt"><b>${esc(w.title||'Join my Discord')}</b><span>discord invite</span></span><span class="arrow">↗</span></a>`; }
-          if(w.type==='image'){ return `<div class="pp-widget"><img src="${esc(safeUrl(w.value))}" alt="" loading="lazy"></div>`; }
-          if(w.type==='text'){ return `<div class="pp-widget"><div class="wtext">${w.title?`<b style="display:block;margin-bottom:8px">${esc(w.title)}</b>`:''}${esc(w.value)}</div></div>`; }
-          return '';
-        }).join('')}
-      </div>
-      ${opts.preview? '' : `<div class="pp-actions">
-        <button id="ppLike" class="${opts.liked?'liked':''}">❤ <span id="ppLikeN">${num(p.likes)}</span></button>
-        <button id="ppShare">↗ Share</button>
-      </div>`}
       <div class="pp-foot"><img src="logo.png" alt="">made with MISTY</div>
     </div>
   </div>`;
