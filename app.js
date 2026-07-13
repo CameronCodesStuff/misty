@@ -61,6 +61,19 @@ const PRESETS = [
   {name:'Redline', pro:false, t:{preset:'Redline',bgType:'gradient',bgA:'#1a1400',bgB:'#eab308',accent:'#facc15',font:'spacemono',btnStyle:'solid',glow:true,particles:false,cursorFx:false,textColor:'#fffbea',radius:6,orbitRing:true}},
   {name:'Static Frost', pro:false, t:{preset:'Static Frost',bgType:'image',bgImage:'assets/theme-import/static-frost-bg.jpg',bgA:'#0a0a0a',bgB:'#101820',accent:'#67cae2',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,cursorStyle:'bia',textColor:'#ffffff',radius:17,cardOpacity:70}}
 ];
+
+// Reskin every preset/template with the exact bia-bio look: frosted
+// cyan-blue buttons, Chillax font, the real bia-bio cursor image and its
+// 17px corner radius. Each preset keeps its own background/accent colors
+// so they're still distinguishable as separate themes.
+function applyBiaChrome(themeObj){
+  themeObj.btnStyle = 'bia';
+  themeObj.font = 'chillax';
+  themeObj.cursorStyle = 'bia';
+  themeObj.radius = 17;
+  return themeObj;
+}
+PRESETS.forEach(p=>applyBiaChrome(p.t));
 const DEFAULT_THEME = JSON.parse(JSON.stringify(PRESETS[0].t));
 
 function toast(msg, icon='✨'){ const t=document.createElement('div'); t.className='toast'; t.innerHTML=`<span>${icon}</span><span>${esc(msg)}</span>`; $('#toasts').appendChild(t); setTimeout(()=>{t.style.opacity='0';t.style.transition='.4s';setTimeout(()=>t.remove(),400)},2600); }
@@ -292,6 +305,7 @@ const BUILTIN_TEMPLATES = [
   {id:'b16', name:'Static Frost', desc:'The real forest photo, Chillax font, exact frost buttons & cursor.', author:'misty', builtin:true, pro:false,
    theme:{bgType:'image',bgImage:'assets/theme-import/static-frost-bg.jpg',bgA:'#0a0a0a',bgB:'#101820',accent:'#67cae2',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,cursorStyle:'bia',textColor:'#ffffff',radius:17,cardOpacity:70}}
 ];
+BUILTIN_TEMPLATES.forEach(b=>applyBiaChrome(b.theme));
 
 let TPL_CACHE = [];
 let TPL_FILTER = 'all';
