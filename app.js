@@ -59,7 +59,11 @@ const PRESETS = [
   {name:'Downpour', pro:false, t:{preset:'Downpour',bgType:'gradient',bgA:'#0a1230',bgB:'#1e3a8a',accent:'#2563eb',font:'spacemono',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#dbeafe',radius:16,orbitRing:true}},
   {name:'Crimson OP', pro:false, t:{preset:'Crimson OP',bgType:'gradient',bgA:'#1a0505',bgB:'#dc2626',accent:'#f87171',font:'spacemono',btnStyle:'icons',glow:true,particles:true,cursorFx:false,textColor:'#fee2e2',radius:18,nameFx:'glow',orbitRing:true}},
   {name:'Redline', pro:false, t:{preset:'Redline',bgType:'gradient',bgA:'#1a1400',bgB:'#eab308',accent:'#facc15',font:'spacemono',btnStyle:'solid',glow:true,particles:false,cursorFx:false,textColor:'#fffbea',radius:6,orbitRing:true}},
-  {name:'Static Frost', pro:false, t:{preset:'Static Frost',bgType:'image',bgImage:'assets/theme-import/static-frost-bg.jpg',bgA:'#0a0a0a',bgB:'#101820',accent:'#67cae2',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,cursorStyle:'bia',textColor:'#ffffff',radius:17,cardOpacity:70}}
+  {name:'Static Frost', pro:false, t:{preset:'Static Frost',bgType:'image',bgImage:'assets/theme-import/static-frost-bg.jpg',bgA:'#0a0a0a',bgB:'#101820',accent:'#67cae2',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,cursorStyle:'bia',textColor:'#ffffff',radius:17,cardOpacity:70}},
+  {name:'Rainy Pines', pro:true, t:{preset:'Rainy Pines',bgType:'video',bgVideo:'assets/backgrounds/rainy-pine-forest.mp4',bgA:'#0a1410',bgB:'#12201a',accent:'#7dd3a8',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Sakura Bloom', pro:true, t:{preset:'Sakura Bloom',bgType:'video',bgVideo:'assets/backgrounds/large-sakura-tree.mp4',bgA:'#1a0a12',bgB:'#2a1020',accent:'#f9a8d4',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Celestial Veil', pro:true, t:{preset:'Celestial Veil',bgType:'video',bgVideo:'assets/backgrounds/celestial-veil.mp4',bgA:'#080614',bgB:'#140f2a',accent:'#a78bfa',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Shadow Monarch', pro:true, t:{preset:'Shadow Monarch',bgType:'video',bgVideo:'assets/backgrounds/shadow-king.mp4',bgA:'#0a0616',bgB:'#160b2e',accent:'#8b5cf6',font:'chillax',btnStyle:'bia',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}}
 ];
 
 // Reskin every preset/template with the exact bia-bio look: frosted
@@ -75,6 +79,12 @@ function applyBiaChrome(themeObj){
 }
 PRESETS.forEach(p=>applyBiaChrome(p.t));
 const DEFAULT_THEME = JSON.parse(JSON.stringify(PRESETS[0].t));
+const BG_VIDEOS = [
+  {name:'Rainy Pine Forest', res:'1080p', src:'assets/backgrounds/rainy-pine-forest.mp4'},
+  {name:'Large Sakura Tree', res:'4K', src:'assets/backgrounds/large-sakura-tree.mp4'},
+  {name:'Celestial Veil', res:'4K', src:'assets/backgrounds/celestial-veil.mp4'},
+  {name:'Shadow King', res:'4K', src:'assets/backgrounds/shadow-king.mp4'}
+];
 
 function toast(msg, icon='✨'){ const t=document.createElement('div'); t.className='toast'; t.innerHTML=`<span>${icon}</span><span>${esc(msg)}</span>`; $('#toasts').appendChild(t); setTimeout(()=>{t.style.opacity='0';t.style.transition='.4s';setTimeout(()=>t.remove(),400)},2600); }
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -172,7 +182,7 @@ async function claimUsername(user, wanted){
         tx.set(doc(db,'profiles',test),{
           owner:user.uid, username:test, displayName:user.displayName||test,
           avatar:user.photoURL||'', banner:'', bio:'Just arrived in the mist.', status:'',
-          badges:['og'], theme:DEFAULT_THEME, links:[], widgets:[],
+          badges:['og'], theme:DEFAULT_THEME, links:[], widgets:[], location:'',
           views:0, likes:0, createdAt:serverTimestamp()
         });
       });
@@ -635,11 +645,13 @@ function renderEditorTab(){
       ${field('Display name', `<input id="eName" value="${esc(p.displayName)}" maxlength="32">`)}
       ${field('Status', `<input id="eStatus" value="${esc(p.status||'')}" maxlength="60" placeholder="🌫️ vibing in the mist">`)}
       ${field('Bio', `<textarea id="eBio" rows="4" maxlength="400">${esc(p.bio||'')}</textarea>`)}
+      ${field('Location', `<input id="eLoc" value="${esc(p.location||'')}" maxlength="24" placeholder="NZ">`)}
       ${field('Avatar', `<div class="filedrop" id="upAv">${p.avatar?'Change avatar':'Upload avatar'} · or paste a URL below</div><input id="eAv" value="${esc(p.avatar||'')}" placeholder="https://..." style="margin-top:8px">`)}
       ${field('Banner', `<div class="filedrop" id="upBan">${p.banner?'Change banner':'Upload banner'} · or paste a URL below</div><input id="eBan" value="${esc(p.banner||'')}" placeholder="https://..." style="margin-top:8px">`)}`;
     $('#eName').oninput = e=>{ p.displayName=e.target.value; saveProfile(); };
     $('#eStatus').oninput = e=>{ p.status=e.target.value; saveProfile(); };
     $('#eBio').oninput = e=>{ p.bio=e.target.value; saveProfile(); };
+    $('#eLoc').oninput = e=>{ p.location=e.target.value; saveProfile(); };
     $('#eAv').onchange = e=>{ p.avatar=safeUrl(e.target.value); saveProfile(); };
     $('#eBan').onchange = e=>{ p.banner=safeUrl(e.target.value); saveProfile(); };
     $('#upAv').onclick = ()=>pickUpload('avatar', url=>{ p.avatar=url; $('#eAv').value=url; saveProfile(); });
@@ -717,7 +729,18 @@ function renderEditorTab(){
       $('#upBg').onclick = ()=>pickUpload('background', url=>{ t.bgImage=url; saveProfile(); renderEditorTab(); });
     }
     if(t.bgType==='video'){
-      extra.innerHTML = field('Background video (mp4/webm)', `<div class="filedrop" id="upVid">Upload video</div><input id="bgVid" value="${esc(t.bgVideo||'')}" placeholder="https://....mp4" style="margin-top:8px">`);
+      extra.innerHTML = field('Video presets — full original quality', `<div class="vidgrid">${BG_VIDEOS.map((v,i)=>`
+        <div class="vidcard ${t.bgVideo===v.src?'on':''}" data-vid="${i}">
+          <video src="${v.src}" muted loop playsinline preload="metadata"></video>
+          <div class="vidname">${v.name}<span class="vidres">${v.res}</span></div>
+        </div>`).join('')}</div>`)
+      + field('Or your own (mp4/webm)', `<div class="filedrop" id="upVid">Upload video</div><input id="bgVid" value="${esc(t.bgVideo||'')}" placeholder="https://....mp4" style="margin-top:8px">`);
+      extra.querySelectorAll('[data-vid]').forEach(c=>{
+        const vid = c.querySelector('video');
+        c.onmouseenter = ()=>vid.play().catch(()=>{});
+        c.onmouseleave = ()=>{ vid.pause(); vid.currentTime=0; };
+        c.onclick = ()=>{ t.bgVideo=BG_VIDEOS[+c.dataset.vid].src; t.preset=''; saveProfile(); renderEditorTab(); };
+      });
       $('#bgVid').onchange = e=>{ t.bgVideo=safeUrl(e.target.value); saveProfile(); };
       $('#upVid').onclick = ()=>pickUpload('bgvideo', url=>{ t.bgVideo=url; saveProfile(); renderEditorTab(); }, 'video/*', 50);
     }
@@ -937,64 +960,106 @@ function badgeChips(list){
   return out? `<div class="pp-badges">${out}</div>`:'';
 }
 
+const BIA_BADGES = {
+  owner:{tip:'Owner', svg:`<svg xmlns="http://www.w3.org/2000/svg" height="1.3em" width="1.3em" viewBox="0 0 24 24"><path d="m21.58 11.4-4.28-7.39-.35-.6h-9.91l-.35.6-4.27 7.39-.35.6.35.6 4.27 7.39.35.6h9.92l.35-.6 4.28-7.39.35-.6zm-13.07-1.03-1.63 1.63 1.63 1.63v2.73l-4.36-4.36 4.37-4.37v2.74zm3.12 6.93-2.04-.63 3.1-9.98 2.04.64zm3.86-.93v-2.73l1.63-1.64-1.63-1.63v-2.74l4.36 4.37z" fill="currentColor"/></svg>`},
+  og:{tip:'OG — early member', svg:`<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="1 1.5 22 21" style="fill:currentColor"><path d="m8.6 22.5l-1.9-3.2l-3.6-.8l.35-3.7L1 12l2.45-2.8l-.35-3.7l3.6-.8l1.9-3.2L12 2.95l3.4-1.45l1.9 3.2l3.6.8l-.35 3.7L23 12l-2.45 2.8l.35 3.7l-3.6.8l-1.9 3.2l-3.4-1.45l-3.4 1.45Zm2.35-6.95L16.6 9.9l-1.4-1.45l-4.25 4.25l-2.15-2.1L7.4 12l3.55 3.55Z"></path></svg>`},
+  pro:{tip:'Misty Pro', svg:`<svg xmlns="http://www.w3.org/2000/svg" height="1em" width="1.3em" viewBox="23 32 465 448"><path d="M396.31 32H264l84.19 112.26L396.31 32zm-280.62 0l48.12 112.26L248 32H115.69zM256 74.67L192 160h128l-64-85.33zm166.95-23.61L376.26 160H488L422.95 51.06zm-333.9 0L23 160h112.74L89.05 51.06zM146.68 192H24l222.8 288h.53L146.68 192zm218.64 0L264.67 480h.53L488 192H365.32zm-35.93 0H182.61L256 400l73.39-208z" fill="currentColor"/></svg>`}
+};
+
 function profileHTML(p, opts={}){
   const t = {...DEFAULT_THEME, ...(p.theme||{})};
   const font = FONTS[t.font]||FONTS.sora;
+  const pre = !!opts.preview;
+  const av = pre ? 'show' : '';
+  const tc = t.textColor||'#ffffff';
   const animLayer = t.bgType==='anim'? `<div class="pp-anim anim-${esc(t.anim||'aurora')}"></div>`:'';
-  const bgLayer = t.bgType==='image' && t.bgImage? `<img src="${esc(t.bgImage)}" alt="">`
-    : t.bgType==='video' && t.bgVideo? `<video src="${esc(t.bgVideo)}" autoplay muted loop playsinline></video>` : '';
-  const overlay = (t.bgType==='image'||t.bgType==='video')? `<div style="position:absolute;inset:0;background:rgba(4,4,10,.4)"></div>`:'';
+  const bgLayer = t.bgType==='image' && t.bgImage? `<img class="bia-media" src="${esc(t.bgImage)}" alt="">`
+    : t.bgType==='video' && t.bgVideo? `<video class="bia-media" src="${esc(t.bgVideo)}" autoplay muted loop playsinline preload="auto" disablepictureinpicture></video>` : '';
   const partCanvas = t.particles? `<canvas class="pp-particles" style="position:absolute;inset:0;width:100%;height:100%;z-index:1"></canvas>`:'';
   const statics = t.bgType==='mist'||t.bgType==='gradient'||t.bgType==='solid';
   const orbA = t.bgType==='solid'? (t.accent||'#a78bfa') : (t.bgA||t.accent||'#a78bfa');
   const orbB = t.bgType==='solid'? (t.bgA||'#67e8f9') : (t.bgB||t.accent||'#67e8f9');
   const fxLayers = `${statics?`<div class="pp-orb o1" style="background:${esc(orbA)}"></div><div class="pp-orb o2" style="background:${esc(orbB)}"></div>`:''}<div class="pp-tex"></div>`;
+  const name = String(p.displayName||p.username||'misty');
+  const nameHTML = `${esc(name.charAt(0))}<span>${esc(name.slice(1))}</span>`;
+  const typedSrc = (p.status||p.bio||'welcome to my page').split('|').map(s=>s.trim()).filter(Boolean).join(' <> ');
+  const badges = (p.badges||[]).filter(b=>BIA_BADGES[b]);
+  const badgesHTML = badges.length? `<div class="bia-badges">${badges.map(b=>`
+    <div class="bia-badge" data-tip="${esc(BIA_BADGES[b].tip)}">${BIA_BADGES[b].svg}</div>`).join('')}</div>`:'';
   const links = p.links||[];
-  const iconRow = t.btnStyle==='icons';
-  const linksHTML = iconRow
-    ? `<div class="pp-iconrow">${links.map(l=>`
-        <a class="pp-icon ${t.glow?'glow':''}" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener" data-lid="${esc(l.id)}" title="${esc(l.title)}" aria-label="${esc(l.title)}">${iconHTML(l.icon, t)}</a>`).join('')}</div>`
-    : `<div class="pp-links">${links.map(l=>`
-        <a class="pp-link ${t.btnStyle} ${t.glow?'glow':''}" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener" data-lid="${esc(l.id)}">
-          <span class="li">${iconHTML(l.icon, t)}</span>
-          <span class="lt"><b>${esc(l.title)}</b>${l.desc?`<span>${esc(l.desc)}</span>`:''}</span>
-          <span class="arrow">↗</span>
-        </a>`).join('')}</div>`;
-  const widgetLinkStyle = iconRow? 'glass' : t.btnStyle;
-  return `<div class="pp-stage" ${t.bgType==='anim'?`data-anim="${esc(t.anim||'aurora')}"`:''} style="${bgStyle(t)};${cursorCSS(t)}color:${t.textColor||'#e7e7f2'};font-family:${font};--pa:${t.accent};--pr:${t.radius??16}px;--co:${Math.max(0,Math.min(100,t.cardOpacity??100))/100};--cb:${Math.max(0,Math.min(40,t.cardBlur??28))}px">
-    <div class="pp-bg">${animLayer}${bgLayer}${overlay}${fxLayers}${partCanvas}</div>
-    <div class="pp-content">
-      <div class="pp-card">
-        ${t.tilt?`<div class="pp-glare"></div>`:''}
-        ${p.banner? `<div class="pp-banner" style="background-image:url('${esc(p.banner)}')"></div>`:`<div class="pp-nobanner"></div>`}
-        <div class="pp-head ${p.banner?'':'flat'}">
-          ${t.orbitRing?`<div class="pp-orbit-wrap" style="--pa:${t.accent}"><img class="pp-av" src="${esc(p.avatar||avatarFor(p.username))}" alt="" style="${t.glow?`box-shadow:0 0 34px ${t.accent}66`:''}"></div>`
-            :`<img class="pp-av" src="${esc(p.avatar||avatarFor(p.username))}" alt="" style="${t.glow?`box-shadow:0 0 34px ${t.accent}66`:''}">`}
-          <div class="pp-name${t.nameFx&&t.nameFx!=='none'?' fx-'+esc(t.nameFx):''}">${esc(p.displayName||p.username)}</div>
-          ${badgeChips(p.badges)}
-          <div class="pp-user">misty.gg/${esc(p.username)}</div>
-          ${p.status? `<div class="pp-status">${t.typewriter?`<span class="pp-tw" data-tw="${esc(p.status)}">&nbsp;</span>`:esc(p.status)}</div>`:''}
-          ${p.bio? `<div class="pp-bio">${esc(p.bio)}</div>`:''}
+  const linkedHTML = links.length? `<div class="bia-linked">${links.map(l=>`
+    <a class="bia-la" data-type="${esc(l.title)}" data-lid="${esc(l.id)}" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${iconHTML(l.icon,{...t,btnStyle:'icons'})}</a>`).join('')}</div>`:'';
+  const widgetsHTML = (p.widgets||[]).map(w=>{
+    if(w.type==='youtube'){ const e=ytEmbed(w.value); return e?`<div class="pp-widget"><iframe src="${esc(e)}" height="230" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe></div>`:''; }
+    if(w.type==='spotify'){ const e=spEmbed(w.value); return e?`<div class="pp-widget"><iframe src="${esc(e)}" height="152" allow="encrypted-media" loading="lazy" style="border-radius:18px"></iframe></div>`:''; }
+    if(w.type==='discord'){ return `<a class="bia-la wide" data-type="${esc(w.title||'Discord')}" href="${esc(safeUrl(w.value))}" target="_blank" rel="noopener">${iconHTML('discord',{...t,btnStyle:'icons'})}</a>`; }
+    if(w.type==='image'){ return `<div class="pp-widget"><img src="${esc(safeUrl(w.value))}" alt="" loading="lazy"></div>`; }
+    if(w.type==='text'){ return `<div class="pp-widget"><div class="wtext">${w.title?`<b style="display:block;margin-bottom:8px">${esc(w.title)}</b>`:''}${esc(w.value)}</div></div>`; }
+    return '';
+  }).join('');
+  const loc = (p.location||'').trim();
+  const audio = t.audioUrl? safeUrl(t.audioUrl) : '';
+  return `<div class="pp-stage biav" ${t.bgType==='anim'?`data-anim="${esc(t.anim||'aurora')}"`:''} style="${bgStyle(t)};${cursorCSS(t)}color:${tc};font-family:${font};--pa:${t.accent};--btc:${tc}">
+    <div class="pp-bg">${animLayer}${bgLayer}${fxLayers}${partCanvas}</div>
+    ${audio && !pre? `<div class="bia-volume">
+      <svg class="bia-volicon" xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24" style="opacity:.7"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77"></path></svg>
+      <input type="range" class="bia-volslider" min="0" max="1" step="0.1" value="1">
+    </div>`:''}
+    <div class="bia-content">
+      <div class="bia-container">
+        <div class="bia-anim delay-7 ${av}"><img class="bia-avatar" src="${esc(p.avatar||avatarFor(p.username))}" alt=""></div>
+        <div class="bia-layout">
+          <div class="bia-anim delay-10 ${av}"><h1 class="bia-username" style="color:${tc};text-shadow:0 0 20px ${tc}">${nameHTML}</h1></div>
+          ${badgesHTML? `<div class="bia-anim delay-15 ${av}">${badgesHTML}</div>`:''}
+          <div class="bia-anim delay-16 ${av}"><h3 class="bia-bio" data-typed="${esc(typedSrc)}">&nbsp;</h3></div>
         </div>
-        ${linksHTML}
-        <div class="pp-widgets">
-          ${(p.widgets||[]).map(w=>{
-            if(w.type==='youtube'){ const e=ytEmbed(w.value); return e?`<div class="pp-widget"><iframe src="${esc(e)}" height="230" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe></div>`:''; }
-            if(w.type==='spotify'){ const e=spEmbed(w.value); return e?`<div class="pp-widget"><iframe src="${esc(e)}" height="152" allow="encrypted-media" loading="lazy" style="border-radius:18px"></iframe></div>`:''; }
-            if(w.type==='discord'){ return `<a class="pp-link ${widgetLinkStyle} ${t.glow?'glow':''}" href="${esc(safeUrl(w.value))}" target="_blank" rel="noopener"><span class="li">${iconHTML('discord',t)}</span><span class="lt"><b>${esc(w.title||'Join my Discord')}</b><span>discord invite</span></span><span class="arrow">↗</span></a>`; }
-            if(w.type==='image'){ return `<div class="pp-widget"><img src="${esc(safeUrl(w.value))}" alt="" loading="lazy"></div>`; }
-            if(w.type==='text'){ return `<div class="pp-widget"><div class="wtext">${w.title?`<b style="display:block;margin-bottom:8px">${esc(w.title)}</b>`:''}${esc(w.value)}</div></div>`; }
-            return '';
-          }).join('')}
+        <div class="bia-anim delay-17 ${av}">
+          <div class="bia-presence">
+            <div class="bia-pav"><img src="${esc(p.avatar||avatarFor(p.username))}" alt=""><span class="bia-dot"></span></div>
+            <div class="bia-pinfo">
+              <div class="bia-puser"><span>${esc(p.username)}</span>${badges[0]?`<i class="bia-pbadge">${BIA_BADGES[badges[0]].svg}</i>`:''}</div>
+              <h3>misty.gg/${esc(p.username)}</h3>
+            </div>
+          </div>
         </div>
-        <div class="pp-meta">
-          <span class="pp-views">👁 ${num(p.views)}</span>
-          ${opts.preview? '' : `<div class="pp-actions">
-            <button id="ppLike" class="${opts.liked?'liked':''}">❤ <span id="ppLikeN">${num(p.likes)}</span></button>
-            <button id="ppShare">↗ Share</button>
-          </div>`}
+        ${linkedHTML? `<div class="bia-anim delay-18 ${av}">${linkedHTML}</div>`:''}
+        ${widgetsHTML? `<div class="bia-anim delay-19 ${av}"><div class="bia-widgets">${widgetsHTML}</div></div>`:''}
+        <div class="bia-anim delay-20 ${av}">
+          <div class="bia-stats">
+            <div class="bia-stat" data-type="Views">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              <span style="font-weight:400;font-size:17px">${num(p.views)}</span>
+            </div>
+            ${loc? `<div class="bia-sep"></div>
+            <div class="bia-stat" data-type="Location">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span style="font-weight:550;font-size:17px">${esc(loc)}</span>
+            </div>`:''}
+            ${opts.preview? '' : `<div class="bia-sep"></div>
+            <button id="ppLike" class="bia-stat asbtn ${opts.liked?'liked':''}" data-type="Like">❤ <span id="ppLikeN">${num(p.likes)}</span></button>
+            <div class="bia-sep"></div>
+            <button id="ppShare" class="bia-stat asbtn" data-type="Share">↗</button>`}
+          </div>
         </div>
       </div>
+      ${audio? `<div class="bia-anim delay-5 ${av}">
+        <div class="bia-music">
+          <div class="bia-player">
+            <div class="bia-ptimeline">
+              <span class="bia-cur" style="margin-right:5px;opacity:.9">0:00</span>
+              <div class="bia-timeline"><div class="bia-tprog"></div></div>
+              <span class="bia-tot" style="margin-left:5px;opacity:.9">0:00</span>
+            </div>
+            <div class="bia-pcontrols">
+              <svg style="opacity:.4" class="bia-prev" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M7 6c.55 0 1 .45 1 1v10c0 .55-.45 1-1 1s-1-.45-1-1V7c0-.55.45-1 1-1m3.66 6.82l5.77 4.07c.66.47 1.58-.01 1.58-.82V7.93c0-.81-.91-1.28-1.58-.82l-5.77 4.07a1 1 0 0 0 0 1.64"></path></svg>
+              <svg class="bia-pause" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" style="cursor:pointer;pointer-events:auto;display:none"><path fill="currentColor" d="M8 19c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2s-2 .9-2 2v10c0 1.1.9 2 2 2m6-12v10c0 1.1.9 2 2 2s2-.9 2-2V7c0-1.1-.9-2-2-2s-2 .9-2 2"></path></svg>
+              <svg class="bia-play" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" style="cursor:pointer;pointer-events:auto"><path fill="currentColor" d="M8 17.175V6.825q0-.425.3-.713t.7-.287q.125 0 .263.037t.262.113l8.15 5.175q.225.15.338.375t.112.475t-.112.475t-.338.375l-8.15 5.175q-.125.075-.262.113T9 18.175q-.4 0-.7-.288t-.3-.712"></path></svg>
+              <svg style="opacity:.4" class="bia-next" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="m7.58 16.89l5.77-4.07c.56-.4.56-1.24 0-1.63L7.58 7.11C6.91 6.65 6 7.12 6 7.93v8.14c0 .81.91 1.28 1.58.82M16 7v10c0 .55.45 1 1 1s1-.45 1-1V7c0-.55-.45-1-1-1s-1 .45-1 1"></path></svg>
+            </div>
+          </div>
+          <audio class="bia-audio" src="${esc(audio)}" loop preload="${pre?'none':'auto'}"></audio>
+        </div>
+      </div>`:''}
       <div class="pp-foot"><img src="logo.png" alt="">made with MISTY</div>
     </div>
   </div>`;
@@ -1002,8 +1067,10 @@ function profileHTML(p, opts={}){
 
 function wireProfileFx(root, p, opts={}){
   const t = {...DEFAULT_THEME, ...(p.theme||{})};
+  const pre = !!opts.preview;
   window.__curAccent = t.accent;
-  if(!opts.preview) cursorFxOn = !!t.cursorFx;
+  if(!pre) cursorFxOn = !!t.cursorFx;
+
   const pc = root.querySelector('.pp-particles');
   if(pc){
     const ctx = pc.getContext('2d');
@@ -1026,50 +1093,180 @@ function wireProfileFx(root, p, opts={}){
       requestAnimationFrame(loop);
     })();
   }
-  const tw = root.querySelector('.pp-tw');
-  if(tw){
-    const parts = (tw.dataset.tw||'').split('|').map(s=>s.trim()).filter(Boolean);
-    if(parts.length){
-      let pi=0, ci=0, del=false;
-      (function tick(){
-        if(!tw.isConnected) return;
-        const cur = parts[pi];
-        ci += del? -1 : 1;
-        tw.textContent = cur.slice(0,ci) || '\u00a0';
-        let wait = del? 32 : 68;
-        if(!del && ci>=cur.length){ del=true; wait=1700; }
-        else if(del && ci<=0){ del=false; pi=(pi+1)%parts.length; wait=420; }
-        setTimeout(tick, wait);
-      })();
+
+  const typedEl = root.querySelector('.bia-bio');
+  if(typedEl){
+    const texts = (typedEl.dataset.typed||'').split(' <> ').map(s=>s.trim()).filter(Boolean);
+    if(texts.length){
+      const cursorChar = '|';
+      let ti = 0;
+      function typeWriter(text, i){
+        if(!typedEl.isConnected) return;
+        if(i < text.length){
+          typedEl.textContent = text.substring(0, i+1) + cursorChar;
+          setTimeout(()=>typeWriter(text, i+1), 185);
+        } else {
+          setTimeout(()=>eraseText(text), 1000);
+        }
+      }
+      function eraseText(text){
+        if(!typedEl.isConnected) return;
+        const len = text.length;
+        if(len > 0){
+          typedEl.textContent = text.substring(0, len-1) + cursorChar;
+          setTimeout(()=>eraseText(text.substring(0, len-1)), 40);
+        } else {
+          ti = (ti+1) % texts.length;
+          setTimeout(()=>typeWriter(texts[ti], 0), 500);
+        }
+      }
+      typeWriter(texts[ti], 0);
     }
   }
-  const card = root.querySelector('.pp-card');
-  if(card && t.tilt && !opts.preview && matchMedia('(hover:hover)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches){
-    const stage = root.querySelector('.pp-stage');
-    const glare = card.querySelector('.pp-glare');
-    let rx=0, ry=0, tx=0, ty=0, raf=0;
-    card.addEventListener('animationend', ()=>{ card.style.animation='none'; }, {once:true});
-    card.style.willChange='transform';
-    const loop = ()=>{
-      rx += (tx-rx)*.12; ry += (ty-ry)*.12;
-      card.style.transform = `perspective(1100px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
-      if(Math.abs(tx-rx)>.02 || Math.abs(ty-ry)>.02) raf=requestAnimationFrame(loop); else raf=0;
+
+  const container = root.querySelector('.bia-container');
+  const music = root.querySelector('.bia-music');
+  if(container && !pre && t.tilt!==false && matchMedia('(hover:hover)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+    container.style.willChange = 'transform';
+    container.style.backfaceVisibility = 'hidden';
+    container.style.transformStyle = 'preserve-3d';
+    let currentX=0, currentY=0, targetX=0, targetY=0, rafId=null;
+    function animateTransform(){
+      currentX += (targetX-currentX)*0.1;
+      currentY += (targetY-currentY)*0.1;
+      container.style.transform = `perspective(1000px) rotateX(${currentY}deg) rotateY(${currentX}deg)`;
+      if(Math.abs(targetX-currentX)>0.01 || Math.abs(targetY-currentY)>0.01) rafId=requestAnimationFrame(animateTransform);
+      else rafId=null;
+    }
+    container.addEventListener('mousemove', e=>{
+      const rect = container.getBoundingClientRect();
+      const offsetX = ((e.clientX-rect.left)-rect.width/2)/(rect.width/2);
+      const offsetY = ((e.clientY-rect.top)-rect.height/2)/(rect.height/2);
+      const intensity = 15;
+      targetX = offsetX*intensity*0.5;
+      targetY = -offsetY*intensity*0.5;
+      if(!rafId) rafId=requestAnimationFrame(animateTransform);
+    });
+    container.addEventListener('mouseleave', ()=>{
+      targetX=0; targetY=0;
+      if(!rafId) rafId=requestAnimationFrame(animateTransform);
+    });
+  }
+
+  let tipEl = document.querySelector('.badge-tooltip');
+  if(!tipEl){ tipEl = document.createElement('div'); tipEl.className='badge-tooltip'; document.body.appendChild(tipEl); }
+  root.querySelectorAll('.bia-badge').forEach(b=>{
+    b.addEventListener('mouseenter', ()=>{
+      const r = b.getBoundingClientRect();
+      tipEl.textContent = b.dataset.tip||'';
+      tipEl.style.left = (r.left+r.width/2)+'px';
+      tipEl.style.top = (r.top-38)+'px';
+      tipEl.classList.add('show');
+    });
+    b.addEventListener('mouseleave', ()=>tipEl.classList.remove('show'));
+  });
+
+  if(!pre){
+    root.querySelectorAll('.bia-la[data-lid], .bia-la[href]').forEach(a=>{
+      a.addEventListener('click', e=>{
+        if(a.dataset.lid) recordClick(p.username, a.dataset.lid);
+        e.preventDefault();
+        openRedirectPopup(a.dataset.type||'this link', a.href);
+      });
+    });
+  }
+
+  const audio = root.querySelector('.bia-audio');
+  if(audio){
+    const playIcon = root.querySelector('.bia-play');
+    const pauseIcon = root.querySelector('.bia-pause');
+    const timeline = root.querySelector('.bia-timeline');
+    const prog = root.querySelector('.bia-tprog');
+    const cur = root.querySelector('.bia-cur');
+    const tot = root.querySelector('.bia-tot');
+    const fmt = s=>{ s=Math.floor(s||0); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; };
+    audio.addEventListener('loadedmetadata', ()=>{ tot.textContent = fmt(audio.duration); });
+    audio.addEventListener('timeupdate', ()=>{
+      cur.textContent = fmt(audio.currentTime);
+      if(audio.duration) prog.style.width = (audio.currentTime/audio.duration*100)+'%';
+    });
+    const setPlaying = on=>{ playIcon.style.display = on?'none':'block'; pauseIcon.style.display = on?'block':'none'; };
+    playIcon.addEventListener('click', ()=>{ audio.play().catch(()=>{}); setPlaying(true); });
+    pauseIcon.addEventListener('click', ()=>{ audio.pause(); setPlaying(false); });
+    audio.addEventListener('play', ()=>setPlaying(true));
+    audio.addEventListener('pause', ()=>setPlaying(false));
+    root.querySelector('.bia-prev').addEventListener('click', ()=>{ audio.currentTime = Math.max(audio.currentTime-5, 0); });
+    root.querySelector('.bia-next').addEventListener('click', ()=>{ audio.currentTime = Math.min(audio.currentTime+5, audio.duration||0); });
+    timeline.addEventListener('click', e=>{
+      const r = timeline.getBoundingClientRect();
+      if(audio.duration) audio.currentTime = ((e.clientX-r.left)/r.width)*audio.duration;
+    });
+    const slider = root.querySelector('.bia-volslider');
+    if(slider) slider.oninput = e=>{ audio.volume = +e.target.value; };
+    root.__biaAudio = audio;
+  }
+
+  if(!pre){
+    const elements = root.querySelectorAll('.bia-anim');
+    const reveal = ()=>{
+      elements.forEach(el=>{
+        const dc = Array.from(el.classList).find(c=>c.startsWith('delay-'));
+        const delay = dc? parseInt(dc.replace('delay-',''),10)*100 : 0;
+        setTimeout(()=>{
+          el.style.transition = 'opacity 500ms cubic-bezier(0.4,0,0.2,1), transform 500ms cubic-bezier(0.4,0,0.2,1)';
+          el.style.opacity='1'; el.style.transform='translateY(0)';
+          setTimeout(()=>{ el.style.willChange='auto'; }, 500);
+        }, delay);
+      });
     };
-    stage.addEventListener('mousemove', e=>{
-      const r = card.getBoundingClientRect();
-      const px = (e.clientX-r.left)/r.width-.5, py = (e.clientY-r.top)/r.height-.5;
-      tx = Math.max(-10,Math.min(10, py*-9));
-      ty = Math.max(-12,Math.min(12, px*11));
-      if(glare){ glare.style.setProperty('--gx', (px*100+50)+'%'); glare.style.setProperty('--gy', (py*100+50)+'%'); glare.style.opacity='1'; }
-      if(!raf) raf=requestAnimationFrame(loop);
-    });
-    stage.addEventListener('mouseleave', ()=>{ tx=0; ty=0; if(glare) glare.style.opacity='0'; if(!raf) raf=requestAnimationFrame(loop); });
+    if(t.enterScreen!==false){
+      const lock = document.createElement('div');
+      lock.className='bia-lockscreen';
+      lock.style.fontFamily = FONTS[t.font]||FONTS.sora;
+      lock.innerHTML = `<div class="bia-lockcontent"><div class="bia-clicktext">[ click to unlock ]</div></div>`;
+      root.appendChild(lock);
+      let unlocked = false;
+      lock.addEventListener('click', ()=>{
+        if(unlocked) return;
+        unlocked = true;
+        lock.querySelector('.bia-clicktext').style.animation='none';
+        lock.style.transition='opacity 500ms cubic-bezier(0.165,0.84,0.44,1), transform 500ms cubic-bezier(0.165,0.84,0.44,1)';
+        lock.style.opacity='0';
+        lock.style.transform='scale(1.1) translateZ(0)';
+        setTimeout(()=>{ reveal(); setTimeout(()=>lock.remove(), 300); }, 500);
+        if(audio) setTimeout(()=>{ audio.play().catch(()=>{}); }, 2000);
+      });
+    } else {
+      reveal();
+      if(audio){
+        document.addEventListener('click', function once(){
+          document.removeEventListener('click', once);
+          setTimeout(()=>{ audio.play().catch(()=>{}); }, 2000);
+        });
+      }
+    }
   }
-  if(!opts.preview){
-    root.querySelectorAll('[data-lid]').forEach(a=>{
-      a.addEventListener('click', ()=>{ recordClick(p.username, a.dataset.lid); });
-    });
+}
+
+function openRedirectPopup(label, url){
+  let pop = document.querySelector('.bia-popup');
+  if(!pop){
+    pop = document.createElement('div');
+    pop.className='bia-popup';
+    pop.innerHTML = `<div class="bia-popbox">
+      <p class="bia-popmsg"></p>
+      <div class="bia-popbtns">
+        <button class="bia-popbtn confirm">Continue</button>
+        <button class="bia-popbtn cancel">Cancel</button>
+      </div>
+    </div>`;
+    document.body.appendChild(pop);
+    pop.addEventListener('click', e=>{ if(e.target===pop) pop.classList.remove('active'); });
+    pop.querySelector('.cancel').onclick = ()=>pop.classList.remove('active');
   }
+  pop.querySelector('.bia-popmsg').textContent = `You will be redirected to ${label}. Continue?`;
+  pop.querySelector('.confirm').onclick = ()=>{ pop.classList.remove('active'); window.open(url,'_blank','noopener'); };
+  pop.classList.add('active');
 }
 
 async function recordClick(uname, lid){
@@ -1102,31 +1299,6 @@ async function renderPublic(uname){
   }
   page.innerHTML = `<button class="pp-back" onclick="history.length>1?history.back():go('')">← misty</button>` + profileHTML(p,{liked});
   wireProfileFx(page, p);
-  const pt = {...DEFAULT_THEME, ...(p.theme||{})};
-  if(pt.audioUrl){
-    const au = document.createElement('audio');
-    au.id='ppAudio'; au.loop=true; au.preload='auto'; au.src=safeUrl(pt.audioUrl); au.volume=.55;
-    page.appendChild(au);
-    const vol = document.createElement('div');
-    vol.className='pp-audio';
-    vol.innerHTML = `<button id="ppMute" title="Mute">🔊</button><input id="ppVol" type="range" min="0" max="100" value="55" aria-label="Volume">`;
-    page.appendChild(vol);
-    const mBtn = vol.querySelector('#ppMute');
-    vol.querySelector('#ppVol').oninput = e=>{ au.volume = e.target.value/100; au.muted = e.target.value==='0'; mBtn.textContent = (au.muted||au.volume===0)?'🔇':'🔊'; };
-    mBtn.onclick = ()=>{ au.muted=!au.muted; mBtn.textContent = au.muted?'🔇':'🔊'; };
-  }
-  if(pt.enterScreen || pt.audioUrl){
-    const ent = document.createElement('div');
-    ent.className='pp-enter';
-    ent.style.fontFamily = FONTS[pt.font]||FONTS.sora;
-    ent.innerHTML = `<span class="pe-txt" style="--ea:${pt.accent||'#a78bfa'}">[ click to enter ]</span>`;
-    page.appendChild(ent);
-    ent.addEventListener('click', ()=>{
-      ent.classList.add('gone');
-      setTimeout(()=>ent.remove(), 750);
-      const au = page.querySelector('#ppAudio'); if(au) au.play().catch(()=>{});
-    }, {once:true});
-  }
   page.querySelector('#ppShare').onclick = ()=>{
     const url = location.origin+BASE_PATH+'@'+uname;
     if(navigator.share) navigator.share({title:`${p.displayName} on Misty`, url}).catch(()=>{});
