@@ -53,7 +53,13 @@ const PRESETS = [
   {name:'Holo Chrome', pro:true, t:{preset:'Holo Chrome',bgType:'anim',anim:'holo',bgA:'#241a3a',bgB:'#0d2a33',accent:'#ffffff',font:'orbitron',btnStyle:'outline',glow:true,particles:false,cursorFx:true,textColor:'#ffffff',radius:14}},
   {name:'Midnight Gold', pro:true, t:{preset:'Midnight Gold',bgType:'anim',anim:'gold',bgA:'#0c0803',bgB:'#2a1c05',accent:'#fbbf24',font:'cinzel',btnStyle:'outline',glow:true,particles:false,cursorFx:false,textColor:'#fdf3d7',radius:10}},
   {name:'Ember Rift', pro:true, t:{preset:'Ember Rift',bgType:'anim',anim:'ember',bgA:'#160308',bgB:'#3a0d10',accent:'#fb7185',font:'unbounded',btnStyle:'glass',glow:true,particles:false,cursorFx:true,textColor:'#ffe8e4',radius:16}},
-  {name:'Deep Current', pro:true, t:{preset:'Deep Current',bgType:'anim',anim:'ocean',bgA:'#02131f',bgB:'#0a2a4a',accent:'#38bdf8',font:'sora',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#e2f6ff',radius:18}}
+  {name:'Deep Current', pro:true, t:{preset:'Deep Current',bgType:'anim',anim:'ocean',bgA:'#02131f',bgB:'#0a2a4a',accent:'#38bdf8',font:'sora',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#e2f6ff',radius:18}},
+  {name:'Neon Static', pro:false, t:{preset:'Neon Static',bgType:'gradient',bgA:'#0a0a1a',bgB:'#3a1030',accent:'#00ced1',font:'mono',btnStyle:'outline',glow:true,particles:true,cursorFx:true,textColor:'#e0e0ff',radius:20,cursorStyle:'dot'}},
+  {name:'Terminal Root', pro:false, t:{preset:'Terminal Root',bgType:'solid',bgA:'#04120a',bgB:'#04120a',accent:'#22c55e',font:'mono',btnStyle:'outline',glow:true,particles:false,cursorFx:false,textColor:'#c6f6d5',radius:4,cursorStyle:'cross'}},
+  {name:'Downpour', pro:false, t:{preset:'Downpour',bgType:'gradient',bgA:'#0a1230',bgB:'#1e3a8a',accent:'#2563eb',font:'mono',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#dbeafe',radius:16}},
+  {name:'Crimson OP', pro:false, t:{preset:'Crimson OP',bgType:'gradient',bgA:'#1a0505',bgB:'#dc2626',accent:'#f87171',font:'unbounded',btnStyle:'icons',glow:true,particles:true,cursorFx:false,textColor:'#fee2e2',radius:18,nameFx:'glow'}},
+  {name:'Redline', pro:false, t:{preset:'Redline',bgType:'gradient',bgA:'#1a1400',bgB:'#eab308',accent:'#facc15',font:'orbitron',btnStyle:'solid',glow:true,particles:false,cursorFx:false,textColor:'#fffbea',radius:6}},
+  {name:'Static Frost', pro:false, t:{preset:'Static Frost',bgType:'gradient',bgA:'#0a0a0a',bgB:'#101820',accent:'#67cae2',font:'sora',btnStyle:'glass',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:17,cardOpacity:70}}
 ];
 const DEFAULT_THEME = JSON.parse(JSON.stringify(PRESETS[0].t));
 
@@ -271,7 +277,19 @@ const BUILTIN_TEMPLATES = [
   {id:'b9', name:'Abyss', desc:'Deep ocean light with rising particles.', author:'misty', builtin:true, pro:true,
    theme:{bgType:'anim',anim:'ocean',bgA:'#02131f',bgB:'#0a2a4a',accent:'#38bdf8',font:'sora',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#e0f2fe',radius:18}},
   {id:'b10', name:'Neon Circuit', desc:'Full-spectrum holo chrome.', author:'misty', builtin:true, pro:true,
-   theme:{bgType:'anim',anim:'holo',bgA:'#241a3a',bgB:'#0d2a33',accent:'#ffffff',font:'orbitron',btnStyle:'outline',glow:true,particles:false,cursorFx:true,textColor:'#ffffff',radius:10}}
+   theme:{bgType:'anim',anim:'holo',bgA:'#241a3a',bgB:'#0d2a33',accent:'#ffffff',font:'orbitron',btnStyle:'outline',glow:true,particles:false,cursorFx:true,textColor:'#ffffff',radius:10}},
+  {id:'b11', name:'Neon Static', desc:'Cyan-on-pink mono terminal, dot cursor.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'gradient',bgA:'#0a0a1a',bgB:'#3a1030',accent:'#00ced1',font:'mono',btnStyle:'outline',glow:true,particles:true,cursorFx:true,textColor:'#e0e0ff',radius:20,cursorStyle:'dot'}},
+  {id:'b12', name:'Terminal Root', desc:'Black-on-green hacker console.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'solid',bgA:'#04120a',bgB:'#04120a',accent:'#22c55e',font:'mono',btnStyle:'outline',glow:true,particles:false,cursorFx:false,textColor:'#c6f6d5',radius:4,cursorStyle:'cross'}},
+  {id:'b13', name:'Downpour', desc:'Stormy blues with drifting particles.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'gradient',bgA:'#0a1230',bgB:'#1e3a8a',accent:'#2563eb',font:'mono',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#dbeafe',radius:16}},
+  {id:'b14', name:'Crimson OP', desc:'Anime-red glow with icon links.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'gradient',bgA:'#1a0505',bgB:'#dc2626',accent:'#f87171',font:'unbounded',btnStyle:'icons',glow:true,particles:true,cursorFx:false,textColor:'#fee2e2',radius:18,nameFx:'glow'}},
+  {id:'b15', name:'Redline', desc:'Racing yellow on black, solid blocks.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'gradient',bgA:'#1a1400',bgB:'#eab308',accent:'#facc15',font:'orbitron',btnStyle:'solid',glow:true,particles:false,cursorFx:false,textColor:'#fffbea',radius:6}},
+  {id:'b16', name:'Static Frost', desc:'Black glass with icy cyan-blue buttons.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'gradient',bgA:'#0a0a0a',bgB:'#101820',accent:'#67cae2',font:'sora',btnStyle:'glass',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:17,cardOpacity:70}}
 ];
 
 let TPL_CACHE = [];
