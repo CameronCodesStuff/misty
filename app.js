@@ -42,12 +42,12 @@ const BRAND_MATCH = [
 ];
 
 const PRESETS = [
-  {name:'Violet Mist', pro:false, t:{preset:'Violet Mist',bgType:'mist',bgA:'#a78bfa',bgB:'#67e8f9',accent:'#a78bfa',font:'sora',btnStyle:'glass',glow:true,particles:false,cursorFx:false,textColor:'#e7e7f2',radius:16}},
-  {name:'Cyber Night', pro:false, t:{preset:'Cyber Night',bgType:'gradient',bgA:'#0f0524',bgB:'#003344',accent:'#67e8f9',font:'orbitron',btnStyle:'outline',glow:true,particles:true,cursorFx:false,textColor:'#d6faff',radius:8}},
-  {name:'Rose Static', pro:false, t:{preset:'Rose Static',bgType:'gradient',bgA:'#1a0512',bgB:'#2b0a2e',accent:'#f472b6',font:'unbounded',btnStyle:'glass',glow:true,particles:false,cursorFx:true,textColor:'#ffe4f1',radius:22}},
-  {name:'Terminal', pro:false, t:{preset:'Terminal',bgType:'solid',bgA:'#050805',bgB:'#050805',accent:'#34d399',font:'mono',btnStyle:'outline',glow:true,particles:false,cursorFx:false,textColor:'#c6f6d5',radius:4}},
-  {name:'Arcade', pro:false, t:{preset:'Arcade',bgType:'gradient',bgA:'#12002e',bgB:'#000000',accent:'#fbbf24',font:'pixel',btnStyle:'solid',glow:false,particles:true,cursorFx:false,textColor:'#fff7d6',radius:0}},
-  {name:'Ivory Ghost', pro:false, t:{preset:'Ivory Ghost',bgType:'gradient',bgA:'#101018',bgB:'#1c1c28',accent:'#ffffff',font:'serif',btnStyle:'icons',glow:true,particles:false,cursorFx:false,textColor:'#f5f5fa',radius:14}},
+  {name:'Violet Mist', pro:false, t:{preset:'Violet Mist',bgType:'mist',bgA:'#8b5cf6',bgB:'#22d3ee',accent:'#a78bfa',font:'sora',btnStyle:'glass',glow:true,particles:false,cursorFx:false,textColor:'#e7e7f2',radius:16}},
+  {name:'Cyber Night', pro:false, t:{preset:'Cyber Night',bgType:'gradient',bgA:'#2e1065',bgB:'#0e7490',accent:'#22d3ee',font:'orbitron',btnStyle:'outline',glow:true,particles:true,cursorFx:false,textColor:'#d6faff',radius:8}},
+  {name:'Rose Static', pro:false, t:{preset:'Rose Static',bgType:'gradient',bgA:'#9f1239',bgB:'#581c87',accent:'#fb7185',font:'unbounded',btnStyle:'glass',glow:true,particles:false,cursorFx:true,textColor:'#ffe4f1',radius:22}},
+  {name:'Terminal', pro:false, t:{preset:'Terminal',bgType:'solid',bgA:'#04120a',bgB:'#04120a',accent:'#34d399',font:'mono',btnStyle:'outline',glow:true,particles:false,cursorFx:false,textColor:'#c6f6d5',radius:4}},
+  {name:'Arcade', pro:false, t:{preset:'Arcade',bgType:'gradient',bgA:'#4c1d95',bgB:'#be123c',accent:'#fbbf24',font:'pixel',btnStyle:'solid',glow:false,particles:true,cursorFx:false,textColor:'#fff7d6',radius:0}},
+  {name:'Ivory Ghost', pro:false, t:{preset:'Ivory Ghost',bgType:'gradient',bgA:'#3f3f56',bgB:'#101018',accent:'#ffffff',font:'serif',btnStyle:'icons',glow:true,particles:false,cursorFx:false,textColor:'#f5f5fa',radius:14}},
   {name:'Aurora Veil', pro:true, t:{preset:'Aurora Veil',bgType:'anim',anim:'aurora',bgA:'#04221c',bgB:'#0b1030',accent:'#34d399',font:'sora',btnStyle:'glass',glow:true,particles:false,cursorFx:true,textColor:'#e8fff7',radius:18}},
   {name:'Nebula Drift', pro:true, t:{preset:'Nebula Drift',bgType:'anim',anim:'nebula',bgA:'#1c0b3a',bgB:'#3a0b2e',accent:'#e879f9',font:'unbounded',btnStyle:'glass',glow:true,particles:false,cursorFx:true,textColor:'#f7e9ff',radius:20}},
   {name:'Holo Chrome', pro:true, t:{preset:'Holo Chrome',bgType:'anim',anim:'holo',bgA:'#241a3a',bgB:'#0d2a33',accent:'#ffffff',font:'orbitron',btnStyle:'outline',glow:true,particles:false,cursorFx:true,textColor:'#ffffff',radius:14}},
@@ -209,6 +209,7 @@ function router(){
   if(r==='auth') return renderAuth();
   if(r==='dashboard') return ME? renderDashboard(): renderAuth();
   if(r==='discover') return renderDiscover();
+  if(r==='templates') return renderTemplates();
   if(r==='admin') return renderAdmin();
   renderLanding();
 }
@@ -219,6 +220,7 @@ function navHTML(active){
     <div class="logo" onclick="go('')"><img src="logo.png" alt="">MISTY</div>
     <div class="navlinks">
       <button class="nl hidem ${active==='discover'?'on':''}" onclick="go('discover')">Discover</button>
+      <button class="nl ${active==='templates'?'on':''}" onclick="go('templates')">Templates</button>
       ${user? `<button class="nl ${active==='dash'?'on':''}" onclick="go('dashboard')">Dashboard</button>
         ${MYDOC?.role==='admin'? `<button class="nl ${active==='admin'?'on':''}" onclick="go('admin')">Admin</button>`:''}
         <button class="nl hidem" onclick="go('@${MYDOC.username}')">My page</button>
@@ -241,7 +243,7 @@ function miniLinkStyle(t, small){
 }
 function miniThemeInner(p){
   const t = p.t;
-  const bg = t.bgType==='anim'? '' : t.bgType==='solid'? `background:${t.bgA}` : t.bgType==='mist'? `background:radial-gradient(120% 90% at 20% 10%,${t.bgA}33,transparent 60%),radial-gradient(110% 90% at 85% 85%,${t.bgB}2e,transparent 60%),#0a0a14` : `background:linear-gradient(140deg,${t.bgA},${t.bgB})`;
+  const bg = t.bgType==='anim'? 'background:#04040c' : bgStyle(t);
   const animLayer = t.bgType==='anim'? `<div class="pp-anim anim-${t.anim}" style="inset:0"></div>`:'';
   const row = t.btnStyle==='icons'? 'flex-direction:row;justify-content:center' : '';
   return `<div style="position:absolute;inset:0;${bg}">${animLayer}</div>
@@ -249,8 +251,170 @@ function miniThemeInner(p){
     <div class="pv-links" style="${row}"><i style="${miniLinkStyle(t,true)}"></i><i style="${miniLinkStyle(t,true)}"></i><i style="${miniLinkStyle(t,true)}"></i></div>`;
 }
 
+const BUILTIN_TEMPLATES = [
+  {id:'b1', name:'Bloodmoon', desc:'Deep crimson over black. For villains.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'gradient',bgA:'#7f1d1d',bgB:'#18181b',accent:'#ef4444',font:'unbounded',btnStyle:'solid',glow:true,particles:false,cursorFx:false,textColor:'#fee2e2',radius:12}},
+  {id:'b2', name:'Vapor Grid', desc:'Synthwave purple-pink with cyan neon.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'gradient',bgA:'#7c3aed',bgB:'#db2777',accent:'#22d3ee',font:'orbitron',btnStyle:'outline',glow:true,particles:true,cursorFx:false,textColor:'#f5f3ff',radius:6,tilt:true,nameFx:'rainbow',cardOpacity:55}},
+  {id:'b3', name:'Glacier', desc:'Cold blue glass. Calm and crisp.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'gradient',bgA:'#0c4a6e',bgB:'#155e75',accent:'#7dd3fc',font:'sora',btnStyle:'glass',glow:true,particles:false,cursorFx:false,textColor:'#e0f2fe',radius:20}},
+  {id:'b4', name:'Matcha', desc:'Quiet forest greens, soft serif.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'gradient',bgA:'#14532d',bgB:'#052e16',accent:'#86efac',font:'serif',btnStyle:'glass',glow:false,particles:false,cursorFx:false,textColor:'#dcfce7',radius:18}},
+  {id:'b5', name:'Noir', desc:'Monochrome. Nothing extra — not even a card.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'solid',bgA:'#0b0b0f',bgB:'#0b0b0f',accent:'#e4e4e7',font:'mono',btnStyle:'outline',glow:false,particles:false,cursorFx:false,textColor:'#e4e4e7',radius:8,cardOpacity:0,cursorStyle:'cross'}},
+  {id:'b6', name:'Sakura', desc:'Pink petals on indigo dusk.', author:'misty', builtin:true, pro:false,
+   theme:{bgType:'gradient',bgA:'#9d174d',bgB:'#1e1b4b',accent:'#f9a8d4',font:'serif',btnStyle:'icons',glow:true,particles:true,cursorFx:false,textColor:'#fdf2f8',radius:22}},
+  {id:'b7', name:'Starfall', desc:'Drifting nebula with icon links.', author:'misty', builtin:true, pro:true,
+   theme:{bgType:'anim',anim:'nebula',bgA:'#1c0b3a',bgB:'#3a0b2e',accent:'#c4b5fd',font:'unbounded',btnStyle:'icons',glow:true,particles:false,cursorFx:true,textColor:'#f5f3ff',radius:20,tilt:true,typewriter:true,nameFx:'neon',cursorStyle:'dot'}},
+  {id:'b8', name:'Golden Hour', desc:'Slow gold shimmer, serif luxury.', author:'misty', builtin:true, pro:true,
+   theme:{bgType:'anim',anim:'gold',bgA:'#0c0803',bgB:'#2a1c05',accent:'#fcd34d',font:'cinzel',btnStyle:'glass',glow:true,particles:false,cursorFx:false,textColor:'#fef3c7',radius:12}},
+  {id:'b9', name:'Abyss', desc:'Deep ocean light with rising particles.', author:'misty', builtin:true, pro:true,
+   theme:{bgType:'anim',anim:'ocean',bgA:'#02131f',bgB:'#0a2a4a',accent:'#38bdf8',font:'sora',btnStyle:'glass',glow:true,particles:true,cursorFx:false,textColor:'#e0f2fe',radius:18}},
+  {id:'b10', name:'Neon Circuit', desc:'Full-spectrum holo chrome.', author:'misty', builtin:true, pro:true,
+   theme:{bgType:'anim',anim:'holo',bgA:'#241a3a',bgB:'#0d2a33',accent:'#ffffff',font:'orbitron',btnStyle:'outline',glow:true,particles:false,cursorFx:true,textColor:'#ffffff',radius:10}}
+];
+
+let TPL_CACHE = [];
+let TPL_FILTER = 'all';
+let TPL_SEARCH = '';
+
+async function renderTemplates(){
+  app.innerHTML = navHTML('templates') + `<div class="wrap">
+    <div class="pagehead">
+      <div>
+        <div class="eyebrow">// community templates</div>
+        <h2>Wear someone else's fog</h2>
+        <p class="sub">Full profile designs made by the community. Preview any of them, apply in one click${ME?'':' — log in to use one'}.</p>
+      </div>
+      ${ME&&MYPROFILE? `<button class="btn primary" id="tplPub">＋ Publish my theme</button>`:''}
+    </div>
+    <div class="tplbar glass">
+      <input id="tplSearch" placeholder="Search templates…" value="${esc(TPL_SEARCH)}" spellcheck="false">
+      <div class="optrow">${[['all','All'],['free','Free'],['pro','✦ Pro'],['mine','Mine']].map(([k,l])=>`<button class="opt ${TPL_FILTER===k?'on':''}" data-tf="${k}">${l}</button>`).join('')}</div>
+    </div>
+    <div class="tpl-grid" id="tplGrid"><div class="spin" style="grid-column:1/-1"></div></div>
+  </div>`;
+  $('#tplSearch').addEventListener('input', e=>{ TPL_SEARCH=e.target.value; drawTemplates(); });
+  document.querySelectorAll('[data-tf]').forEach(b=>b.addEventListener('click', ()=>{ TPL_FILTER=b.dataset.tf; document.querySelectorAll('[data-tf]').forEach(x=>x.classList.toggle('on',x===b)); drawTemplates(); }));
+  $('#tplPub')?.addEventListener('click', publishTemplate);
+  TPL_CACHE = [...BUILTIN_TEMPLATES];
+  drawTemplates();
+  try{
+    const qs = await getDocs(query(collection(db,'templates'), orderBy('uses','desc'), limit(80)));
+    const remote=[]; qs.forEach(d=>{ const t=d.data(); t.id=d.id; remote.push(t); });
+    TPL_CACHE = [...BUILTIN_TEMPLATES, ...remote];
+  }catch(e){}
+  drawTemplates();
+}
+
+function tplVisible(){
+  const q = TPL_SEARCH.trim().toLowerCase();
+  return TPL_CACHE.filter(t=>{
+    if(TPL_FILTER==='free' && t.pro) return false;
+    if(TPL_FILTER==='pro' && !t.pro) return false;
+    if(TPL_FILTER==='mine' && !(ME && t.uid===ME.uid)) return false;
+    if(q && !(`${t.name} ${t.desc||''} ${t.author||''}`.toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
+function drawTemplates(){
+  const g = $('#tplGrid'); if(!g) return;
+  const list = tplVisible();
+  if(!list.length){ g.innerHTML = `<div class="empty" style="grid-column:1/-1;padding:60px 0"><span class="big">🌫️</span>Nothing in the mist${TPL_FILTER==='mine'?' — publish your theme to see it here':''}.</div>`; return; }
+  g.innerHTML = list.map((t,i)=>`
+    <div class="tpl-card glass reveal" style="transition-delay:${(i%4)*.05}s">
+      <div class="preset-card tpl-prev" data-tp="${i}" title="Preview ${esc(t.name)}">
+        ${miniThemeInner({t:{...DEFAULT_THEME,...t.theme}})}
+        ${t.pro && !(MYDOC&&MYDOC.pro)? `<div class="pv-lock">✦</div>`:''}
+      </div>
+      <div class="tpl-meta">
+        <div class="tpl-name">${t.pro?'✦ ':''}${esc(t.name)}</div>
+        <div class="tpl-by">${t.builtin? `<span class="badge owner">OFFICIAL</span>` : `by @${esc(t.author||'?')}${t.uses?` · ${num(t.uses)} uses`:''}`}</div>
+        ${t.desc? `<div class="tpl-desc">${esc(t.desc)}</div>`:''}
+      </div>
+      <div class="tpl-actions">
+        <button class="btn sm" data-tp="${i}">Preview</button>
+        <button class="btn primary sm" data-tu="${i}">Use</button>
+        ${ME && t.uid===ME.uid? `<button class="btn sm danger" data-td="${i}" title="Delete">🗑</button>`:''}
+      </div>
+    </div>`).join('');
+  g.querySelectorAll('[data-tp]').forEach(el=>el.addEventListener('click', ()=>previewTemplate(list[+el.dataset.tp])));
+  g.querySelectorAll('[data-tu]').forEach(el=>el.addEventListener('click', e=>{ e.stopPropagation(); useTemplate(list[+el.dataset.tu]); }));
+  g.querySelectorAll('[data-td]').forEach(el=>el.addEventListener('click', e=>{ e.stopPropagation(); deleteTemplate(list[+el.dataset.td]); }));
+  observeReveals();
+}
+
+function previewTemplate(t){
+  const demo = {username: MYDOC?.username||'you', displayName: MYDOC?.displayName||MYDOC?.username||'you',
+    avatar: MYDOC?.avatar||'', banner:'', status:'previewing · '+t.name, bio:'', badges: MYDOC?.pro?['pro']:[],
+    views: 1234, likes: 88, widgets: [],
+    theme: {...DEFAULT_THEME, ...t.theme, particles:false, cursorFx:false},
+    links: (MYPROFILE?.links?.length? MYPROFILE.links.slice(0,3) : [
+      {id:'p1',title:'GitHub',url:'#',icon:'github'},{id:'p2',title:'Discord',url:'#',icon:'discord'},{id:'p3',title:'Spotify',url:'#',icon:'spotify'}])};
+  openModal(`<h3>${t.pro?'✦ ':''}${esc(t.name)}</h3>
+    <div class="sub">${esc(t.desc||'')} ${t.builtin?'· official Misty template':`· by @${esc(t.author||'?')}`}</div>
+    <div class="tplframe"><div class="mframe">${profileHTML(demo,{preview:true})}</div></div>
+    <div class="mrow"><button class="btn" id="mCancel">Close</button><button class="btn primary" id="tplUseM">Use this template</button></div>`);
+  $('#tplUseM').addEventListener('click', ()=>{ closeModal(); useTemplate(t); });
+}
+
+async function useTemplate(t){
+  if(!ME || !MYDOC){ toast('Log in to use templates','🔐'); return go('auth'); }
+  if(t.pro && !MYDOC.pro) return openProModal(t.name);
+  MYPROFILE.theme = {...DEFAULT_THEME, ...JSON.parse(JSON.stringify(t.theme)), preset:''};
+  try{
+    await updateDoc(doc(db,'profiles',MYDOC.username), {theme: MYPROFILE.theme});
+    if(!t.builtin){ try{ await updateDoc(doc(db,'templates',t.id), {uses: increment(1)}); }catch{} }
+    toast(`Wearing ${t.name}`, t.pro?'✦':'🎨');
+    go('dashboard');
+  }catch(e){ toast('Apply failed: '+cleanErr(e),'⚠️'); }
+}
+
+function publishTemplate(){
+  if(!ME || !MYPROFILE) return go('auth');
+  const isProTheme = MYPROFILE.theme?.bgType==='anim' || MYPROFILE.theme?.bgType==='video';
+  openModal(`<h3>Publish your theme</h3>
+    <div class="sub">Shares your current colors, background, fonts and button style as a template anyone can wear. Your links and info stay private.</div>
+    <label>Template name</label><input id="tpName" maxlength="30" placeholder="e.g. Midnight Static">
+    <label>Description</label><input id="tpDesc" maxlength="80" placeholder="One line about the vibe (optional)">
+    ${isProTheme? `<div class="sub" style="margin-top:10px">✦ Uses an animated background — it will be listed as a Pro template.</div>`:''}
+    <div class="mrow"><button class="btn" id="mCancel">Cancel</button><button class="btn primary" id="tpGo">Publish</button></div>`);
+  $('#tpGo').addEventListener('click', async ()=>{
+    const name = $('#tpName').value.trim();
+    if(!name) return toast('Give it a name','✏️');
+    const d = doc(collection(db,'templates'));
+    try{
+      await setDoc(d, {name, desc: $('#tpDesc').value.trim(), author: MYDOC.username, uid: ME.uid,
+        theme: JSON.parse(JSON.stringify(MYPROFILE.theme||DEFAULT_THEME)), pro: isProTheme, uses: 0, ts: serverTimestamp()});
+      closeModal(); toast('Template published','🌫️'); renderTemplates();
+    }catch(e){ toast('Publish failed: '+cleanErr(e),'⚠️'); }
+  });
+}
+
+function deleteTemplate(t){
+  openModal(`<h3>Delete "${esc(t.name)}"?</h3><div class="sub">People who already applied it keep the theme.</div>
+    <div class="mrow"><button class="btn" id="mCancel">Cancel</button><button class="btn danger" id="tdGo">Delete</button></div>`);
+  $('#tdGo').addEventListener('click', async ()=>{
+    try{ await deleteDoc(doc(db,'templates',t.id)); closeModal(); toast('Deleted','🗑'); renderTemplates(); }
+    catch(e){ toast('Delete failed: '+cleanErr(e),'⚠️'); }
+  });
+}
+
+const MOCK_PROFILES = [
+  {username:'azrea',displayName:'azrea',avatar:'',banner:'',status:'GFX Artist | Owner',bio:'',badges:['og','owner'],views:2317,likes:184,
+   theme:{...PRESETS[10].t,particles:false,cursorFx:false},
+   links:[{id:'m1',title:'My Portfolio',url:'#',icon:'🎨'},{id:'m2',title:'My Store',url:'#',icon:'🛒'},{id:'m3',title:'Discord Server',url:'#',icon:'discord'}],widgets:[]},
+  {username:'vue',displayName:'vue',avatar:'',banner:'',status:'welcome to my page!',bio:'',badges:['og','pro'],views:3194,likes:220,
+   theme:{...PRESETS[6].t,btnStyle:'icons',particles:false,cursorFx:false,cardOpacity:34,nameFx:'glow'},
+   links:[{id:'m1',title:'GitHub',url:'#',icon:'github'},{id:'m2',title:'Spotify',url:'#',icon:'spotify'},{id:'m3',title:'Discord',url:'#',icon:'discord'},{id:'m4',title:'Steam',url:'#',icon:'steam'}],widgets:[]},
+  {username:'hris',displayName:'hris',avatar:'',banner:'',status:'misty on top! | liquid glass | your identity',bio:'',badges:['pro','og','owner'],views:4814,likes:312,
+   theme:{...PRESETS[7].t,btnStyle:'icons',particles:false,cursorFx:false,typewriter:true,nameFx:'neon'},
+   links:[{id:'m1',title:'GitHub',url:'#',icon:'github'},{id:'m2',title:'Discord',url:'#',icon:'discord'},{id:'m3',title:'X',url:'#',icon:'x'}],
+   widgets:[{id:'w1',type:'discord',title:'popaperc',value:'#'}]}
+];
+
 function renderLanding(){
-  const wIcon = s => `<img src="https://cdn.simpleicons.org/${s}/ffffff" alt="" loading="lazy">`;
   app.innerHTML = navHTML('') + `
   <div class="wrap">
     <div class="hero">
@@ -269,38 +433,7 @@ function renderLanding(){
           <button class="btn primary sm" id="claimBtn">Claim</button>
         </div>
       </div>
-      <div class="mockdeck" aria-hidden="true">
-        <div class="mockcard c1" style="--mc-bg:radial-gradient(120% 90% at 30% 0%,rgba(148,148,168,.18),transparent 60%)">
-          <img class="mav" src="${avatarFor('azrea')}" alt="">
-          <div class="mname">azrea</div>
-          <div class="mbadges"><i>✦</i><i>♛</i><i>✧</i></div>
-          <div class="mstatus">GFX Artist | Owner</div>
-          <div class="mlink">My Portfolio</div>
-          <div class="mlink">My Store</div>
-          <div class="mlink">My Discord Server</div>
-          <div class="mviews">👁 2,317</div>
-        </div>
-        <div class="mockcard c2" style="--mc-bg:radial-gradient(120% 90% at 70% 0%,rgba(103,232,249,.16),transparent 60%)">
-          <img class="mav" src="${avatarFor('vue')}" alt="">
-          <div class="mname">vue</div>
-          <div class="mbadges"><i>✧</i><i>✦</i></div>
-          <div class="mstatus">welcome to my page!</div>
-          <div class="micons"><i>${wIcon('github')}</i><i>${wIcon('spotify')}</i><i>${wIcon('discord')}</i><i>${wIcon('steam')}</i></div>
-          <div class="mviews">👁 3,194</div>
-        </div>
-        <div class="mockcard c3" style="--mc-bg:radial-gradient(130% 90% at 50% 0%,rgba(167,139,250,.24),transparent 62%)">
-          <img class="mav" src="${avatarFor('hris')}" alt="">
-          <div class="mname">hris</div>
-          <div class="mbadges"><i>✦</i><i>✧</i><i>♛</i><i>✦</i></div>
-          <div class="mstatus">guns.lol on top!</div>
-          <div class="mpresence">
-            <div class="pi">${wIcon('discord')}</div>
-            <div><b>popaperc</b><span>Playing Visual Studio Code<br>editing globals.css</span></div>
-          </div>
-          <div class="micons"><i>${wIcon('github')}</i><i>${wIcon('discord')}</i><i>${wIcon('x')}</i></div>
-          <div class="mviews">👁 4,814</div>
-        </div>
-      </div>
+      <div class="mockdeck" aria-hidden="true">${MOCK_PROFILES.map((m,i)=>`<div class="mockcard c${i+1}"><div class="mframe">${profileHTML(m,{preview:true})}</div></div>`).join('')}</div>
     </div>
   </div>
   <section class="land"><div class="wrap">
@@ -318,7 +451,7 @@ function renderLanding(){
     <div class="sechead"><div class="eyebrow">// theme showcase</div><h2>Start from a mood</h2><p>The ✦ themes are animated Pro exclusives.</p></div>
     <div class="showcase">${PRESETS.map((p,i)=>`
       <div class="theme-mini reveal" style="transition-delay:${(i%3)*.06}s" onclick="go('auth')">
-        <div style="position:absolute;inset:0;${p.t.bgType==='anim'?'':p.t.bgType==='solid'?`background:${p.t.bgA}`:`background:linear-gradient(140deg,${p.t.bgA},${p.t.bgB})`}">
+        <div style="position:absolute;inset:0;${p.t.bgType==='anim'?'background:#04040c':bgStyle(p.t)}">
           ${p.t.bgType==='anim'?`<div class="pp-anim anim-${p.t.anim}" style="inset:0"></div>`:''}
         </div>
         <div class="tuser" style="font-family:${FONTS[p.t.font]};color:${p.t.textColor}">username</div>
@@ -328,6 +461,7 @@ function renderLanding(){
         <div class="tlabel">${p.pro?'✦ ':''}${p.name}</div>
       </div>`).join('')}
     </div>
+    <div style="text-align:center;margin-top:34px"><button class="btn" onclick="go('templates')">Browse community templates →</button></div>
   </div></section>
   <section class="land"><div class="wrap">
     <div class="sechead"><div class="eyebrow">// pricing</div><h2>Free forever. Pro when you want more.</h2></div>
@@ -352,6 +486,7 @@ function renderLanding(){
   <footer><div class="wrap"><div class="logo"><img src="logo.png" alt="">MISTY</div>Made in the mist · © ${new Date().getFullYear()}</div></footer>`;
   $('#claimBtn').onclick = ()=>{ const v=normUser($('#claimIn').value); if(v) sessionStorage.setItem('misty_uname', v); go('auth'); };
   $('#claimIn').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#claimBtn').click(); });
+  document.querySelectorAll('.mockcard').forEach((c,i)=>wireProfileFx(c, MOCK_PROFILES[i], {preview:true}));
   observeReveals();
 }
 
@@ -491,11 +626,19 @@ function renderEditorTab(){
       ${field('Font', `<div class="optrow">${Object.keys(FONTS).map(f=>`<button class="opt ${t.font===f?'on':''}" data-font="${f}" style="font-family:${FONTS[f]}">${FONT_NAMES[f]}</button>`).join('')}</div>`)}
       ${field('Button style', `<div class="optrow">${['glass','outline','solid','icons'].map(s=>`<button class="opt ${t.btnStyle===s?'on':''}" data-bs="${s}">${s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</div>`)}
       ${field('Corner radius', `<input id="eRad" type="range" min="0" max="28" value="${t.radius??16}">`)}
+      ${field('Card opacity', `<input id="eCo" type="range" min="0" max="100" value="${t.cardOpacity??100}"><div class="hint">Slide to 0 for a fully transparent card — your content floats on the background.</div>`)}
+      ${field('Card blur', `<input id="eCb" type="range" min="0" max="40" value="${t.cardBlur??28}">`)}
+      ${field('Name effect', `<div class="optrow">${[['none','None'],['glow','✨ Glow'],['neon','💡 Neon pulse'],['rainbow','🌈 Rainbow']].map(([k,l])=>`<button class="opt ${(t.nameFx||'none')===k?'on':''}" data-nf="${k}">${l}</button>`).join('')}</div>`)}
+      ${field('Cursor', `<div class="optrow">${[['default','Default'],['dot','◉ Dot'],['cross','＋ Crosshair']].map(([k,l])=>`<button class="opt ${(t.cursorStyle||'default')===k?'on':''}" data-cs="${k}">${l}</button>`).join('')}</div>`)}
       ${field('Effects', `<div class="optrow">
         <button class="opt ${t.glow?'on':''}" id="fxGlow">✨ Glow</button>
         <button class="opt ${t.particles?'on':''}" id="fxPart">❄ Particles</button>
         <button class="opt ${t.cursorFx?'on':''}" id="fxCur">🖱 Cursor trail</button>
-      </div>`)}
+        <button class="opt ${t.tilt?'on':''}" id="fxTilt">🎴 Card tilt</button>
+        <button class="opt ${t.typewriter?'on':''}" id="fxTw">⌨ Typewriter status</button>
+        <button class="opt ${t.enterScreen?'on':''}" id="fxEnter">🚪 Enter screen</button>
+      </div><div class="hint">Typewriter cycles through your status — separate lines with |. Enter screen greets visitors with "click to enter" and lets audio autoplay.</div>`)}
+      ${field('Profile audio ✦', `<div class="filedrop" id="upAu">Upload audio (mp3/ogg)</div><input id="auUrl" value="${esc(t.audioUrl||'')}" placeholder="https://....mp3" style="margin-top:8px">${t.audioUrl?`<button class="btn sm danger" id="auClr" style="margin-top:10px">Remove audio</button>`:''}`)}
       ${field('Text color', `<div class="swatches">${['#e7e7f2','#ffffff','#d6faff','#ffe4f1','#c6f6d5','#fff7d6','#f7e9ff','#e2f6ff'].map(c=>`<div class="sw ${t.textColor===c?'on':''}" data-tc="${c}" style="background:${c}"></div>`).join('')}</div>`)}`;
     body.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{
       const pr = PRESETS[+b.dataset.preset];
@@ -513,9 +656,19 @@ function renderEditorTab(){
     body.querySelectorAll('[data-font]').forEach(b=>b.onclick=()=>{ t.font=b.dataset.font; saveProfile(); renderEditorTab(); });
     body.querySelectorAll('[data-bs]').forEach(b=>b.onclick=()=>{ t.btnStyle=b.dataset.bs; saveProfile(); renderEditorTab(); });
     $('#eRad').oninput = e=>{ t.radius=+e.target.value; saveProfile(); };
+    $('#eCo').oninput = e=>{ t.cardOpacity=+e.target.value; saveProfile(); };
+    $('#eCb').oninput = e=>{ t.cardBlur=+e.target.value; saveProfile(); };
+    body.querySelectorAll('[data-nf]').forEach(b=>b.onclick=()=>{ t.nameFx=b.dataset.nf; saveProfile(); renderEditorTab(); });
+    body.querySelectorAll('[data-cs]').forEach(b=>b.onclick=()=>{ t.cursorStyle=b.dataset.cs; saveProfile(); renderEditorTab(); });
     $('#fxGlow').onclick = ()=>{ t.glow=!t.glow; saveProfile(); renderEditorTab(); };
     $('#fxPart').onclick = ()=>{ t.particles=!t.particles; saveProfile(); renderEditorTab(); };
     $('#fxCur').onclick = ()=>{ t.cursorFx=!t.cursorFx; saveProfile(); renderEditorTab(); };
+    $('#fxTilt').onclick = ()=>{ t.tilt=!t.tilt; saveProfile(); renderEditorTab(); };
+    $('#fxTw').onclick = ()=>{ t.typewriter=!t.typewriter; saveProfile(); renderEditorTab(); };
+    $('#fxEnter').onclick = ()=>{ t.enterScreen=!t.enterScreen; saveProfile(); renderEditorTab(); };
+    $('#upAu').onclick = ()=>{ if(!MYDOC.pro) return openProModal('Profile audio'); pickUpload('audio', url=>{ t.audioUrl=url; t.enterScreen=true; saveProfile(); renderEditorTab(); }, 'audio/*', 10); };
+    $('#auUrl').onchange = e=>{ if(e.target.value && !MYDOC.pro){ e.target.value=''; return openProModal('Profile audio'); } t.audioUrl=safeUrl(e.target.value); if(t.audioUrl) t.enterScreen=true; saveProfile(); renderEditorTab(); };
+    const ac=$('#auClr'); if(ac) ac.onclick = ()=>{ t.audioUrl=''; saveProfile(); renderEditorTab(); };
     const extra = $('#bgExtra');
     if(t.bgType==='gradient'||t.bgType==='solid'){
       extra.innerHTML = field(t.bgType==='solid'?'Color':'Gradient colors', `<div style="display:flex;gap:10px">
@@ -714,13 +867,26 @@ function pickUpload(kind, done, accept='image/*', maxMB=8){
   inp.click();
 }
 
+function cursorCSS(t){
+  const c = t.accent||'#a78bfa';
+  let svg = '', hx = 11, hy = 11, fb = 'auto';
+  if(t.cursorStyle==='dot'){
+    svg = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><circle cx="11" cy="11" r="5" fill="${c}" fill-opacity="0.9"/><circle cx="11" cy="11" r="9" fill="none" stroke="${c}" stroke-opacity="0.5" stroke-width="1.5"/></svg>`;
+  }else if(t.cursorStyle==='cross'){
+    svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M12 3v7M12 14v7M3 12h7M14 12h7" stroke="${c}" stroke-width="2" stroke-linecap="round"/></svg>`;
+    hx = 12; hy = 12; fb = 'crosshair';
+  }else return '';
+  return `cursor:url('data:image/svg+xml,${encodeURIComponent(svg)}') ${hx} ${hy},${fb};`;
+}
+
 function bgStyle(t){
-  if(t.bgType==='solid') return `background:${t.bgA||'#07070f'}`;
-  if(t.bgType==='gradient') return `background:linear-gradient(150deg,${t.bgA||'#0f0524'},${t.bgB||'#003344'})`;
+  const a = t.bgA||'#a78bfa', b = t.bgB||'#67e8f9';
+  if(t.bgType==='solid') return `background:radial-gradient(130% 85% at 50% -22%,color-mix(in srgb,${a} 70%,#fff 30%) 0%,transparent 56%),radial-gradient(150% 100% at 50% 120%,color-mix(in srgb,${a} 50%,#000 50%) 0%,transparent 62%),${a}`;
+  if(t.bgType==='gradient') return `background:radial-gradient(115% 85% at 8% -12%,${a} 0%,transparent 58%),radial-gradient(115% 85% at 94% 114%,${b} 0%,transparent 58%),radial-gradient(65% 50% at 82% 4%,color-mix(in srgb,${b} 40%,transparent) 0%,transparent 70%),linear-gradient(165deg,color-mix(in srgb,${a} 55%,#05050d),color-mix(in srgb,${b} 48%,#04040b))`;
   if(t.bgType==='image') return `background:#07070f`;
   if(t.bgType==='video') return `background:#000`;
   if(t.bgType==='anim') return `background:#04040c`;
-  return `background:radial-gradient(1200px 700px at 20% 10%,${(t.bgA||'#a78bfa')}26,transparent 60%),radial-gradient(1000px 700px at 85% 85%,${(t.bgB||'#67e8f9')}22,transparent 60%),#0a0a14`;
+  return `background:radial-gradient(95% 75% at 12% -8%,${a}59 0%,transparent 60%),radial-gradient(85% 70% at 90% 18%,${b}42 0%,transparent 62%),radial-gradient(115% 85% at 50% 118%,${a}4f 0%,transparent 64%),linear-gradient(180deg,#0b0b18,#07070f)`;
 }
 function ytEmbed(u){ try{ const url=new URL(u); let id=''; if(url.hostname.includes('youtu.be')) id=url.pathname.slice(1); else id=url.searchParams.get('v')||url.pathname.split('/').pop(); return id? `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}`:''; }catch{ return ''; } }
 function spEmbed(u){ try{ const url=new URL(u); if(!url.hostname.includes('spotify.com')) return ''; return `https://open.spotify.com/embed${url.pathname}`; }catch{ return ''; } }
@@ -743,6 +909,10 @@ function profileHTML(p, opts={}){
     : t.bgType==='video' && t.bgVideo? `<video src="${esc(t.bgVideo)}" autoplay muted loop playsinline></video>` : '';
   const overlay = (t.bgType==='image'||t.bgType==='video')? `<div style="position:absolute;inset:0;background:rgba(4,4,10,.4)"></div>`:'';
   const partCanvas = t.particles? `<canvas class="pp-particles" style="position:absolute;inset:0;width:100%;height:100%;z-index:1"></canvas>`:'';
+  const statics = t.bgType==='mist'||t.bgType==='gradient'||t.bgType==='solid';
+  const orbA = t.bgType==='solid'? (t.accent||'#a78bfa') : (t.bgA||t.accent||'#a78bfa');
+  const orbB = t.bgType==='solid'? (t.bgA||'#67e8f9') : (t.bgB||t.accent||'#67e8f9');
+  const fxLayers = `${statics?`<div class="pp-orb o1" style="background:${esc(orbA)}"></div><div class="pp-orb o2" style="background:${esc(orbB)}"></div>`:''}<div class="pp-tex"></div>`;
   const links = p.links||[];
   const iconRow = t.btnStyle==='icons';
   const linksHTML = iconRow
@@ -755,17 +925,18 @@ function profileHTML(p, opts={}){
           <span class="arrow">↗</span>
         </a>`).join('')}</div>`;
   const widgetLinkStyle = iconRow? 'glass' : t.btnStyle;
-  return `<div class="pp-stage" ${t.bgType==='anim'?`data-anim="${esc(t.anim||'aurora')}"`:''} style="${bgStyle(t)};color:${t.textColor||'#e7e7f2'};font-family:${font};--pa:${t.accent};--pr:${t.radius??16}px">
-    <div class="pp-bg">${animLayer}${bgLayer}${overlay}${partCanvas}</div>
+  return `<div class="pp-stage" ${t.bgType==='anim'?`data-anim="${esc(t.anim||'aurora')}"`:''} style="${bgStyle(t)};${cursorCSS(t)}color:${t.textColor||'#e7e7f2'};font-family:${font};--pa:${t.accent};--pr:${t.radius??16}px;--co:${Math.max(0,Math.min(100,t.cardOpacity??100))/100};--cb:${Math.max(0,Math.min(40,t.cardBlur??28))}px">
+    <div class="pp-bg">${animLayer}${bgLayer}${overlay}${fxLayers}${partCanvas}</div>
     <div class="pp-content">
       <div class="pp-card">
+        ${t.tilt?`<div class="pp-glare"></div>`:''}
         ${p.banner? `<div class="pp-banner" style="background-image:url('${esc(p.banner)}')"></div>`:`<div class="pp-nobanner"></div>`}
         <div class="pp-head ${p.banner?'':'flat'}">
           <img class="pp-av" src="${esc(p.avatar||avatarFor(p.username))}" alt="" style="${t.glow?`box-shadow:0 0 34px ${t.accent}66`:''}">
-          <div class="pp-name">${esc(p.displayName||p.username)}</div>
+          <div class="pp-name${t.nameFx&&t.nameFx!=='none'?' fx-'+esc(t.nameFx):''}">${esc(p.displayName||p.username)}</div>
           ${badgeChips(p.badges)}
           <div class="pp-user">misty.gg/${esc(p.username)}</div>
-          ${p.status? `<div class="pp-status">${esc(p.status)}</div>`:''}
+          ${p.status? `<div class="pp-status">${t.typewriter?`<span class="pp-tw" data-tw="${esc(p.status)}">&nbsp;</span>`:esc(p.status)}</div>`:''}
           ${p.bio? `<div class="pp-bio">${esc(p.bio)}</div>`:''}
         </div>
         ${linksHTML}
@@ -818,6 +989,45 @@ function wireProfileFx(root, p, opts={}){
       requestAnimationFrame(loop);
     })();
   }
+  const tw = root.querySelector('.pp-tw');
+  if(tw){
+    const parts = (tw.dataset.tw||'').split('|').map(s=>s.trim()).filter(Boolean);
+    if(parts.length){
+      let pi=0, ci=0, del=false;
+      (function tick(){
+        if(!tw.isConnected) return;
+        const cur = parts[pi];
+        ci += del? -1 : 1;
+        tw.textContent = cur.slice(0,ci) || '\u00a0';
+        let wait = del? 32 : 68;
+        if(!del && ci>=cur.length){ del=true; wait=1700; }
+        else if(del && ci<=0){ del=false; pi=(pi+1)%parts.length; wait=420; }
+        setTimeout(tick, wait);
+      })();
+    }
+  }
+  const card = root.querySelector('.pp-card');
+  if(card && t.tilt && !opts.preview && matchMedia('(hover:hover)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const stage = root.querySelector('.pp-stage');
+    const glare = card.querySelector('.pp-glare');
+    let rx=0, ry=0, tx=0, ty=0, raf=0;
+    card.addEventListener('animationend', ()=>{ card.style.animation='none'; }, {once:true});
+    card.style.willChange='transform';
+    const loop = ()=>{
+      rx += (tx-rx)*.12; ry += (ty-ry)*.12;
+      card.style.transform = `perspective(1100px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+      if(Math.abs(tx-rx)>.02 || Math.abs(ty-ry)>.02) raf=requestAnimationFrame(loop); else raf=0;
+    };
+    stage.addEventListener('mousemove', e=>{
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX-r.left)/r.width-.5, py = (e.clientY-r.top)/r.height-.5;
+      tx = Math.max(-10,Math.min(10, py*-9));
+      ty = Math.max(-12,Math.min(12, px*11));
+      if(glare){ glare.style.setProperty('--gx', (px*100+50)+'%'); glare.style.setProperty('--gy', (py*100+50)+'%'); glare.style.opacity='1'; }
+      if(!raf) raf=requestAnimationFrame(loop);
+    });
+    stage.addEventListener('mouseleave', ()=>{ tx=0; ty=0; if(glare) glare.style.opacity='0'; if(!raf) raf=requestAnimationFrame(loop); });
+  }
   if(!opts.preview){
     root.querySelectorAll('[data-lid]').forEach(a=>{
       a.addEventListener('click', ()=>{ recordClick(p.username, a.dataset.lid); });
@@ -855,6 +1065,31 @@ async function renderPublic(uname){
   }
   page.innerHTML = `<button class="pp-back" onclick="history.length>1?history.back():go('')">← misty</button>` + profileHTML(p,{liked});
   wireProfileFx(page, p);
+  const pt = {...DEFAULT_THEME, ...(p.theme||{})};
+  if(pt.audioUrl){
+    const au = document.createElement('audio');
+    au.id='ppAudio'; au.loop=true; au.preload='auto'; au.src=safeUrl(pt.audioUrl); au.volume=.55;
+    page.appendChild(au);
+    const vol = document.createElement('div');
+    vol.className='pp-audio';
+    vol.innerHTML = `<button id="ppMute" title="Mute">🔊</button><input id="ppVol" type="range" min="0" max="100" value="55" aria-label="Volume">`;
+    page.appendChild(vol);
+    const mBtn = vol.querySelector('#ppMute');
+    vol.querySelector('#ppVol').oninput = e=>{ au.volume = e.target.value/100; au.muted = e.target.value==='0'; mBtn.textContent = (au.muted||au.volume===0)?'🔇':'🔊'; };
+    mBtn.onclick = ()=>{ au.muted=!au.muted; mBtn.textContent = au.muted?'🔇':'🔊'; };
+  }
+  if(pt.enterScreen || pt.audioUrl){
+    const ent = document.createElement('div');
+    ent.className='pp-enter';
+    ent.style.fontFamily = FONTS[pt.font]||FONTS.sora;
+    ent.innerHTML = `<span class="pe-txt" style="--ea:${pt.accent||'#a78bfa'}">[ click to enter ]</span>`;
+    page.appendChild(ent);
+    ent.addEventListener('click', ()=>{
+      ent.classList.add('gone');
+      setTimeout(()=>ent.remove(), 750);
+      const au = page.querySelector('#ppAudio'); if(au) au.play().catch(()=>{});
+    }, {once:true});
+  }
   page.querySelector('#ppShare').onclick = ()=>{
     const url = location.origin+BASE_PATH+'@'+uname;
     if(navigator.share) navigator.share({title:`${p.displayName} on Misty`, url}).catch(()=>{});
