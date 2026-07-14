@@ -977,24 +977,38 @@ function openProModal(themeName){
 }
 
 function renderThanks(){
-  app.innerHTML = navHTML('') + `<div class="wrap" style="max-width:560px;text-align:center;padding-top:80px">
-    <div class="eyebrow">// payment received</div>
+  app.innerHTML = navHTML('') + `<div class="wrap" style="max-width:600px;text-align:center;padding-top:70px">
+    <div class="thanks-check" id="thanksCheck">
+      <svg viewBox="0 0 52 52" width="60" height="60"><circle cx="26" cy="26" r="24" fill="none" stroke="var(--mist,#a78bfa)" stroke-width="2.5" class="tc-ring"/><path fill="none" stroke="var(--mist,#a78bfa)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d="M14 27l8 8 16-17" class="tc-tick"/></svg>
+    </div>
+    <div class="eyebrow" style="margin-top:26px">// payment received</div>
     <h2 style="margin:10px 0">✦ Welcome to Misty Pro</h2>
     <p class="sub" id="thanksMsg">Confirming your payment with Stripe — this usually takes a few seconds…</p>
-    <div class="spin" style="margin:30px auto" id="thanksSpin"></div>
-    <button class="btn primary" style="display:none" id="thanksGo" onclick="go('dashboard')">Open my dashboard</button>
+    <div class="spin" style="margin:26px auto" id="thanksSpin"></div>
+    <div class="thanks-perks glass" id="thanksPerks" style="display:none">
+      <div class="tp"><span>🎬</span> 15 animated + 4K video themes</div>
+      <div class="tp"><span>🔓</span> Custom lock screen text</div>
+      <div class="tp"><span>🎵</span> Profile audio + music player</div>
+      <div class="tp"><span>✦</span> PRO badge on your page</div>
+      <div class="tp"><span>🚀</span> Priority on Discover</div>
+    </div>
+    <button class="btn primary" style="display:none;margin-top:22px" id="thanksGo" onclick="go('dashboard')">Open my dashboard</button>
+    <div style="margin-top:18px;font-size:11px;color:var(--dim)">Receipt sent to your email by Stripe · cancel anytime from your account page</div>
   </div>`;
+  const unlocked = ()=>{
+    $('#thanksMsg').textContent = 'Your Pro perks are live. Go make something unreal.';
+    $('#thanksSpin').style.display='none';
+    $('#thanksPerks').style.display='grid';
+    $('#thanksGo').style.display='inline-block';
+    $('#thanksCheck').classList.add('go');
+  };
   let waited = 0;
   const waitAuth = setInterval(()=>{
     waited += 300;
     if(ME && MYDOC){
       clearInterval(waitAuth);
-      if(MYDOC.pro){ $('#thanksMsg').textContent = 'Your Pro perks are live. Go make something unreal.'; $('#thanksSpin').style.display='none'; $('#thanksGo').style.display='inline-block'; return; }
-      pollProActivation(()=>{
-        $('#thanksMsg').textContent = 'Your Pro perks are live. Go make something unreal.';
-        $('#thanksSpin').style.display='none';
-        $('#thanksGo').style.display='inline-block';
-      });
+      if(MYDOC.pro) return unlocked();
+      pollProActivation(unlocked);
     } else if(waited > 8000){
       clearInterval(waitAuth);
       $('#thanksMsg').innerHTML = 'Payment received — log in with the same account to activate your Pro perks.';
