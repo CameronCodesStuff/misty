@@ -995,8 +995,16 @@ function profileHTML(p, opts={}){
   const badgesHTML = badges.length? `<div class="bia-badges">${badges.map(b=>`
     <div class="bia-badge" data-tip="${esc(BIA_BADGES[b].tip)}">${BIA_BADGES[b].svg}</div>`).join('')}</div>`:'';
   const links = p.links||[];
-  const linkedHTML = links.length? `<div class="bia-linked">${links.map(l=>`
-    <a class="bia-la" data-type="${esc(l.title)}" data-lid="${esc(l.id)}" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${iconHTML(l.icon,{...t,btnStyle:'icons'})}</a>`).join('')}</div>`:'';
+  const host = u=>{ try{ return new URL(safeUrl(u)).hostname.replace('www.',''); }catch(e){ return ''; } };
+  const linkedHTML = !links.length? '' : t.btnStyle==='icons'?
+    `<div class="bia-linked">${links.map(l=>`
+    <a class="bia-la" data-type="${esc(l.title)}" data-lid="${esc(l.id)}" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${iconHTML(l.icon,{...t,btnStyle:'icons'})}</a>`).join('')}</div>`
+    : `<div class="pp-links">${links.map(l=>`
+    <a class="pp-link ${t.btnStyle==='glass'?'':esc(t.btnStyle||'')} ${t.glow?'glow':''}" data-type="${esc(l.title)}" data-lid="${esc(l.id)}" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">
+      <span class="li">${iconHTML(l.icon,t)}</span>
+      <span class="lt"><b>${esc(l.title)}</b><span>${esc(host(l.url))}</span></span>
+      <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+    </a>`).join('')}</div>`;
   const widgetsHTML = (p.widgets||[]).map(w=>{
     if(w.type==='youtube'){ const e=ytEmbed(w.value); return e?`<div class="pp-widget"><iframe src="${esc(e)}" height="230" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe></div>`:''; }
     if(w.type==='spotify'){ const e=spEmbed(w.value); return e?`<div class="pp-widget"><iframe src="${esc(e)}" height="152" allow="encrypted-media" loading="lazy" style="border-radius:18px"></iframe></div>`:''; }
@@ -1007,7 +1015,7 @@ function profileHTML(p, opts={}){
   }).join('');
   const loc = (p.location||'').trim();
   const audio = t.audioUrl? safeUrl(t.audioUrl) : '';
-  return `<div class="pp-stage biav" ${t.bgType==='anim'?`data-anim="${esc(t.anim||'aurora')}"`:''} style="${bgStyle(t)};${cursorCSS(t)}color:${tc};font-family:${font};--pa:${t.accent};--btc:${tc}">
+  return `<div class="pp-stage biav" ${t.bgType==='anim'?`data-anim="${esc(t.anim||'aurora')}"`:''} style="${bgStyle(t)};${cursorCSS(t)}color:${tc};font-family:${font};--pa:${t.accent};--btc:${tc};--pr:${Math.min(t.radius??16,18)}px">
     <div class="pp-bg">${animLayer}${bgLayer}${fxLayers}${partCanvas}</div>
     ${audio && !pre? `<div class="bia-volume">
       <svg class="bia-volicon" xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24" style="opacity:.7"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77"></path></svg>
@@ -1017,7 +1025,7 @@ function profileHTML(p, opts={}){
       <div class="bia-container">
         <div class="bia-anim delay-7 ${av}"><img class="bia-avatar" src="${esc(p.avatar||avatarFor(p.username))}" alt=""></div>
         <div class="bia-layout">
-          <div class="bia-anim delay-10 ${av}"><h1 class="bia-username" style="color:${tc};text-shadow:0 0 20px ${tc}">${nameHTML}</h1></div>
+          <div class="bia-anim delay-10 ${av}"><h1 class="bia-username" style="color:${tc}">${nameHTML}</h1></div>
           ${badgesHTML? `<div class="bia-anim delay-15 ${av}">${badgesHTML}</div>`:''}
           <div class="bia-anim delay-16 ${av}"><h3 class="bia-bio" data-typed="${esc(typedSrc)}">&nbsp;</h3></div>
         </div>
@@ -1175,7 +1183,8 @@ function wireProfileFx(root, p, opts={}){
   });
 
   if(!pre){
-    root.querySelectorAll('.bia-la[data-lid], .bia-la[href]').forEach(a=>{
+    document.documentElement.style.setProperty('--profileFont', FONTS[t.font]||FONTS.sora);
+    root.querySelectorAll('.bia-la[data-lid], .pp-link[data-lid]').forEach(a=>{
       a.addEventListener('click', e=>{
         if(a.dataset.lid) recordClick(p.username, a.dataset.lid);
         e.preventDefault();
@@ -1231,6 +1240,7 @@ function wireProfileFx(root, p, opts={}){
       const lock = document.createElement('div');
       lock.className='bia-lockscreen';
       lock.style.fontFamily = FONTS[t.font]||FONTS.sora;
+      lock.style.setProperty('--pa', t.accent||'#a78bfa');
       lock.innerHTML = `<div class="bia-lockcontent"><div class="bia-clicktext">[ click to unlock ]</div></div>`;
       root.appendChild(lock);
       let unlocked = false;

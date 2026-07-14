@@ -1795,6 +1795,10 @@ body::after{
    ============================================================ */
 
 .pp-stage.biav{display:flex;justify-content:center;align-items:flex-start}
+.pp-stage.biav h1,.pp-stage.biav h2,.pp-stage.biav h3,.pp-stage.biav button,.pp-stage.biav input,.pp-stage.biav .pp-link .lt b,.pp-stage.biav .pp-link .lt span{font-family:inherit}
+.bia-popbox,.badge-tooltip{font-family:var(--profileFont,inherit)}
+.pp-stage.biav .pp-links{width:100%;max-width:28rem;margin-top:2rem}
+.pp-stage.biav .pp-link.bia{color:var(--btc,#67cae2)}
 .pp-stage.biav .pp-bg{position:fixed;inset:0}
 .public-page .pp-stage.biav .pp-bg{height:100vh;height:100dvh}
 .preview-frame{transform:translateZ(0)}
@@ -1878,8 +1882,8 @@ body::after{
 }
 .bia-username span{font-weight:600;font-size:40px;pointer-events:none}
 @keyframes biaGlow{
-  from{text-shadow:0 0 12px currentColor}
-  to{text-shadow:0 0 26px currentColor,0 0 44px currentColor}
+  from{text-shadow:0 0 12px var(--pa,currentColor)}
+  to{text-shadow:0 0 26px var(--pa,currentColor),0 0 44px var(--pa,currentColor)}
 }
 
 .bia-badges{
@@ -1899,7 +1903,7 @@ body::after{
   font-size:20.5px;
   display:flex;
   align-items:center;
-  color:var(--btc,#ffffff);
+  color:var(--pa,var(--btc,#ffffff));
 }
 .bia-badge svg{filter:drop-shadow(0 0 1.5px currentColor)}
 
@@ -2068,7 +2072,6 @@ body::after{
 }
 
 .bia-music{
-  font-family:'Chillax',sans-serif;
   position:relative;
   display:flex;
   align-items:center;
@@ -2105,7 +2108,7 @@ body::after{
 .bia-tprog{
   position:absolute;top:0;left:0;
   height:100%;width:0%;
-  background-color:currentColor;
+  background-color:var(--pa,currentColor);
   border-radius:2px;
 }
 .bia-pcontrols{
@@ -2149,7 +2152,7 @@ body::after{
 .bia-volslider::-webkit-slider-thumb{
   -webkit-appearance:none;appearance:none;
   width:12px;height:12px;
-  background:#fff;border-radius:50%;
+  background:var(--pa,#fff);border-radius:50%;
 }
 
 .bia-lockscreen{
@@ -2181,7 +2184,7 @@ body::after{
   font-size:18px;
   font-weight:500;
   opacity:.8;
-  text-shadow:0 0 10px rgba(255,255,255,0.3);
+  text-shadow:0 0 14px var(--pa,rgba(255,255,255,0.3));
   animation:biaLockPulse 1.5s infinite ease-in-out;
   will-change:opacity,transform;
   user-select:none;
