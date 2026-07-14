@@ -220,7 +220,8 @@ async function claimUsername(user, wanted){
 // BASE_PATH is the site's root folder (e.g. "/misty/"), figured out once
 // from whatever URL the page happened to load with. Everything after it
 // (e.g. "@cameron", "dashboard", "") is the route.
-const ROUTE_KEYWORDS = ['auth', 'dashboard', 'discover', 'admin'];
+const STRIPE_LINK = 'https://buy.stripe.com/28EfZh9Fa9ey3Bz60EeME00';
+const ROUTE_KEYWORDS = ['auth', 'dashboard', 'discover', 'admin', 'thanks'];
 function splitBaseAndRoute(pathname){
   const parts = pathname.split('/');
   const last = parts[parts.length - 1];
@@ -260,6 +261,7 @@ function router(){
   if(r.startsWith('@')) return renderPublic(normUser(r.slice(1)));
   if(r==='auth') return renderAuth();
   if(r==='dashboard') return ME? renderDashboard(): renderAuth();
+  if(r==='thanks') return renderThanks();
   if(r==='discover') return renderDiscover();
   if(r==='templates') return renderTemplates();
   if(r==='admin') return renderAdmin();
@@ -837,7 +839,7 @@ function renderEditorTab(){
         <div class="stat glass"><div class="n">${MYDOC.pro?'PRO':'FREE'}</div><div class="l">Plan</div></div>
         <div class="stat glass"><div class="n mono" style="font-size:15px;padding-top:8px">@${esc(MYDOC.username)}</div><div class="l">Username</div></div>
       </div>
-      ${!MYDOC.pro? `<button class="btn primary" id="goPro" style="width:100%">✦ Upgrade to Misty Pro</button>`:`<div class="empty" style="padding:16px">✦ You're a Pro. Thanks for supporting the mist.</div>`}
+      ${!MYDOC.pro? `<button class="btn primary" id="goPro" style="width:100%">✦ Upgrade to Misty Pro</button>`:`<div class="empty" style="padding:16px">✦ You're a Pro. Thanks for supporting the mist.<br><span style="font-size:11px;color:var(--dim)">Manage or cancel anytime from the receipt Stripe emailed you.</span></div>`}
       ${field('Share your page', `<div style="display:flex;gap:8px"><input readonly value="${location.origin+BASE_PATH}@${esc(MYDOC.username)}"><button class="btn sm" id="copyUrl">Copy</button></div>`)}
       <div style="display:flex;gap:10px;margin-top:26px">
         <button class="btn" id="logout" style="flex:1">Log out</button>
@@ -931,20 +933,75 @@ function openModal(inner){
 }
 function closeModal(){ $('#veil')?.remove(); }
 
-function openProModal(themeName){
-  openModal(`<h3>✦ Misty Pro</h3>
-    <div class="sub">${themeName? `<b>${esc(themeName)}</b> is a Pro theme. `:''}Unlock all six animated themes, video backgrounds, the PRO badge, priority on Discover, and everything we ship next.</div>
-    <div class="stat glass" style="margin:18px 0"><div class="n">$4<small style="font-size:13px;color:var(--dim)">/mo</small></div><div class="l">Cancel anytime</div></div>
-    <button class="btn primary" id="mPro" style="width:100%">Activate Pro</button>
-    <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--dim)">Payment processing coming soon — activating instantly for now.</div>`);
-  $('#mPro').onclick = async ()=>{
+function stripeCheckoutUrl(){
+  const u = new URL(STRIPE_LINK);
+  if(ME){ u.searchParams.set('client_reference_id', ME.uid); if(ME.email) u.searchParams.set('prefilled_email', ME.email); }
+  return u.toString();
+}
+
+let PRO_POLL = null;
+function pollProActivation(onDone){
+  clearInterval(PRO_POLL);
+  let tries = 0;
+  PRO_POLL = setInterval(async ()=>{
+    if(!ME || ++tries > 150){ clearInterval(PRO_POLL); return; }
     try{
-      await updateDoc(doc(db,'users',ME.uid),{pro:true});
-      MYDOC.pro = true;
-      if(!MYPROFILE.badges.includes('pro')) MYPROFILE.badges.push('pro');
-      saveProfile(); closeModal(); toast('Welcome to Pro','✦'); renderDashboard();
-    }catch(e){ toast(cleanErr(e),'⚠️'); }
+      const snap = await getDoc(doc(db,'users',ME.uid));
+      if(snap.exists() && snap.data().pro){
+        clearInterval(PRO_POLL);
+        MYDOC.pro = true;
+        if(MYPROFILE && !MYPROFILE.badges.includes('pro')){ MYPROFILE.badges.push('pro'); saveProfile(); }
+        toast('Welcome to Pro','✦');
+        if(onDone) onDone();
+      }
+    }catch(e){}
+  }, 4000);
+}
+
+function openProModal(themeName){
+  if(!ME || !MYDOC){ toast('Log in first','🔐'); return go('auth'); }
+  openModal(`<h3>✦ Misty Pro</h3>
+    <div class="sub">${themeName? `<b>${esc(themeName)}</b> is a Pro perk. `:''}Unlock all animated + video themes, custom lock screen text, profile audio, the PRO badge, priority on Discover, and everything we ship next.</div>
+    <div class="stat glass" style="margin:18px 0"><div class="n">$4<small style="font-size:13px;color:var(--dim)">/mo</small></div><div class="l">Cancel anytime</div></div>
+    <button class="btn primary" id="mPro" style="width:100%">✦ Continue to checkout</button>
+    <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--dim)">Secure payment via Stripe. Pro activates automatically within a minute of paying.</div>`);
+  $('#mPro').onclick = ()=>{
+    window.open(stripeCheckoutUrl(), '_blank', 'noopener');
+    openModal(`<h3>✦ Finishing up…</h3>
+      <div class="sub">Complete your payment in the Stripe tab. This page will unlock Pro automatically once it goes through — keep it open.</div>
+      <div class="spin" style="margin:26px auto"></div>
+      <div style="text-align:center;font-size:11px;color:var(--dim)">Paid but nothing happened after a minute? Refresh this page — your Pro is tied to your account, not this tab.</div>
+      <div class="mrow"><button class="btn" id="mCancel">Close</button></div>`);
+    pollProActivation(()=>{ closeModal(); renderDashboard(); });
   };
+}
+
+function renderThanks(){
+  app.innerHTML = navHTML('') + `<div class="wrap" style="max-width:560px;text-align:center;padding-top:80px">
+    <div class="eyebrow">// payment received</div>
+    <h2 style="margin:10px 0">✦ Welcome to Misty Pro</h2>
+    <p class="sub" id="thanksMsg">Confirming your payment with Stripe — this usually takes a few seconds…</p>
+    <div class="spin" style="margin:30px auto" id="thanksSpin"></div>
+    <button class="btn primary" style="display:none" id="thanksGo" onclick="go('dashboard')">Open my dashboard</button>
+  </div>`;
+  let waited = 0;
+  const waitAuth = setInterval(()=>{
+    waited += 300;
+    if(ME && MYDOC){
+      clearInterval(waitAuth);
+      if(MYDOC.pro){ $('#thanksMsg').textContent = 'Your Pro perks are live. Go make something unreal.'; $('#thanksSpin').style.display='none'; $('#thanksGo').style.display='inline-block'; return; }
+      pollProActivation(()=>{
+        $('#thanksMsg').textContent = 'Your Pro perks are live. Go make something unreal.';
+        $('#thanksSpin').style.display='none';
+        $('#thanksGo').style.display='inline-block';
+      });
+    } else if(waited > 8000){
+      clearInterval(waitAuth);
+      $('#thanksMsg').innerHTML = 'Payment received — log in with the same account to activate your Pro perks.';
+      $('#thanksSpin').style.display='none';
+      const b=$('#thanksGo'); b.textContent='Log in'; b.onclick=()=>go('auth'); b.style.display='inline-block';
+    }
+  }, 300);
 }
 
 function pickUpload(kind, done, accept='image/*', maxMB=8){
@@ -1124,14 +1181,15 @@ function fitCardPreviews(scope){
       const availW = dp.clientWidth, availH = dp.clientHeight;
       if(!availW || !availH) return;
       const r1 = mf.getBoundingClientRect(), r2 = cont.getBoundingClientRect();
-      const curScale = r1.width/396 || 1;
+      const mtx = new DOMMatrix(getComputedStyle(mf).transform);
+      const curScale = mtx.a || 1;
       const contentH = Math.max((r2.bottom - r1.top)/curScale + 14, 220);
       const s = Math.min(availW/396, availH/contentH);
       mf.style.transformOrigin = 'top left';
       mf.style.transform = `scale(${s})`;
-      mf.style.width = '396px';
+      mf.style.width = (availW/s)+'px';
       mf.style.height = (availH/s)+'px';
-      mf.style.marginLeft = Math.max((availW-396*s)/2,0)+'px';
+      mf.style.marginLeft = '0';
     });
   });
 }
