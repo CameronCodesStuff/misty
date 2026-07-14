@@ -2305,3 +2305,27 @@ body::after{
   .bia-volume{display:none}
   .bia-music{border:4px solid rgba(175,175,175,0.034);border-radius:10px}
 }
+
+/* whole-card previews (discover + templates) */
+.dprev{position:relative;overflow:hidden;background:#08070f}
+.dprev .mframe{pointer-events:none}
+.pcard .dprev{height:215px;border-radius:18px 18px 0 0}
+.tpl-card .tpl-prev.dprev{height:215px;border-radius:16px}
+.tplframe.dprev{width:264px;height:420px}
+.pcard .cbody{position:relative;z-index:2}
+
+/* real mini previews in the editor preset grid */
+.preset-card.dprev{height:150px}
+.preset-card.dprev .pv-name{z-index:6}
+.preset-card.dprev .mframe{pointer-events:none}
+@media (max-width:900px){.preset-card.dprev{height:124px}}
+
+/* discover lazy placeholders shimmer softly until they render */
+.dprev[data-lz]:empty::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.06) 50%,transparent 70%);
+  background-size:200% 100%;
+  animation:dprevShimmer 1.4s linear infinite;
+}
+@keyframes dprevShimmer{from{background-position:200% 0}to{background-position:-200% 0}}

@@ -63,11 +63,18 @@ const PRESETS = [
   {name:'Rainy Pines', pro:true, t:{preset:'Rainy Pines',bgType:'video',bgVideo:'assets/backgrounds/rainy-pine-forest.mp4',bgA:'#0a1410',bgB:'#12201a',accent:'#7dd3a8',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
   {name:'Sakura Bloom', pro:true, t:{preset:'Sakura Bloom',bgType:'video',bgVideo:'assets/backgrounds/large-sakura-tree.mp4',bgA:'#1a0a12',bgB:'#2a1020',accent:'#f9a8d4',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
   {name:'Celestial Veil', pro:true, t:{preset:'Celestial Veil',bgType:'video',bgVideo:'assets/backgrounds/celestial-veil.mp4',bgA:'#080614',bgB:'#140f2a',accent:'#a78bfa',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
-  {name:'Shadow Monarch', pro:true, t:{preset:'Shadow Monarch',bgType:'video',bgVideo:'assets/backgrounds/shadow-king.mp4',bgA:'#0a0616',bgB:'#160b2e',accent:'#8b5cf6',font:'chillax',btnStyle:'bia',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
-  {name:'Ultra Ego', pro:true, t:{preset:'Ultra Ego',bgType:'video',bgVideo:'assets/backgrounds/vegeta-ultra-ego.mp4',bgA:'#160516',bgB:'#2e0b2a',accent:'#d946ef',font:'chillax',btnStyle:'bia',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Shadow Monarch', pro:true, t:{preset:'Shadow Monarch',lockText:'[ arise ]',bgType:'video',bgVideo:'assets/backgrounds/shadow-king.mp4',bgA:'#0a0616',bgB:'#160b2e',accent:'#8b5cf6',font:'chillax',btnStyle:'bia',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Ultra Ego', pro:true, t:{preset:'Ultra Ego',lockText:'[ power up ]',bgType:'video',bgVideo:'assets/backgrounds/vegeta-ultra-ego.mp4',bgA:'#160516',bgB:'#2e0b2a',accent:'#d946ef',font:'chillax',btnStyle:'bia',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
   {name:'Poppy Field', pro:true, t:{preset:'Poppy Field',bgType:'video',bgVideo:'assets/backgrounds/poppy-field.mp4',bgA:'#160a0a',bgB:'#2e1410',accent:'#fb7185',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
   {name:'Yellow Sundress', pro:true, t:{preset:'Yellow Sundress',bgType:'video',bgVideo:'assets/backgrounds/yellow-sundress.mp4',bgA:'#161206',bgB:'#2e260b',accent:'#fde047',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
-  {name:'Golden Sky', pro:true, t:{preset:'Golden Sky',bgType:'video',bgVideo:'assets/backgrounds/golden-sky.mp4',bgA:'#161006',bgB:'#2e220b',accent:'#fbbf24',font:'chillax',btnStyle:'bia',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}}
+  {name:'Golden Sky', pro:true, t:{preset:'Golden Sky',bgType:'video',bgVideo:'assets/backgrounds/golden-sky.mp4',bgA:'#161006',bgB:'#2e220b',accent:'#fbbf24',font:'chillax',btnStyle:'bia',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Morning Light', pro:true, t:{preset:'Morning Light',bgType:'video',bgVideo:'assets/backgrounds/morning-light.mp4',bgA:'#16100a',bgB:'#2e2014',accent:'#fdba74',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Minecraft Sunset', pro:true, t:{preset:'Minecraft Sunset',lockText:'[ click to spawn ]',bgType:'video',bgVideo:'assets/backgrounds/minecraft-sunset.mp4',bgA:'#140c06',bgB:'#2e1a0b',accent:'#fb923c',font:'pixel',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:8}},
+  {name:'Night Train', pro:true, t:{preset:'Night Train',bgType:'video',bgVideo:'assets/backgrounds/train-landscape.mp4',bgA:'#0a0c16',bgB:'#141a2e',accent:'#a5b4fc',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Pixel Rain', pro:true, t:{preset:'Pixel Rain',lockText:'[ jack in ]',bgType:'video',bgVideo:'assets/backgrounds/pixel-rain.mp4',bgA:'#060c14',bgB:'#0b1a2e',accent:'#22d3ee',font:'spacemono',btnStyle:'bia',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:10}},
+  {name:'Akatsuki Rain', pro:true, t:{preset:'Akatsuki Rain',lockText:'[ enter the rain ]',bgType:'video',bgVideo:'assets/backgrounds/akatsuki-rain.mp4',bgA:'#140606',bgB:'#2e0b0b',accent:'#ef4444',font:'chillax',btnStyle:'bia',glow:true,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Roses in Rain', pro:true, t:{preset:'Roses in Rain',bgType:'video',bgVideo:'assets/backgrounds/roses-in-rain.mp4',bgA:'#14060a',bgB:'#2e0b14',accent:'#fb7185',font:'chillax',btnStyle:'bia',glow:false,particles:false,cursorFx:false,textColor:'#ffffff',radius:15}},
+  {name:'Headlines', pro:true, t:{preset:'Headlines',lockText:'[ read all about it ]',bgType:'video',bgVideo:'assets/backgrounds/beneath-headlines.mp4',bgA:'#0b0b0f',bgB:'#1a1a20',accent:'#e4e4e7',font:'spacemono',btnStyle:'outline',glow:false,particles:false,cursorFx:false,textColor:'#f4f4f5',radius:6}}
 ];
 
 // Reskin every preset/template with the exact bia-bio look: frosted
@@ -83,6 +90,7 @@ function applyBiaChrome(themeObj){
 }
 PRESETS.forEach(p=>applyBiaChrome(p.t));
 const DEFAULT_THEME = JSON.parse(JSON.stringify(PRESETS[0].t));
+function posterFor(src){ const m=/assets\/backgrounds\/([\w-]+)\.mp4$/.exec(src||''); return m? `assets/posters/${m[1]}.jpg` : ''; }
 const BG_VIDEOS = [
   {name:'Rainy Pine Forest', res:'1080p', src:'assets/backgrounds/rainy-pine-forest.mp4'},
   {name:'Large Sakura Tree', res:'4K', src:'assets/backgrounds/large-sakura-tree.mp4'},
@@ -91,7 +99,14 @@ const BG_VIDEOS = [
   {name:'Vegeta Ultra Ego', res:'4K', src:'assets/backgrounds/vegeta-ultra-ego.mp4'},
   {name:'Poppy Field', res:'4K', src:'assets/backgrounds/poppy-field.mp4'},
   {name:'Yellow Sundress', res:'4K', src:'assets/backgrounds/yellow-sundress.mp4'},
-  {name:'Golden Sky', res:'4K', src:'assets/backgrounds/golden-sky.mp4'}
+  {name:'Golden Sky', res:'4K', src:'assets/backgrounds/golden-sky.mp4'},
+  {name:'Morning Light', res:'4K', src:'assets/backgrounds/morning-light.mp4'},
+  {name:'Minecraft Sunset', res:'4K', src:'assets/backgrounds/minecraft-sunset.mp4'},
+  {name:'Night Train', res:'4K', src:'assets/backgrounds/train-landscape.mp4'},
+  {name:'Pixel Rain', res:'4K', src:'assets/backgrounds/pixel-rain.mp4'},
+  {name:'Akatsuki Rain', res:'4K', src:'assets/backgrounds/akatsuki-rain.mp4'},
+  {name:'Roses in Rain', res:'4K', src:'assets/backgrounds/roses-in-rain.mp4'},
+  {name:'Headlines', res:'1080p', src:'assets/backgrounds/beneath-headlines.mp4'}
 ];
 
 function toast(msg, icon='✨'){ const t=document.createElement('div'); t.className='toast'; t.innerHTML=`<span>${icon}</span><span>${esc(msg)}</span>`; $('#toasts').appendChild(t); setTimeout(()=>{t.style.opacity='0';t.style.transition='.4s';setTimeout(()=>t.remove(),400)},2600); }
@@ -375,8 +390,8 @@ function drawTemplates(){
   if(!list.length){ g.innerHTML = `<div class="empty" style="grid-column:1/-1;padding:60px 0"><span class="big">🌫️</span>Nothing in the mist${TPL_FILTER==='mine'?' — publish your theme to see it here':''}.</div>`; return; }
   g.innerHTML = list.map((t,i)=>`
     <div class="tpl-card glass reveal" style="transition-delay:${(i%4)*.05}s">
-      <div class="preset-card tpl-prev" data-tp="${i}" title="Preview ${esc(t.name)}">
-        ${miniThemeInner({t:{...DEFAULT_THEME,...t.theme}})}
+      <div class="preset-card tpl-prev dprev" data-tp="${i}" title="Preview ${esc(t.name)}">
+        <div class="mframe">${profileHTML(tplDemoProfile(t),{preview:true,still:true})}</div>
         ${t.pro && !(MYDOC&&MYDOC.pro)? `<div class="pv-lock">✦</div>`:''}
       </div>
       <div class="tpl-meta">
@@ -393,20 +408,28 @@ function drawTemplates(){
   g.querySelectorAll('[data-tp]').forEach(el=>el.addEventListener('click', ()=>previewTemplate(list[+el.dataset.tp])));
   g.querySelectorAll('[data-tu]').forEach(el=>el.addEventListener('click', e=>{ e.stopPropagation(); useTemplate(list[+el.dataset.tu]); }));
   g.querySelectorAll('[data-td]').forEach(el=>el.addEventListener('click', e=>{ e.stopPropagation(); deleteTemplate(list[+el.dataset.td]); }));
+  fitCardPreviews(g);
   observeReveals();
 }
 
-function previewTemplate(t){
-  const demo = {username: MYDOC?.username||'you', displayName: MYDOC?.displayName||MYDOC?.username||'you',
-    avatar: MYDOC?.avatar||'', banner:'', status:'previewing · '+t.name, bio:'', badges: MYDOC?.pro?['pro']:[],
-    views: 1234, likes: 88, widgets: [],
-    theme: {...DEFAULT_THEME, ...t.theme, particles:false, cursorFx:false},
+function tplDemoProfile(t, statusText){
+  return {username: MYDOC?.username||'you', displayName: MYDOC?.displayName||MYDOC?.username||'you',
+    avatar: MYDOC?.avatar||'', banner:'', status: statusText||t.name, bio:'', badges: MYDOC?.pro?['pro']:[],
+    views: 1234, likes: 88, widgets: [], location:'',
+    theme: {...DEFAULT_THEME, ...t.theme, particles:false, cursorFx:false, audioUrl:''},
     links: (MYPROFILE?.links?.length? MYPROFILE.links.slice(0,3) : [
       {id:'p1',title:'GitHub',url:'#',icon:'github'},{id:'p2',title:'Discord',url:'#',icon:'discord'},{id:'p3',title:'Spotify',url:'#',icon:'spotify'}])};
+}
+
+function previewTemplate(t){
+  const demo = tplDemoProfile(t, 'previewing · '+t.name);
   openModal(`<h3>${t.pro?'✦ ':''}${esc(t.name)}</h3>
     <div class="sub">${esc(t.desc||'')} ${t.builtin?'· official Misty template':`· by @${esc(t.author||'?')}`}</div>
-    <div class="tplframe"><div class="mframe">${profileHTML(demo,{preview:true})}</div></div>
+    <div class="tplframe dprev"><div class="mframe">${profileHTML(demo,{preview:true})}</div></div>
     <div class="mrow"><button class="btn" id="mCancel">Close</button><button class="btn primary" id="tplUseM">Use this template</button></div>`);
+  const frame = document.querySelector('.tplframe .pp-stage');
+  if(frame) wireProfileFx(frame.parentElement, demo, {preview:true});
+  fitCardPreviews(document.querySelector('.modal')||document);
   $('#tplUseM').addEventListener('click', ()=>{ closeModal(); useTemplate(t); });
 }
 
@@ -453,16 +476,15 @@ function deleteTemplate(t){
 }
 
 const MOCK_PROFILES = [
-  {username:'azrea',displayName:'azrea',avatar:'',banner:'',status:'GFX Artist | Owner',bio:'',badges:['og','owner'],views:2317,likes:184,
-   theme:{...PRESETS[10].t,particles:false,cursorFx:false},
-   links:[{id:'m1',title:'My Portfolio',url:'#',icon:'🎨'},{id:'m2',title:'My Store',url:'#',icon:'🛒'},{id:'m3',title:'Discord Server',url:'#',icon:'discord'}],widgets:[]},
-  {username:'vue',displayName:'vue',avatar:'',banner:'',status:'welcome to my page!',bio:'',badges:['og','pro'],views:3194,likes:220,
-   theme:{...PRESETS[6].t,btnStyle:'icons',particles:false,cursorFx:false,cardOpacity:34,nameFx:'glow'},
+  {username:'azrea',displayName:'Azrea',avatar:'',banner:'',status:'shadow monarch|arise',bio:'',location:'KR',badges:['og','owner'],views:12317,likes:984,
+   theme:{...PRESETS.find(p=>p.name==='Shadow Monarch').t,particles:false,cursorFx:false,tilt:false},
+   links:[{id:'m1',title:'My Portfolio',url:'#',icon:'🎨'},{id:'m2',title:'Discord Server',url:'#',icon:'discord'},{id:'m3',title:'My Store',url:'#',icon:'🛒'}],widgets:[]},
+  {username:'vue',displayName:'vue',avatar:'',banner:'',status:'lost in the petals|桜の下で',bio:'',location:'JP',badges:['og','pro'],views:23194,likes:1720,
+   theme:{...PRESETS.find(p=>p.name==='Sakura Bloom').t,btnStyle:'icons',particles:false,cursorFx:false,tilt:false},
    links:[{id:'m1',title:'GitHub',url:'#',icon:'github'},{id:'m2',title:'Spotify',url:'#',icon:'spotify'},{id:'m3',title:'Discord',url:'#',icon:'discord'},{id:'m4',title:'Steam',url:'#',icon:'steam'}],widgets:[]},
-  {username:'hris',displayName:'hris',avatar:'',banner:'',status:'misty on top! | liquid glass | your identity',bio:'',badges:['pro','og','owner'],views:4814,likes:312,
-   theme:{...PRESETS[7].t,btnStyle:'icons',particles:false,cursorFx:false,typewriter:true,nameFx:'neon'},
-   links:[{id:'m1',title:'GitHub',url:'#',icon:'github'},{id:'m2',title:'Discord',url:'#',icon:'discord'},{id:'m3',title:'X',url:'#',icon:'x'}],
-   widgets:[{id:'w1',type:'discord',title:'popaperc',value:'#'}]}
+  {username:'hris',displayName:'hris',avatar:'',banner:'',status:'city lights|misty on top|pixel rain',bio:'',location:'NZ',badges:['pro','og','owner'],views:44814,likes:3120,
+   theme:{...PRESETS.find(p=>p.name==='Pixel Rain').t,particles:false,cursorFx:false,tilt:false},
+   links:[{id:'m1',title:'GitHub',url:'#',icon:'github'},{id:'m2',title:'Discord',url:'#',icon:'discord'},{id:'m3',title:'X',url:'#',icon:'x'}],widgets:[]}
 ];
 
 function renderLanding(){
@@ -484,7 +506,7 @@ function renderLanding(){
           <button class="btn primary sm" id="claimBtn">Claim</button>
         </div>
       </div>
-      <div class="mockdeck" aria-hidden="true">${MOCK_PROFILES.map((m,i)=>`<div class="mockcard c${i+1}"><div class="mframe">${profileHTML(m,{preview:true})}</div></div>`).join('')}</div>
+      <div class="mockdeck" aria-hidden="true">${MOCK_PROFILES.map((m,i)=>`<div class="mockcard c${i+1}"><div class="mframe">${profileHTML(m,{preview:true,still:true})}</div></div>`).join('')}</div>
     </div>
   </div>
   <section class="land"><div class="wrap">
@@ -646,6 +668,13 @@ function observeReveals(){
   els.forEach(e=>io.observe(e));
 }
 
+function presetDemo(pr){
+  return {username: MYDOC?.username||'you', displayName: MYDOC?.displayName||MYDOC?.username||'you',
+    avatar: MYDOC?.avatar||'', status: pr.name, bio:'', location:'', badges:[], views:1234, likes:88, widgets:[],
+    theme:{...DEFAULT_THEME, ...pr.t, particles:false, cursorFx:false, audioUrl:''},
+    links:[{id:'d1',title:'GitHub',url:'#',icon:'github'},{id:'d2',title:'Discord',url:'#',icon:'discord'}]};
+}
+
 function renderEditorTab(){
   const body = $('#dBody'); const p = MYPROFILE; const t = p.theme;
   if(liveEditTab==='profile'){
@@ -668,8 +697,8 @@ function renderEditorTab(){
   if(liveEditTab==='looks'){
     body.innerHTML = `
       ${field('Theme presets', `<div class="preset-grid">${PRESETS.map((pr,i)=>`
-        <div class="preset-card ${t.preset===pr.name?'on':''}" data-preset="${i}">
-          ${miniThemeInner(pr)}
+        <div class="preset-card dprev ${t.preset===pr.name?'on':''}" data-preset="${i}">
+          <div class="mframe">${profileHTML(presetDemo(pr),{preview:true,still:true})}</div>
           <div class="pv-name">${pr.pro?'✦':''} ${pr.name}</div>
           ${pr.pro && !MYDOC.pro? `<div class="pv-lock">🔒</div>`:''}
         </div>`).join('')}</div>`)}
@@ -689,10 +718,12 @@ function renderEditorTab(){
         <button class="opt ${t.cursorFx?'on':''}" id="fxCur">🖱 Cursor trail</button>
         <button class="opt ${t.tilt?'on':''}" id="fxTilt">🎴 Card tilt</button>
         <button class="opt ${t.typewriter?'on':''}" id="fxTw">⌨ Typewriter status</button>
-        <button class="opt ${t.enterScreen?'on':''}" id="fxEnter">🚪 Enter screen</button>
+        <button class="opt ${t.enterScreen!==false?'on':''}" id="fxEnter">🚪 Enter screen</button>
       </div><div class="hint">Typewriter cycles through your status — separate lines with |. Enter screen greets visitors with "click to enter" and lets audio autoplay.</div>`)}
+      ${field('Lock screen text ✦', `<input id="lockTxt" value="${esc(t.lockText||'')}" maxlength="40" placeholder="[ click to unlock ]"><div class="hint">Shown on the unlock screen before your page reveals.</div>`)}
       ${field('Profile audio ✦', `<div class="filedrop" id="upAu">Upload audio (mp3/ogg)</div><input id="auUrl" value="${esc(t.audioUrl||'')}" placeholder="https://....mp3" style="margin-top:8px">${t.audioUrl?`<button class="btn sm danger" id="auClr" style="margin-top:10px">Remove audio</button>`:''}`)}
       ${field('Text color', `<div class="swatches">${['#e7e7f2','#ffffff','#d6faff','#ffe4f1','#c6f6d5','#fff7d6','#f7e9ff','#e2f6ff'].map(c=>`<div class="sw ${t.textColor===c?'on':''}" data-tc="${c}" style="background:${c}"></div>`).join('')}</div>`)}`;
+    fitCardPreviews(body);
     body.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{
       const pr = PRESETS[+b.dataset.preset];
       if(pr.pro && !MYDOC.pro) return openProModal(pr.name);
@@ -718,7 +749,8 @@ function renderEditorTab(){
     $('#fxCur').onclick = ()=>{ t.cursorFx=!t.cursorFx; saveProfile(); renderEditorTab(); };
     $('#fxTilt').onclick = ()=>{ t.tilt=!t.tilt; saveProfile(); renderEditorTab(); };
     $('#fxTw').onclick = ()=>{ t.typewriter=!t.typewriter; saveProfile(); renderEditorTab(); };
-    $('#fxEnter').onclick = ()=>{ t.enterScreen=!t.enterScreen; saveProfile(); renderEditorTab(); };
+    $('#fxEnter').onclick = ()=>{ t.enterScreen = t.enterScreen===false; saveProfile(); renderEditorTab(); };
+    $('#lockTxt').onchange = e=>{ if(e.target.value && !MYDOC.pro){ e.target.value=''; return openProModal('Custom lock screen text'); } t.lockText=e.target.value; saveProfile(); };
     $('#upAu').onclick = ()=>{ if(!MYDOC.pro) return openProModal('Profile audio'); pickUpload('audio', url=>{ t.audioUrl=url; t.enterScreen=true; saveProfile(); renderEditorTab(); }, 'audio/*', 10); };
     $('#auUrl').onchange = e=>{ if(e.target.value && !MYDOC.pro){ e.target.value=''; return openProModal('Profile audio'); } t.audioUrl=safeUrl(e.target.value); if(t.audioUrl) t.enterScreen=true; saveProfile(); renderEditorTab(); };
     const ac=$('#auClr'); if(ac) ac.onclick = ()=>{ t.audioUrl=''; saveProfile(); renderEditorTab(); };
@@ -739,7 +771,7 @@ function renderEditorTab(){
     if(t.bgType==='video'){
       extra.innerHTML = field('Video presets — full original quality', `<div class="vidgrid">${BG_VIDEOS.map((v,i)=>`
         <div class="vidcard ${t.bgVideo===v.src?'on':''}" data-vid="${i}">
-          <video src="${v.src}" muted loop playsinline preload="metadata"></video>
+          <video src="${v.src}" poster="${posterFor(v.src)}" muted loop playsinline preload="none"></video>
           <div class="vidname">${v.name}<span class="vidres">${v.res}</span></div>
         </div>`).join('')}</div>`)
       + field('Or your own (mp4/webm)', `<div class="filedrop" id="upVid">Upload video</div><input id="bgVid" value="${esc(t.bgVideo||'')}" placeholder="https://....mp4" style="margin-top:8px">`);
@@ -982,7 +1014,8 @@ function profileHTML(p, opts={}){
   const tc = t.textColor||'#ffffff';
   const animLayer = t.bgType==='anim'? `<div class="pp-anim anim-${esc(t.anim||'aurora')}"></div>`:'';
   const bgLayer = t.bgType==='image' && t.bgImage? `<img class="bia-media" src="${esc(t.bgImage)}" alt="">`
-    : t.bgType==='video' && t.bgVideo? `<video class="bia-media" src="${esc(t.bgVideo)}" autoplay muted loop playsinline preload="auto" disablepictureinpicture></video>` : '';
+    : t.bgType==='video' && t.bgVideo? (opts.still && posterFor(t.bgVideo)? `<img class="bia-media" src="${esc(posterFor(t.bgVideo))}" alt="" loading="lazy">`
+      : `<video class="bia-media" src="${esc(t.bgVideo)}" ${posterFor(t.bgVideo)?`poster="${esc(posterFor(t.bgVideo))}"`:''} ${opts.still?'muted playsinline preload="metadata"':'autoplay muted loop playsinline preload="auto"'} disablepictureinpicture></video>`) : '';
   const partCanvas = t.particles? `<canvas class="pp-particles" style="position:absolute;inset:0;width:100%;height:100%;z-index:1"></canvas>`:'';
   const statics = t.bgType==='mist'||t.bgType==='gradient'||t.bgType==='solid';
   const orbA = t.bgType==='solid'? (t.accent||'#a78bfa') : (t.bgA||t.accent||'#a78bfa');
@@ -1027,7 +1060,7 @@ function profileHTML(p, opts={}){
         <div class="bia-layout">
           <div class="bia-anim delay-10 ${av}"><h1 class="bia-username" style="color:${tc}">${nameHTML}</h1></div>
           ${badgesHTML? `<div class="bia-anim delay-15 ${av}">${badgesHTML}</div>`:''}
-          <div class="bia-anim delay-16 ${av}"><h3 class="bia-bio" data-typed="${esc(typedSrc)}">&nbsp;</h3></div>
+          <div class="bia-anim delay-16 ${av}"><h3 class="bia-bio" data-typed="${esc(typedSrc)}">${opts.still? esc(typedSrc.split(' <> ')[0]) : '&nbsp;'}</h3></div>
         </div>
         <div class="bia-anim delay-17 ${av}">
           <div class="bia-presence">
@@ -1079,6 +1112,28 @@ function profileHTML(p, opts={}){
       <div class="pp-foot"><img src="logo.png" alt="">made with MISTY</div>
     </div>
   </div>`;
+}
+
+function fitCardPreviews(scope){
+  scope = scope||document;
+  const els = (scope.matches && scope.matches('.dprev'))? [scope] : scope.querySelectorAll('.dprev');
+  els.forEach(dp=>{
+    const mf = dp.querySelector('.mframe'); if(!mf) return;
+    const cont = mf.querySelector('.bia-container'); if(!cont) return;
+    requestAnimationFrame(()=>{
+      const availW = dp.clientWidth, availH = dp.clientHeight;
+      if(!availW || !availH) return;
+      const r1 = mf.getBoundingClientRect(), r2 = cont.getBoundingClientRect();
+      const curScale = r1.width/396 || 1;
+      const contentH = Math.max((r2.bottom - r1.top)/curScale + 14, 220);
+      const s = Math.min(availW/396, availH/contentH);
+      mf.style.transformOrigin = 'top left';
+      mf.style.transform = `scale(${s})`;
+      mf.style.width = '396px';
+      mf.style.height = (availH/s)+'px';
+      mf.style.marginLeft = Math.max((availW-396*s)/2,0)+'px';
+    });
+  });
 }
 
 function wireProfileFx(root, p, opts={}){
@@ -1241,7 +1296,7 @@ function wireProfileFx(root, p, opts={}){
       lock.className='bia-lockscreen';
       lock.style.fontFamily = FONTS[t.font]||FONTS.sora;
       lock.style.setProperty('--pa', t.accent||'#a78bfa');
-      lock.innerHTML = `<div class="bia-lockcontent"><div class="bia-clicktext">[ click to unlock ]</div></div>`;
+      lock.innerHTML = `<div class="bia-lockcontent"><div class="bia-clicktext">${esc((t.lockText||'').trim() || '[ click to unlock ]')}</div></div>`;
       root.appendChild(lock);
       let unlocked = false;
       lock.addEventListener('click', ()=>{
@@ -1315,7 +1370,7 @@ async function renderPublic(uname){
       updateDoc(doc(db,'profiles',uname),{views:increment(1)}).catch(()=>{});
     }
   }
-  page.innerHTML = `<button class="pp-back" onclick="history.length>1?history.back():go('')">← misty</button>` + profileHTML(p,{liked});
+  page.innerHTML = `<a class="pp-back" href="https://cameroncodesstuff.github.io/misty/" style="text-decoration:none">← misty</a>` + profileHTML(p,{liked});
   wireProfileFx(page, p);
   page.querySelector('#ppShare').onclick = ()=>{
     const url = location.origin+BASE_PATH+'@'+uname;
@@ -1354,11 +1409,10 @@ async function renderDiscover(){
     const qs = await getDocs(query(collection(db,'profiles'), orderBy('views','desc'), limit(30)));
     const profs = []; qs.forEach(d=>profs.push(d.data()));
     profs.sort((a,b)=> ( (b.badges?.includes('pro')?1e9:0)+(b.views||0) ) - ( (a.badges?.includes('pro')?1e9:0)+(a.views||0) ));
-    $('#dgrid').innerHTML = profs.length? profs.map(p=>{
+    $('#dgrid').innerHTML = profs.length? profs.map((p,i)=>{
       const t = {...DEFAULT_THEME,...(p.theme||{})};
       return `<div class="pcard glass" onclick="go('@${esc(p.username)}')">
-        <div class="cb" style="${p.banner?`background-image:url('${esc(p.banner)}')`:`background:linear-gradient(120deg,${t.bgA||'#1e1b3a'},${t.bgB||'#0f2a3a'})`}"></div>
-        <img class="cav" src="${esc(p.avatar||avatarFor(p.username))}" loading="lazy">
+        <div class="dprev" data-lz="${i}" style="background:linear-gradient(120deg,${esc(t.bgA||'#12101e')},${esc(t.bgB||'#0a1420')})"></div>
         <div class="cbody">
           <b>${esc(p.displayName||p.username)}</b> ${(p.badges||[]).includes('pro')?'<span class="badge pro">✦</span>':''}
           <div class="u">@${esc(p.username)}</div>
@@ -1366,6 +1420,16 @@ async function renderDiscover(){
         </div>
       </div>`;
     }).join('') : `<div class="empty" style="grid-column:1/-1"><span class="big">🌫️</span>The mist is quiet. Be the first.</div>`;
+    const io = new IntersectionObserver(entries=>{
+      entries.forEach(en=>{
+        if(!en.isIntersecting) return;
+        const dp = en.target; io.unobserve(dp);
+        const p = profs[+dp.dataset.lz]; if(!p) return;
+        dp.innerHTML = `<div class="mframe">${profileHTML(p,{preview:true,still:true})}</div>`;
+        fitCardPreviews(dp);
+      });
+    }, {rootMargin:'200px 0px'});
+    $('#dgrid').querySelectorAll('.dprev[data-lz]').forEach(dp=>io.observe(dp));
   }catch(e){ $('#dgrid').innerHTML = `<div class="empty" style="grid-column:1/-1">Could not load profiles: ${esc(cleanErr(e))}</div>`; }
 }
 
