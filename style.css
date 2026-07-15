@@ -2358,3 +2358,8 @@ body::after{
 .thanks-perks .tp{font-size:13px;color:var(--txt,#e8e6f2);display:flex;align-items:center;gap:9px}
 .thanks-perks .tp span{font-size:15px}
 @media (max-width:520px){.thanks-perks{grid-template-columns:1fr}}
+
+/* video picker grows to 3 columns now that there are 40+ backgrounds */
+@media (min-width:900px){
+  .vidgrid{grid-template-columns:repeat(3,1fr);max-height:520px;overflow-y:auto;padding-right:4px}
+}

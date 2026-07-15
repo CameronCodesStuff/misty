@@ -90,7 +90,7 @@ function applyBiaChrome(themeObj){
 }
 PRESETS.forEach(p=>applyBiaChrome(p.t));
 const DEFAULT_THEME = JSON.parse(JSON.stringify(PRESETS[0].t));
-function posterFor(src){ const m=/assets\/backgrounds\/([\w-]+)\.mp4$/.exec(src||''); return m? `assets/posters/${m[1]}.jpg` : ''; }
+function posterFor(src){ const m=/assets\/backgrounds\/([\w.-]+)\.mp4$/.exec(src||''); return m? `assets/posters/${m[1]}.jpg` : ''; }
 const BG_VIDEOS = [
   {name:'Rainy Pine Forest', res:'1080p', src:'assets/backgrounds/rainy-pine-forest.mp4'},
   {name:'Large Sakura Tree', res:'4K', src:'assets/backgrounds/large-sakura-tree.mp4'},
@@ -106,7 +106,35 @@ const BG_VIDEOS = [
   {name:'Pixel Rain', res:'4K', src:'assets/backgrounds/pixel-rain.mp4'},
   {name:'Akatsuki Rain', res:'4K', src:'assets/backgrounds/akatsuki-rain.mp4'},
   {name:'Roses in Rain', res:'4K', src:'assets/backgrounds/roses-in-rain.mp4'},
-  {name:'Headlines', res:'1080p', src:'assets/backgrounds/beneath-headlines.mp4'}
+  {name:'Headlines', res:'1080p', src:'assets/backgrounds/beneath-headlines.mp4'},
+  {name:'Autumn Moonlight', res:'4K', src:'assets/backgrounds/autumn-tree-in-moonlight_3840x2160.mp4'},
+  {name:'Shadowheart', res:'4K', src:'assets/backgrounds/shadowheart-baldur-gate-3_3840x2160.mp4'},
+  {name:'Samurai Spirit', res:'4K', src:'assets/backgrounds/samurai-spirit-under-the-moon_3840x2160.mp4'},
+  {name:'Fishing Frogs', res:'4K', src:'assets/backgrounds/fishing-frogs_3840x2160.mp4'},
+  {name:'Forgotten Ritual', res:'4K', src:'assets/backgrounds/echoes-of-the-forgotten-ritual_3840x2160.mp4'},
+  {name:'Rainy Anime Girls', res:'1080p', src:'assets/backgrounds/rainy-anime-girls_1920x1080.mp4'},
+  {name:'Forgotten Arc', res:'4K', src:'assets/backgrounds/beneath-the-forgotten-arc_3840x2160.mp4'},
+  {name:'Serene Girl', res:'4K', src:'assets/backgrounds/serene-anime-girl_3840x2160.mp4'},
+  {name:'Itachi', res:'4K', src:'assets/backgrounds/itachi-uchiha_3840x2160.mp4'},
+  {name:"Witcher's Path", res:'4K', src:'assets/backgrounds/the-witchers-path_3840x2160.mp4'},
+  {name:'Columbina', res:'4K', src:'assets/backgrounds/columbina-lunar-ascension_3840x2160.mp4'},
+  {name:'Void King', res:'1080p', src:'assets/backgrounds/void-king-ascension_1920x1080.mp4'},
+  {name:'Serious Girl', res:'4K', src:'assets/backgrounds/serious-girl_3840x2160.mp4'},
+  {name:'Forgotten Path', res:'4K', src:'assets/backgrounds/forgotten-path_3840x2160.mp4'},
+  {name:'Shadow Cut', res:'4K', src:'assets/backgrounds/shadow-cut-reverie_3840x2160.mp4'},
+  {name:'Beach at Night', res:'1080p', src:'assets/backgrounds/girl-on-the-beach-at-night_1920x1080.mp4'},
+  {name:'BMW M4 Liberty', res:'4K', src:'assets/backgrounds/bmw-m4-liberty_3840x2160.mp4'},
+  {name:'Toyota Drift', res:'4K', src:'assets/backgrounds/white-toyota-drifting_3840x2160.mp4'},
+  {name:'Blooming Meadow', res:'4K', src:'assets/backgrounds/meadow-with-blooming-flowers_3840x2160.mp4'},
+  {name:'Levi Ackerman', res:'4K', src:'assets/backgrounds/levi-ackerman-dark_3840x2160.mp4'},
+  {name:'BMW M5 Dark', res:'4K', src:'assets/backgrounds/bmw-m5-in-dark_3840x2160.mp4'},
+  {name:'Angewomon', res:'4K', src:'assets/backgrounds/angewomon-digimon_3840x2160.mp4'},
+  {name:'Rengoku', res:'4K', src:'assets/backgrounds/rengoku-dawn-in-flames_3840x2160.mp4'},
+  {name:'Suisui', res:'4K', src:'assets/backgrounds/suisui-wuthering-waves_3840x2160.mp4'},
+  {name:'Bikini Girls', res:'4K', src:'assets/backgrounds/anime-bikini-girls_3840x2160.mp4'},
+  {name:'Mountain Flowers', res:'4K', src:'assets/backgrounds/mountains-with-flowers_3840x2160.mp4'},
+  {name:'The Last of Us', res:'4K', src:'assets/backgrounds/surviving-the-last-of-us_3840x2160.mp4'},
+  {name:'End of Summer', res:'4K', src:'assets/backgrounds/the-end-of-summer_3840x2160.mp4'}
 ];
 
 function toast(msg, icon='✨'){ const t=document.createElement('div'); t.className='toast'; t.innerHTML=`<span>${icon}</span><span>${esc(msg)}</span>`; $('#toasts').appendChild(t); setTimeout(()=>{t.style.opacity='0';t.style.transition='.4s';setTimeout(()=>t.remove(),400)},2600); }
@@ -1085,7 +1113,7 @@ function profileHTML(p, opts={}){
   const tc = t.textColor||'#ffffff';
   const animLayer = t.bgType==='anim'? `<div class="pp-anim anim-${esc(t.anim||'aurora')}"></div>`:'';
   const bgLayer = t.bgType==='image' && t.bgImage? `<img class="bia-media" src="${esc(t.bgImage)}" alt="">`
-    : t.bgType==='video' && t.bgVideo? (opts.still && posterFor(t.bgVideo)? `<img class="bia-media" src="${esc(posterFor(t.bgVideo))}" alt="" loading="lazy">`
+    : t.bgType==='video' && t.bgVideo? (opts.still && posterFor(t.bgVideo)? `<img class="bia-media" src="${esc(posterFor(t.bgVideo))}" alt="" loading="lazy" onerror="this.remove()">`
       : `<video class="bia-media" src="${esc(t.bgVideo)}" ${posterFor(t.bgVideo)?`poster="${esc(posterFor(t.bgVideo))}"`:''} ${opts.still?'muted playsinline preload="metadata"':'autoplay muted loop playsinline preload="auto"'} disablepictureinpicture></video>`) : '';
   const partCanvas = t.particles? `<canvas class="pp-particles" style="position:absolute;inset:0;width:100%;height:100%;z-index:1"></canvas>`:'';
   const statics = t.bgType==='mist'||t.bgType==='gradient'||t.bgType==='solid';
