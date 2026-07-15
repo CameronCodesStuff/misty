@@ -107,34 +107,34 @@ const BG_VIDEOS = [
   {name:'Akatsuki Rain', res:'4K', src:'assets/backgrounds/akatsuki-rain.mp4'},
   {name:'Roses in Rain', res:'4K', src:'assets/backgrounds/roses-in-rain.mp4'},
   {name:'Headlines', res:'1080p', src:'assets/backgrounds/beneath-headlines.mp4'},
-  {name:'Autumn Moonlight', res:'4K', src:'assets/backgrounds/autumn-tree-in-moonlight_3840x2160.mp4'},
-  {name:'Shadowheart', res:'4K', src:'assets/backgrounds/shadowheart-baldur-gate-3_3840x2160.mp4'},
-  {name:'Samurai Spirit', res:'4K', src:'assets/backgrounds/samurai-spirit-under-the-moon_3840x2160.mp4'},
-  {name:'Fishing Frogs', res:'4K', src:'assets/backgrounds/fishing-frogs_3840x2160.mp4'},
-  {name:'Forgotten Ritual', res:'4K', src:'assets/backgrounds/echoes-of-the-forgotten-ritual_3840x2160.mp4'},
-  {name:'Rainy Anime Girls', res:'1080p', src:'assets/backgrounds/rainy-anime-girls_1920x1080.mp4'},
-  {name:'Forgotten Arc', res:'4K', src:'assets/backgrounds/beneath-the-forgotten-arc_3840x2160.mp4'},
-  {name:'Serene Girl', res:'4K', src:'assets/backgrounds/serene-anime-girl_3840x2160.mp4'},
-  {name:'Itachi', res:'4K', src:'assets/backgrounds/itachi-uchiha_3840x2160.mp4'},
-  {name:"Witcher's Path", res:'4K', src:'assets/backgrounds/the-witchers-path_3840x2160.mp4'},
-  {name:'Columbina', res:'4K', src:'assets/backgrounds/columbina-lunar-ascension_3840x2160.mp4'},
-  {name:'Void King', res:'1080p', src:'assets/backgrounds/void-king-ascension_1920x1080.mp4'},
-  {name:'Serious Girl', res:'4K', src:'assets/backgrounds/serious-girl_3840x2160.mp4'},
-  {name:'Forgotten Path', res:'4K', src:'assets/backgrounds/forgotten-path_3840x2160.mp4'},
-  {name:'Shadow Cut', res:'4K', src:'assets/backgrounds/shadow-cut-reverie_3840x2160.mp4'},
-  {name:'Beach at Night', res:'1080p', src:'assets/backgrounds/girl-on-the-beach-at-night_1920x1080.mp4'},
-  {name:'BMW M4 Liberty', res:'4K', src:'assets/backgrounds/bmw-m4-liberty_3840x2160.mp4'},
-  {name:'Toyota Drift', res:'4K', src:'assets/backgrounds/white-toyota-drifting_3840x2160.mp4'},
-  {name:'Blooming Meadow', res:'4K', src:'assets/backgrounds/meadow-with-blooming-flowers_3840x2160.mp4'},
-  {name:'Levi Ackerman', res:'4K', src:'assets/backgrounds/levi-ackerman-dark_3840x2160.mp4'},
-  {name:'BMW M5 Dark', res:'4K', src:'assets/backgrounds/bmw-m5-in-dark_3840x2160.mp4'},
-  {name:'Angewomon', res:'4K', src:'assets/backgrounds/angewomon-digimon_3840x2160.mp4'},
-  {name:'Rengoku', res:'4K', src:'assets/backgrounds/rengoku-dawn-in-flames_3840x2160.mp4'},
-  {name:'Suisui', res:'4K', src:'assets/backgrounds/suisui-wuthering-waves_3840x2160.mp4'},
-  {name:'Bikini Girls', res:'4K', src:'assets/backgrounds/anime-bikini-girls_3840x2160.mp4'},
-  {name:'Mountain Flowers', res:'4K', src:'assets/backgrounds/mountains-with-flowers_3840x2160.mp4'},
-  {name:'The Last of Us', res:'4K', src:'assets/backgrounds/surviving-the-last-of-us_3840x2160.mp4'},
-  {name:'End of Summer', res:'4K', src:'assets/backgrounds/the-end-of-summer_3840x2160.mp4'}
+  {pro:true, name:'Autumn Moonlight', res:'4K', src:'assets/backgrounds/autumn-tree-in-moonlight_3840x2160.mp4'},
+  {pro:true, name:'Shadowheart', res:'4K', src:'assets/backgrounds/shadowheart-baldur-gate-3_3840x2160.mp4'},
+  {pro:true, name:'Samurai Spirit', res:'4K', src:'assets/backgrounds/samurai-spirit-under-the-moon_3840x2160.mp4'},
+  {pro:true, name:'Fishing Frogs', res:'4K', src:'assets/backgrounds/fishing-frogs_3840x2160.mp4'},
+  {pro:true, name:'Forgotten Ritual', res:'4K', src:'assets/backgrounds/echoes-of-the-forgotten-ritual_3840x2160.mp4'},
+  {pro:true, name:'Rainy Anime Girls', res:'1080p', src:'assets/backgrounds/rainy-anime-girls_1920x1080.mp4'},
+  {pro:true, name:'Forgotten Arc', res:'4K', src:'assets/backgrounds/beneath-the-forgotten-arc_3840x2160.mp4'},
+  {pro:true, name:'Serene Girl', res:'4K', src:'assets/backgrounds/serene-anime-girl_3840x2160.mp4'},
+  {pro:true, name:'Itachi', res:'4K', src:'assets/backgrounds/itachi-uchiha_3840x2160.mp4'},
+  {pro:true, name:"Witcher's Path", res:'4K', src:'assets/backgrounds/the-witchers-path_3840x2160.mp4'},
+  {pro:true, name:'Columbina', res:'4K', src:'assets/backgrounds/columbina-lunar-ascension_3840x2160.mp4'},
+  {pro:true, name:'Void King', res:'1080p', src:'assets/backgrounds/void-king-ascension_1920x1080.mp4'},
+  {pro:true, name:'Serious Girl', res:'4K', src:'assets/backgrounds/serious-girl_3840x2160.mp4'},
+  {pro:true, name:'Forgotten Path', res:'4K', src:'assets/backgrounds/forgotten-path_3840x2160.mp4'},
+  {pro:true, name:'Shadow Cut', res:'4K', src:'assets/backgrounds/shadow-cut-reverie_3840x2160.mp4'},
+  {pro:true, name:'Beach at Night', res:'1080p', src:'assets/backgrounds/girl-on-the-beach-at-night_1920x1080.mp4'},
+  {pro:true, name:'BMW M4 Liberty', res:'4K', src:'assets/backgrounds/bmw-m4-liberty_3840x2160.mp4'},
+  {pro:true, name:'Toyota Drift', res:'4K', src:'assets/backgrounds/white-toyota-drifting_3840x2160.mp4'},
+  {pro:true, name:'Blooming Meadow', res:'4K', src:'assets/backgrounds/meadow-with-blooming-flowers_3840x2160.mp4'},
+  {pro:true, name:'Levi Ackerman', res:'4K', src:'assets/backgrounds/levi-ackerman-dark_3840x2160.mp4'},
+  {pro:true, name:'BMW M5 Dark', res:'4K', src:'assets/backgrounds/bmw-m5-in-dark_3840x2160.mp4'},
+  {pro:true, name:'Angewomon', res:'4K', src:'assets/backgrounds/angewomon-digimon_3840x2160.mp4'},
+  {pro:true, name:'Rengoku', res:'4K', src:'assets/backgrounds/rengoku-dawn-in-flames_3840x2160.mp4'},
+  {pro:true, name:'Suisui', res:'4K', src:'assets/backgrounds/suisui-wuthering-waves_3840x2160.mp4'},
+  {pro:true, name:'Bikini Girls', res:'4K', src:'assets/backgrounds/anime-bikini-girls_3840x2160.mp4'},
+  {pro:true, name:'Mountain Flowers', res:'4K', src:'assets/backgrounds/mountains-with-flowers_3840x2160.mp4'},
+  {pro:true, name:'The Last of Us', res:'4K', src:'assets/backgrounds/surviving-the-last-of-us_3840x2160.mp4'},
+  {pro:true, name:'End of Summer', res:'4K', src:'assets/backgrounds/the-end-of-summer_3840x2160.mp4'}
 ];
 
 function toast(msg, icon='✨'){ const t=document.createElement('div'); t.className='toast'; t.innerHTML=`<span>${icon}</span><span>${esc(msg)}</span>`; $('#toasts').appendChild(t); setTimeout(()=>{t.style.opacity='0';t.style.transition='.4s';setTimeout(()=>t.remove(),400)},2600); }
@@ -799,11 +799,13 @@ function renderEditorTab(){
       $('#upBg').onclick = ()=>pickUpload('background', url=>{ t.bgImage=url; saveProfile(); renderEditorTab(); });
     }
     if(t.bgType==='video'){
-      extra.innerHTML = field('Video presets — full original quality', `<div class="vidgrid">${BG_VIDEOS.map((v,i)=>`
+      const vidCard = (v,i)=>`
         <div class="vidcard ${t.bgVideo===v.src?'on':''}" data-vid="${i}">
           <video src="${v.src}" poster="${posterFor(v.src)}" muted loop playsinline preload="none"></video>
           <div class="vidname">${v.name}<span class="vidres">${v.res}</span></div>
-        </div>`).join('')}</div>`)
+        </div>`;
+      extra.innerHTML = field('Featured videos', `<div class="vidgrid">${BG_VIDEOS.map((v,i)=>v.pro?'':vidCard(v,i)).join('')}</div>`)
+      + field('✦ Pro collection', `<div class="vidgrid">${BG_VIDEOS.map((v,i)=>v.pro?vidCard(v,i):'').join('')}</div>`)
       + field('Or your own (mp4/webm)', `<div class="filedrop" id="upVid">Upload video</div><input id="bgVid" value="${esc(t.bgVideo||'')}" placeholder="https://....mp4" style="margin-top:8px">`);
       extra.querySelectorAll('[data-vid]').forEach(c=>{
         const vid = c.querySelector('video');
