@@ -15,12 +15,6 @@ A link-in-bio platform with animated 4K video backgrounds, a liquid-glass profil
 - View, like, and per-link click tracking
 - Misty Pro subscription via Stripe
 
-## Stack
-
-Vanilla JS · Firebase (Auth + Firestore) · Stripe · Cloudflare Workers · GitHub Pages
-
-No build step. No frameworks. Edit a file, push, done.
-
 ## Structure
 
 ```
@@ -28,14 +22,7 @@ index.html          app shell
 app.js              the whole app
 style.css           the whole style
 404.html            SPA routing for GitHub Pages
-assets/backgrounds/ video backgrounds (all under 25MB)
+assets/backgrounds/ video backgrounds
 assets/posters/     one poster jpg per video
-make-posters.bat    regenerates posters (needs ffmpeg)
 ```
 
-## Adding a background video
-
-1. Drop the mp4 into `assets/backgrounds/` (keep it under 25MB)
-2. Add an entry to `BG_VIDEOS` in `app.js`
-3. Run `make-posters.bat`
-4. Push
