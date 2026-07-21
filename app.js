@@ -82,10 +82,10 @@ const PRESETS = [
 // 17px corner radius. Each preset keeps its own background/accent colors
 // so they're still distinguishable as separate themes.
 function applyBiaChrome(themeObj){
-  themeObj.btnStyle = 'bia';
-  themeObj.font = 'chillax';
-  themeObj.cursorStyle = 'bia';
-  themeObj.radius = 17;
+  themeObj.btnStyle = themeObj.btnStyle || 'bia';
+  themeObj.font = themeObj.font || 'chillax';
+  themeObj.cursorStyle = themeObj.cursorStyle || 'bia';
+  themeObj.radius = themeObj.radius ?? 17;
   return themeObj;
 }
 PRESETS.forEach(p=>applyBiaChrome(p.t));
@@ -315,7 +315,7 @@ function navHTML(active){
 function avatarFor(name){ return `https://api.dicebear.com/9.x/shapes/svg?seed=${encodeURIComponent(name||'misty')}`; }
 
 function miniLinkStyle(t, small){
-  const r = t.btnStyle==='icons'? '50%' : Math.min(t.radius, small?12:13)+'px';
+  const r = t.btnStyle==='icons'? '50%' : Math.min(t.radius??16, small?12:13)+'px';
   const fill = t.btnStyle==='solid'? `background:${t.accent}`
     : t.btnStyle==='outline'? `border:1.5px solid ${t.accent}`
     : t.btnStyle==='bia'? `background:linear-gradient(90deg,#3399c06b,#3365c04a);border:1px solid #2d5db18f`
@@ -675,16 +675,46 @@ async function renderDashboard(){
 
 function markSaving(){ $('#saveDot')?.classList.add('saving'); if($('#saveTxt')) $('#saveTxt').textContent='Saving…'; }
 function markSaved(){ $('#saveDot')?.classList.remove('saving'); if($('#saveTxt')) $('#saveTxt').textContent='Saved'; }
+const EDITABLE_FIELDS = ['displayName','status','bio','location','avatar','banner','theme','links','widgets'];
 const pushProfile = debounce(async ()=>{
-  try{ await updateDoc(doc(db,'profiles',MYDOC.username), MYPROFILE); markSaved(); }
+  try{
+    const patch = {};
+    EDITABLE_FIELDS.forEach(k=>{ if(MYPROFILE[k]!==undefined) patch[k]=MYPROFILE[k]; });
+    await updateDoc(doc(db,'profiles',MYDOC.username), patch);
+    // keep the users doc (navbar avatar, admin list, etc) in sync
+    const sync = {};
+    if(MYPROFILE.avatar!==MYDOC.avatar) sync.avatar = MYPROFILE.avatar||'';
+    if(MYPROFILE.displayName!==MYDOC.displayName) sync.displayName = MYPROFILE.displayName||MYDOC.username;
+    if(Object.keys(sync).length){
+      await updateDoc(doc(db,'users',ME.uid), sync);
+      Object.assign(MYDOC, sync);
+      const mini = document.querySelector('.avatar-mini');
+      if(mini) mini.src = MYDOC.avatar||avatarFor(MYDOC.username);
+    }
+    markSaved();
+  }
   catch(e){ toast('Save failed: '+cleanErr(e),'⚠️'); }
 }, 700);
-function saveProfile(){ markSaving(); renderPreview(); pushProfile(); }
+const previewSoon = debounce(renderPreview, 200);
+function saveProfile(){ markSaving(); previewSoon(); pushProfile(); }
 
 function renderPreview(){
   const f = $('#previewFrame'); if(!f) return;
+  // keep the already-buffered background video alive across re-renders so
+  // edits don't restart a 100MB+ download on every keystroke
+  const oldVid = f.querySelector('video.bia-media');
   f.innerHTML = profileHTML(MYPROFILE, {preview:true});
+  const newVid = f.querySelector('video.bia-media');
+  if(oldVid && newVid && oldVid.getAttribute('src')===newVid.getAttribute('src')){
+    newVid.replaceWith(oldVid);
+    oldVid.play().catch(()=>{});
+  }
   wireProfileFx(f, MYPROFILE, {preview:true});
+}
+// live-update a CSS variable on the preview without a full re-render (for sliders)
+function previewVar(name, val){
+  const st = document.querySelector('#previewFrame .pp-stage');
+  if(st) st.style.setProperty(name, val);
 }
 
 function field(lbl, html){ return `<label>${lbl}</label>${html}`; }
@@ -719,8 +749,8 @@ function renderEditorTab(){
     $('#eStatus').oninput = e=>{ p.status=e.target.value; saveProfile(); };
     $('#eBio').oninput = e=>{ p.bio=e.target.value; saveProfile(); };
     $('#eLoc').oninput = e=>{ p.location=e.target.value; saveProfile(); };
-    $('#eAv').onchange = e=>{ p.avatar=safeUrl(e.target.value); saveProfile(); };
-    $('#eBan').onchange = e=>{ p.banner=safeUrl(e.target.value); saveProfile(); };
+    $('#eAv').oninput = e=>{ const u=safeUrl(e.target.value); if(u || !e.target.value.trim()){ p.avatar=u; saveProfile(); } };
+    $('#eBan').oninput = e=>{ const u=safeUrl(e.target.value); if(u || !e.target.value.trim()){ p.banner=u; saveProfile(); } };
     $('#upAv').onclick = ()=>pickUpload('avatar', url=>{ p.avatar=url; $('#eAv').value=url; saveProfile(); });
     $('#upBan').onclick = ()=>pickUpload('banner', url=>{ p.banner=url; $('#eBan').value=url; saveProfile(); });
   }
@@ -738,8 +768,8 @@ function renderEditorTab(){
       ${field('Font', `<div class="optrow">${Object.keys(FONTS).map(f=>`<button class="opt ${t.font===f?'on':''}" data-font="${f}" style="font-family:${FONTS[f]}">${FONT_NAMES[f]}</button>`).join('')}</div>`)}
       ${field('Button style', `<div class="optrow">${['glass','outline','solid','icons','bia'].map(s=>`<button class="opt ${t.btnStyle===s?'on':''}" data-bs="${s}">${s==='bia'?'Frost':s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</div>`)}
       ${field('Corner radius', `<input id="eRad" type="range" min="0" max="28" value="${t.radius??16}">`)}
-      ${field('Card opacity', `<input id="eCo" type="range" min="0" max="100" value="${t.cardOpacity??100}"><div class="hint">Slide to 0 for a fully transparent card — your content floats on the background.</div>`)}
-      ${field('Card blur', `<input id="eCb" type="range" min="0" max="40" value="${t.cardBlur??28}">`)}
+      ${field('Card opacity', `<input id="eCo" type="range" min="0" max="100" value="${t.cardOpacity??0}"><div class="hint">Slide to 0 for a fully transparent card — your content floats on the background.</div>`)}
+      ${field('Card blur', `<input id="eCb" type="range" min="0" max="40" value="${t.cardBlur??5}">`)}
       ${field('Name effect', `<div class="optrow">${[['none','None'],['glow','✨ Glow'],['neon','💡 Neon pulse'],['rainbow','🌈 Rainbow']].map(([k,l])=>`<button class="opt ${(t.nameFx||'none')===k?'on':''}" data-nf="${k}">${l}</button>`).join('')}</div>`)}
       ${field('Cursor', `<div class="optrow">${[['default','Default'],['dot','◉ Dot'],['cross','＋ Crosshair'],['bia','🖼 Frost']].map(([k,l])=>`<button class="opt ${(t.cursorStyle||'default')===k?'on':''}" data-cs="${k}">${l}</button>`).join('')}</div>`)}
       ${field('Effects', `<div class="optrow">
@@ -769,9 +799,9 @@ function renderEditorTab(){
     body.querySelectorAll('[data-tc]').forEach(b=>b.onclick=()=>{ t.textColor=b.dataset.tc; saveProfile(); renderEditorTab(); });
     body.querySelectorAll('[data-font]').forEach(b=>b.onclick=()=>{ t.font=b.dataset.font; saveProfile(); renderEditorTab(); });
     body.querySelectorAll('[data-bs]').forEach(b=>b.onclick=()=>{ t.btnStyle=b.dataset.bs; saveProfile(); renderEditorTab(); });
-    $('#eRad').oninput = e=>{ t.radius=+e.target.value; saveProfile(); };
-    $('#eCo').oninput = e=>{ t.cardOpacity=+e.target.value; saveProfile(); };
-    $('#eCb').oninput = e=>{ t.cardBlur=+e.target.value; saveProfile(); };
+    $('#eRad').oninput = e=>{ t.radius=+e.target.value; previewVar('--pr', t.radius+'px'); markSaving(); pushProfile(); };
+    $('#eCo').oninput = e=>{ t.cardOpacity=+e.target.value; previewVar('--cop', t.cardOpacity/100); markSaving(); pushProfile(); };
+    $('#eCb').oninput = e=>{ t.cardBlur=+e.target.value; previewVar('--cbl', t.cardBlur+'px'); markSaving(); pushProfile(); };
     body.querySelectorAll('[data-nf]').forEach(b=>b.onclick=()=>{ t.nameFx=b.dataset.nf; saveProfile(); renderEditorTab(); });
     body.querySelectorAll('[data-cs]').forEach(b=>b.onclick=()=>{ t.cursorStyle=b.dataset.cs; saveProfile(); renderEditorTab(); });
     $('#fxGlow').onclick = ()=>{ t.glow=!t.glow; saveProfile(); renderEditorTab(); };
@@ -1084,7 +1114,7 @@ function bgStyle(t){
   if(t.bgType==='solid') return `background:radial-gradient(130% 85% at 50% -22%,color-mix(in srgb,${a} 70%,#fff 30%) 0%,transparent 56%),radial-gradient(150% 100% at 50% 120%,color-mix(in srgb,${a} 50%,#000 50%) 0%,transparent 62%),${a}`;
   if(t.bgType==='gradient') return `background:radial-gradient(115% 85% at 8% -12%,${a} 0%,transparent 58%),radial-gradient(115% 85% at 94% 114%,${b} 0%,transparent 58%),radial-gradient(65% 50% at 82% 4%,color-mix(in srgb,${b} 40%,transparent) 0%,transparent 70%),linear-gradient(165deg,color-mix(in srgb,${a} 55%,#05050d),color-mix(in srgb,${b} 48%,#04040b))`;
   if(t.bgType==='image') return `background:#07070f`;
-  if(t.bgType==='video') return `background:#000`;
+  if(t.bgType==='video') return `background:radial-gradient(115% 85% at 8% -12%,${a} 0%,transparent 58%),radial-gradient(115% 85% at 94% 114%,${b} 0%,transparent 58%),linear-gradient(165deg,color-mix(in srgb,${a} 55%,#05050d),color-mix(in srgb,${b} 48%,#04040b))`;
   if(t.bgType==='anim') return `background:#04040c`;
   return `background:radial-gradient(95% 75% at 12% -8%,${a}59 0%,transparent 60%),radial-gradient(85% 70% at 90% 18%,${b}42 0%,transparent 62%),radial-gradient(115% 85% at 50% 118%,${a}4f 0%,transparent 64%),linear-gradient(180deg,#0b0b18,#07070f)`;
 }
@@ -1116,7 +1146,7 @@ function profileHTML(p, opts={}){
   const animLayer = t.bgType==='anim'? `<div class="pp-anim anim-${esc(t.anim||'aurora')}"></div>`:'';
   const bgLayer = t.bgType==='image' && t.bgImage? `<img class="bia-media" src="${esc(t.bgImage)}" alt="">`
     : t.bgType==='video' && t.bgVideo? (opts.still && posterFor(t.bgVideo)? `<img class="bia-media" src="${esc(posterFor(t.bgVideo))}" alt="" loading="lazy" onerror="this.remove()">`
-      : `<video class="bia-media" src="${esc(t.bgVideo)}" ${posterFor(t.bgVideo)?`poster="${esc(posterFor(t.bgVideo))}"`:''} ${opts.still?'muted playsinline preload="metadata"':'autoplay muted loop playsinline preload="auto"'} disablepictureinpicture></video>`) : '';
+      : `<video class="bia-media" src="${esc(t.bgVideo)}" ${posterFor(t.bgVideo)?`poster="${esc(posterFor(t.bgVideo))}"`:''} ${opts.still?'muted playsinline preload="metadata"':'autoplay muted loop playsinline preload="auto"'} disablepictureinpicture oncanplay="this.classList.add('ready')" onerror="this.remove()"></video>`) : '';
   const partCanvas = t.particles? `<canvas class="pp-particles" style="position:absolute;inset:0;width:100%;height:100%;z-index:1"></canvas>`:'';
   const statics = t.bgType==='mist'||t.bgType==='gradient'||t.bgType==='solid';
   const orbA = t.bgType==='solid'? (t.accent||'#a78bfa') : (t.bgA||t.accent||'#a78bfa');
@@ -1149,7 +1179,7 @@ function profileHTML(p, opts={}){
   }).join('');
   const loc = (p.location||'').trim();
   const audio = t.audioUrl? safeUrl(t.audioUrl) : '';
-  return `<div class="pp-stage biav" ${t.bgType==='anim'?`data-anim="${esc(t.anim||'aurora')}"`:''} style="${bgStyle(t)};${cursorCSS(t)}color:${tc};font-family:${font};--pa:${t.accent};--btc:${tc};--pr:${Math.min(t.radius??16,18)}px">
+  return `<div class="pp-stage biav" ${t.bgType==='anim'?`data-anim="${esc(t.anim||'aurora')}"`:''} style="${bgStyle(t)};${cursorCSS(t)}color:${tc};font-family:${font};--pa:${t.accent};--btc:${tc};--pr:${t.radius??16}px;--cop:${(t.cardOpacity??0)/100};--cbl:${t.cardBlur??5}px">
     <div class="pp-bg">${animLayer}${bgLayer}${fxLayers}${partCanvas}</div>
     ${audio && !pre? `<div class="bia-volume">
       <svg class="bia-volicon" xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24" style="opacity:.7"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77"></path></svg>
