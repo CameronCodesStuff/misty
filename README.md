@@ -26,3 +26,4 @@ assets/backgrounds/ video backgrounds
 assets/posters/     one poster jpg per video
 ```
 
+[![Sponsor CameronCodesStuff](https://img.shields.io/badge/Sponsor-CameronCodesStuff-ea4aaa?logo=github)](https://github.com/sponsors/CameronCodesStuff)
